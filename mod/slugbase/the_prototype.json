@@ -8,6 +8,8 @@
 		"slugtemplate/explode_on_death": true,
 		"slugtemplate/mean_lizards": 0.8,
 
+		"title_card": "intro_roll_c_MySlugcat",
+
 		"select_menu_scene": "Slugcat_Prototype",
 		"select_menu_scene_ascended": "Ghost_Prototype"
 

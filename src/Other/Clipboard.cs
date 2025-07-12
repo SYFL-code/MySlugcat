@@ -13,6 +13,7 @@ using Watcher;
 namespace MySlugcat
 {
     // Token: 0x02000009 RID: 9
+    // 已抛弃
     public static class Clipboard
     {
         // Token: 0x04000028 RID: 40

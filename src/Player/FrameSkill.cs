@@ -19,10 +19,12 @@ using RewiredConsts;
 using Menu.Remix;
 using MonoMod.RuntimeDetour;
 using Watcher;
+using static MonoMod.InlineRT.MonoModRule;
 
 
 namespace MySlugcat
 {
+    //嫁祸
     public class Frame​​Skill
     {
         public static void Hook()
@@ -72,6 +74,193 @@ namespace MySlugcat
             }
 #endif
         }
+
+/*        public static void Object(PhysicalObject obj, Room room, WorldCoordinate pos)
+        {
+            bool flag;
+            if (obj == null)
+            {
+                flag = (null != null);
+            }
+            else
+            {
+                Room room2 = obj.room;
+                flag = (((room2 != null) ? room2.game : null) != null);
+            }
+            if (!flag || obj.abstractPhysicalObject == null)
+            {
+                return;
+            }
+            AbstractPhysicalObject abstractPhysicalObject = obj.abstractPhysicalObject;
+            if (obj is Player && (obj as Player).playerState != null)
+            {
+                try
+                {
+                    if ((obj as Player).objectInStomach is AbstractCreature)
+                    {
+                        AbstractCreature abstractCreature3 = (obj as Player).objectInStomach as AbstractCreature;
+                        AbstractCreature abstractCreature2 = (obj as Player).abstractCreature;
+                        bool flag2;
+                        if (abstractCreature2 == null)
+                        {
+                            flag2 = (null != null);
+                        }
+                        else
+                        {
+                            World world = abstractCreature2.world;
+                            flag2 = (((world != null) ? world.GetAbstractRoom(abstractCreature3.pos.room) : null) != null);
+                        }
+                        if (!flag2)
+                        {
+                            abstractCreature3.pos = (obj as Player).coord;
+                        }
+                        World world2 = abstractCreature3.world;
+                        bool flag3;
+                        if (world2 == null)
+                        {
+                            flag3 = false;
+                        }
+                        else
+                        {
+                            RainWorldGame game = world2.game;
+                            flag3 = ((game != null) ? new bool?(game.IsStorySession) : null).GetValueOrDefault();
+                        }
+                        if (flag3)
+                        {
+                            (obj as Player).playerState.swallowedItem = SaveState.AbstractCreatureToStringStoryWorld(abstractCreature3);
+                        }
+                        else
+                        {
+                            World world3 = abstractCreature3.world;
+                            bool flag4;
+                            if (world3 == null)
+                            {
+                                flag4 = false;
+                            }
+                            else
+                            {
+                                RainWorldGame game2 = world3.game;
+                                flag4 = ((game2 != null) ? new bool?(game2.IsArenaSession) : null).GetValueOrDefault();
+                            }
+                            if (flag4)
+                            {
+                                (obj as Player).playerState.swallowedItem = SaveState.AbstractCreatureToStringSingleRoomWorld(abstractCreature3);
+                            }
+                            else
+                            {
+                                Plugin.Logger.LogWarning("Clipboard.CutObject, could not store swallowed creature");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        PlayerState playerState = (obj as Player).playerState;
+                        AbstractPhysicalObject objectInStomach = (obj as Player).objectInStomach;
+                        playerState.swallowedItem = ((objectInStomach != null) ? objectInStomach.ToString() : null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Logger.LogWarning("Clipboard.CutObject exception: " + ((ex != null) ? ex.ToString() : null));
+                }
+            }
+            if (obj != null)
+            {
+                obj.RemoveFromRoom();
+            }
+            if (obj != null)
+            {
+                AbstractPhysicalObject abstractPhysicalObject2 = obj.abstractPhysicalObject;
+                if (abstractPhysicalObject2 != null)
+                {
+                    AbstractRoom room2 = abstractPhysicalObject2.Room;
+                    if (room2 != null)
+                    {
+                        room2.RemoveEntity(obj.abstractPhysicalObject);
+                    }
+                }
+            }
+            if (!(obj is Player) && obj != null)
+            {
+                obj.Destroy();
+            }
+
+            if (((room != null) ? room.world : null) == null || ((room != null) ? room.abstractRoom : null) == null)
+            {
+                return;
+            }
+
+            if (abstractPhysicalObject == null)
+            {
+                return;
+            }
+            abstractPhysicalObject.pos = pos;
+            abstractPhysicalObject.world = room.world;
+            AbstractCreature abstractCreature = abstractPhysicalObject as AbstractCreature;
+            if (abstractCreature != null)
+            {
+                AbstractCreatureAI abstractAI = abstractCreature.abstractAI;
+                if (abstractAI != null)
+                {
+                    abstractAI.NewWorld(room.world);
+                }
+            }
+            if (abstractPhysicalObject is AbstractCreature)
+            {
+                abstractPhysicalObject.Abstractize(pos);
+            }
+            if (abstractPhysicalObject.realizedObject != null)
+            {
+                abstractPhysicalObject.realizedObject.slatedForDeletetion = false;
+                abstractPhysicalObject.realizedObject.room = room;
+            }
+            room.abstractRoom.AddEntity(abstractPhysicalObject);
+            abstractPhysicalObject.RealizeInRoom();
+            if (abstractPhysicalObject.realizedObject is Player)
+            {
+                try
+                {
+                    PlayerState playerState = (abstractPhysicalObject.realizedObject as Player).playerState;
+                    if (string.IsNullOrEmpty((playerState != null) ? playerState.swallowedItem : null))
+                    {
+                        (abstractPhysicalObject.realizedObject as Player).objectInStomach = null;
+                    }
+                    else
+                    {
+                        AbstractPhysicalObject abstractPhysicalObject2 = null;
+                        string text = (abstractPhysicalObject.realizedObject as Player).playerState.swallowedItem;
+                        if (text.Contains("<oA>"))
+                        {
+                            abstractPhysicalObject2 = SaveState.AbstractPhysicalObjectFromString(abstractPhysicalObject.world, text);
+                        }
+                        else if (text.Contains("<cA>"))
+                        {
+                            string[] array = text.Split(new string[]
+                            {
+                                "<cA>"
+                            }, StringSplitOptions.None);
+                            text = text.Replace(array[2], string.Format(CultureInfo.InvariantCulture, "{0}.{1}", pos.ResolveRoomName() ?? pos.room.ToString(), pos.abstractNode));
+                            abstractPhysicalObject2 = SaveState.AbstractCreatureFromString(abstractPhysicalObject.world, text, false, default(WorldCoordinate));
+                        }
+                        if (abstractPhysicalObject2 != null)
+                        {
+                            abstractPhysicalObject2.pos = abstractPhysicalObject.pos;
+                        }
+                        (abstractPhysicalObject.realizedObject as Player).objectInStomach = abstractPhysicalObject2;
+                        if (abstractPhysicalObject2 == null && !string.IsNullOrEmpty(text))
+                        {
+                            Plugin.Logger.LogWarning("Clipboard.PasteObject, swallowedItem string available but objectInStomach became null");
+                        }
+                        (abstractPhysicalObject.realizedObject as Player).playerState.swallowedItem = "";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Logger.LogWarning("Clipboard.PasteObject exception: " + ((ex != null) ? ex.ToString() : null));
+                }
+            }
+
+        }*/
 
         //#nullable enable
 
@@ -152,11 +341,22 @@ namespace MySlugcat
                 //***
                 //new CommandBuilder("md_pause_all").Help("md_pause_all [types] [action]").RunGame(delegate(RainWorldGame game, string[] args)
 
-                Room selfroom = self.room;
-                Room creatureroom = creature.room;
-                WorldCoordinate selfpos = self.abstractPhysicalObject.pos;
-                WorldCoordinate creaturepos = creature.abstractPhysicalObject.pos;
-                Console.WriteLine("MySlugcat:st");
+                //Room selfroom = self.room;
+                //Room creatureroom = creature.room;
+                //WorldCoordinate selfpos = self.abstractPhysicalObject.pos;
+                //WorldCoordinate creaturepos = creature.abstractPhysicalObject.pos;
+
+                Vector2 selfpos = self.mainBodyChunk.pos;
+                Vector2 creaturepos = creature.mainBodyChunk.pos;
+
+                Teleport.SetObjectPosition(creature, selfpos);
+                Teleport.SetObjectPosition(self, creaturepos);
+
+
+                //Object(self, creatureroom, creaturepos);
+                //Object(creature, selfroom, selfpos);
+
+/*                Console.WriteLine("MySlugcat:st");
                 Clipboard.CutObject(creature);
                 Console.WriteLine($"MySlugcat:CutObject_C {Clipboard.cutObjects}");
                 Clipboard.CutObject(self);
@@ -165,7 +365,7 @@ namespace MySlugcat
                 Console.WriteLine($"MySlugcat:PasteObject_P {Clipboard.cutObjects}");
                 Clipboard.PasteObject(creatureroom, selfpos);
                 Console.WriteLine($"MySlugcat:PasteObject_C {Clipboard.cutObjects}");
-                Console.WriteLine("sh");
+                Console.WriteLine("sh");*/
                 //return;
 
                 //self.bodyChunks[0].pos = (new Vector2(CV0.X, CV0.Y) + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);

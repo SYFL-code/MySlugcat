@@ -587,6 +587,7 @@ namespace MySlugcat
                 if (obj != null)
                 {
                     self.dead = false;
+                    self.stun = 0;
                     //obj.Die();
                     var hs = obj.State as HealthState;
                     if (hs != null)
@@ -657,9 +658,17 @@ namespace MySlugcat
             if (obj != null)
             {
                 result.obj = obj;
+                self.stun = 0;
             }
 
-            return orig.Invoke(bomb, result, eu);
+            bool resultbool = orig.Invoke(bomb, result, eu);
+
+            if (obj != null)
+            {
+                self.stun = 0;
+            }
+
+            return resultbool;
         }
 
         private static void Creature_Violence(On.Creature.orig_Violence orig, Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)

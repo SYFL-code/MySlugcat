@@ -86,6 +86,7 @@ namespace MySlugcat
 #endif
             orig.Invoke(self);
             //加载设置菜单
+
             /*MachineConnector.SetRegisteredOI(MOD_ID, MyOption.Instance);*/ //***
             //加载玩家皮肤贴图
             //MyPlayerGraphics.HookTexture();

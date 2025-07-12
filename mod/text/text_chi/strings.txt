@@ -1,0 +1,10 @@
+General 1|通用设置1
+General 2|通用设置2
+Tools 1|工具1
+Tools 2|工具2
+Tool Settings|工具设置
+
+Useful for debugging if you share your log files.|分享你的日志文件可以方便排查错误。
+Log debug|错误日志
+Creates an exact copy of the previous object when duplicating.|复制时创建前一个对象的精确副本。
+Copy ID duplicate|复制 ID

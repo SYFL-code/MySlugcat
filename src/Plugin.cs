@@ -47,6 +47,9 @@ namespace MySlugcat
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             //玩家能力
             MyPlayer.Hook();
+            Frame​​Skill.Hook();
+
+            Intros.Hook();
             //玩家图像
             //MyPlayerGraphics.Hook();
             //游戏内容设置
@@ -150,9 +153,9 @@ namespace MySlugcat
         // Implement ExlodeOnDeath-实现死亡自爆效果
         private void Player_Die(On.Player.orig_Die orig, Player self)
         {
-            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
+/*            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
             {
-                Creature obj = MyPlayer.Frame(self, false, self, 12);
+                Creature obj = Frame​​Skill.Frame(self, false, self, 12);
                 if (obj != null)
                 {
                     self.dead = false;
@@ -171,7 +174,7 @@ namespace MySlugcat
             else
             {
                 orig(self);
-            }
+            }*/
 
             bool wasDead = self.dead;
             //布尔值wasDead判断玩家是否死亡

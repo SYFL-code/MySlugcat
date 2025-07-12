@@ -170,7 +170,7 @@ namespace MySlugcat
                 //或许没那么累 在自身位置生成冲击波效果 大小330 强度0.045 时长5 false表示绘制顺序（绘制到HUD图层，True就是HUD2
                 //self.slugcatStats.runspeedFac = 1.75f;
 
-                Creature creature = RandomlySelectedCreature(self.room, false, self);
+                Creature creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
                 {
                     for (int i = 0; i < 13; i++)
@@ -248,7 +248,11 @@ namespace MySlugcat
         // 禁用的生物
         public static bool DisabledCreature(Creature creature)
         {
-            if (creature == null || creature is SandGrub)
+            if (creature == null || creature is Fly || creature is SandGrub || creature is TentaclePlant ||
+                creature is Leech || creature is BigEel || creature is DaddyLongLegs || creature is Overseer ||
+                creature is GarbageWorm || creature is Deer || creature is Inspector || creature is PoleMimic ||
+                creature is BigJellyFish || creature is StowawayBug || creature is Loach || creature is Frog ||
+                creature is SkyWhale || creature is BoxWorm || creature is FireSprite || creature is DrillCrab)
             {
                 return true;
             }
@@ -256,7 +260,7 @@ namespace MySlugcat
         }
 
         // 查找当前房间中距离自身最近的生物
-        public static Creature FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature)
+        public static Creature FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
 #if MYDEBUG
             try
@@ -288,6 +292,10 @@ namespace MySlugcat
                     continue; // 跳过无效项，继续检查下一个
                 }
                 if (DisabledCreature(c))// 禁用生物
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                if (c.dead == true && !IncludeDeadCreature)// 死亡的生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
@@ -324,7 +332,7 @@ namespace MySlugcat
         }
 
         // 随机查找当前房间的生物
-        public static Creature RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature)
+        public static Creature RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
 #if MYDEBUG
             try
@@ -356,6 +364,10 @@ namespace MySlugcat
                     continue; // 跳过无效项，继续检查下一个
                 }
                 if (DisabledCreature(c))// 禁用生物
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                if (c.dead == true && !IncludeDeadCreature)// 死亡的生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }

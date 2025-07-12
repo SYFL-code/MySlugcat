@@ -270,7 +270,7 @@ namespace MySlugcat
             try
             {
 #endif
-            Creature creature = MyPlayer.RandomlySelectedCreature(self.room, false, self);
+            Creature creature = MyPlayer.RandomlySelectedCreature(self.room, false, self, false);
             int percentage = 40;
             if (probability == -1)
             {
@@ -349,8 +349,11 @@ namespace MySlugcat
                 Vector2 selfpos = self.mainBodyChunk.pos;
                 Vector2 creaturepos = creature.mainBodyChunk.pos;
 
+                Console.WriteLine("MySlugcat:st");
                 Teleport.SetObjectPosition(creature, selfpos);
+                Console.WriteLine("MySlugcat:zh");
                 Teleport.SetObjectPosition(self, creaturepos);
+                Console.WriteLine("MySlugcat:sh");
 
 
                 //Object(self, creatureroom, creaturepos);

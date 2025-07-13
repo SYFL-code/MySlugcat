@@ -170,6 +170,14 @@ namespace MySlugcat
                 //或许没那么累 在自身位置生成冲击波效果 大小330 强度0.045 时长5 false表示绘制顺序（绘制到HUD图层，True就是HUD2
                 //self.slugcatStats.runspeedFac = 1.75f;
 
+                StackTrace st = new StackTrace(new StackFrame(true));
+                StackFrame sf = st.GetFrame(0);
+                var sr = sf.GetFileName().Split('\\');
+                MyDebug.outStr = sr[sr.Length - 1] + "\n";
+                MyDebug.outStr += sf.GetMethod() + "\n";
+                MyDebug.outStr += "MySlugcat:wewe";
+                Console.WriteLine("MySlugcat:wewe");
+
                 Creature creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
                 {
@@ -385,6 +393,11 @@ namespace MySlugcat
                                     minSqrDistance = sqrDistance;
                                     nearest = c;
                                 }*/
+            }
+            if (creatures.Count == 0)
+            {
+                Console.WriteLine("MySlugcat:RandomlySelectedCreature: No valid creatures found");
+                return null;
             }
             return creatures[UnityEngine.Random.Range(0, creatures.Count)];
             //return nearest; // 返回最近生物（可能为null）

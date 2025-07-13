@@ -1,4 +1,4 @@
-﻿using BepInEx.Logging;
+﻿/*using BepInEx.Logging;
 using MySlugcat;
 using System;
 using System.Collections.Generic;
@@ -182,7 +182,7 @@ namespace MySlugcat
                 abstractPhysicalObject.realizedObject.slatedForDeletetion = false;
                 abstractPhysicalObject.realizedObject.room = room;
             }
-/*            if (abstractPhysicalObject.realizedObject is Oracle)
+*//*            if (abstractPhysicalObject.realizedObject is Oracle)
             {
                 Oracle oracle = abstractPhysicalObject.realizedObject as Oracle;
                 if (oracle.myScreen != null)
@@ -199,7 +199,7 @@ namespace MySlugcat
                         oracleBehavior.player = (((firstAlivePlayer2 != null) ? firstAlivePlayer2.realizedCreature : null) as Player);
                     }
                 }
-            }*/
+            }*//*
             room.abstractRoom.AddEntity(abstractPhysicalObject);
             abstractPhysicalObject.RealizeInRoom();
             if (abstractPhysicalObject.realizedObject is Player)
@@ -245,10 +245,10 @@ namespace MySlugcat
                     Plugin.Logger.LogWarning("Clipboard.PasteObject exception: " + ((ex != null) ? ex.ToString() : null));
                 }
             }
-/*            if (abstractPhysicalObject.realizedObject is SandGrub)
+*//*            if (abstractPhysicalObject.realizedObject is SandGrub)
             {
                 Duplicate.BigSandGrubPostRealization(abstractPhysicalObject.realizedObject as SandGrub);
-            }*/
+            }*//*
         }
 
         public static PhysicalObject DuplicateObject(PhysicalObject obj)
@@ -381,10 +381,10 @@ namespace MySlugcat
             }
             obj.room.abstractRoom.AddEntity(abstractPhysicalObject3);
             abstractPhysicalObject3.RealizeInRoom();
-/*            if (abstractPhysicalObject3.realizedObject is SandGrub)
+*//*            if (abstractPhysicalObject3.realizedObject is SandGrub)
             {
                 Duplicate.BigSandGrubPostRealization(abstractPhysicalObject3.realizedObject as SandGrub);
-            }*/
+            }*//*
             return abstractPhysicalObject3.realizedObject;
         }
 
@@ -487,4 +487,4 @@ namespace MySlugcat
 
 
     }
-}
+}*/

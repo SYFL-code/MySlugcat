@@ -37,7 +37,7 @@ namespace MySlugcat
             // Put your custom hooks here!-在此放置你自己的钩子
             //On.Player.Jump += Player_Jump;
             //在玩家触发跳跃时执行Player_Jump
-            On.Player.Die += Player_Die;
+            //On.Player.Die += Player_Die;
             //On.Lizard.ctor += Lizard_ctor;
             //On.Player.Update += Player_Update;
 
@@ -153,9 +153,9 @@ namespace MySlugcat
         }
 
         // Implement ExlodeOnDeath-实现死亡自爆效果
-        private void Player_Die(On.Player.orig_Die orig, Player self)
+/*        private void Player_Die(On.Player.orig_Die orig, Player self)
         {
-/*            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
+            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
             {
                 Creature obj = Frame​​Skill.Frame(self, false, self, 12);
                 if (obj != null)
@@ -176,12 +176,12 @@ namespace MySlugcat
             else
             {
                 orig(self);
-            }*/
+            }
 
             bool wasDead = self.dead;
             //布尔值wasDead判断玩家是否死亡
 
-            ///orig(self);
+            /orig(self);
 
             //if(!wasDead && self.dead
             //    && ExplodeOnDeath.TryGet(self, out bool explode)
@@ -216,6 +216,6 @@ namespace MySlugcat
                 room.InGameNoise(new Noise.InGameNoise(pos, 9000f, self, 1f));
                 //游戏内噪声效果
             }
-        }
+        }*/
     }
 }

@@ -39,7 +39,11 @@ namespace MySlugcat
 
             On.Spear.HitSomething += Spear_HitSomething;
             On.Rock.HitSomething += Rock_HitSomething;
+            On.PuffBall.HitSomething += PuffBall_HitSomething;
+            On.FlareBomb.HitSomething += FlareBomb_HitSomething;
+            On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
             //On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
+            On.Player.Die += Player_Die;
 
 #if MYDEBUG
             }
@@ -160,21 +164,22 @@ namespace MySlugcat
 
         private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (result.obj == null)
+            if (spear.thrownBy == null)
             {
-                return false;
+                return orig.Invoke(spear, result, eu);
             }
             //如果被命中的不是玩家
-            if (result.obj is not Player self)
+            if (spear.thrownBy is not Player self)
                 return orig.Invoke(spear, result, eu);
             //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(spear, result, eu);
 
             bool obj = orig.Invoke(spear, result, eu);
+            //if (26 > UnityEngine.Random.Range(0, 100))
             if (80 > UnityEngine.Random.Range(0, 100))
             {
-                Explode(spear, result.chunk, spear.thrownBy);
+                Explode(spear, result.chunk, self);
                 //spear.abstractPhysicalObject.stuckObjects[0].Deactivate();
                 //ScavengerBomb.Explode(result.chunk);
                 //public void Explode(BodyChunk hitChunk)
@@ -185,17 +190,22 @@ namespace MySlugcat
 
         private static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock rock, SharedPhysics.CollisionResult result, bool eu)
         {
+            if (rock.thrownBy == null)
+            {
+                return orig.Invoke(rock, result, eu);
+            }
             //如果被命中的不是玩家
-            if (result.obj is not Player self)
+            if (rock.thrownBy is not Player self)
                 return orig.Invoke(rock, result, eu);
             //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(rock, result, eu);
 
             bool obj = orig.Invoke(rock, result, eu);
+            //if (26 > UnityEngine.Random.Range(0, 100))
             if (80 > UnityEngine.Random.Range(0, 100))
             {
-                Explode(rock, result.chunk, rock.thrownBy);
+                Explode(rock, result.chunk, self);
                 rock.Destroy();
                 return true;
                 //spear.abstractPhysicalObject.stuckObjects[0].Deactivate();
@@ -205,6 +215,102 @@ namespace MySlugcat
             return obj;
         }
 
+        private static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck lillyPuck, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (lillyPuck.thrownBy == null)
+            {
+                return orig.Invoke(lillyPuck, result, eu);
+            }
+            //如果被命中的不是玩家
+            if (lillyPuck.thrownBy is not Player self)
+                return orig.Invoke(lillyPuck, result, eu);
+            //如果玩家不是MySlugcat则运行原程序
+            if (self.slugcatStats.name != Plugin.YourSlugID)
+                return orig.Invoke(lillyPuck, result, eu);
+
+            bool obj = orig.Invoke(lillyPuck, result, eu);
+            if (35 > UnityEngine.Random.Range(0, 100))
+            {
+                Explode(lillyPuck, result.chunk, self);
+                lillyPuck.Destroy();
+                return true;
+                //lillyPuck.abstractPhysicalObject.stuckObjects[0].Deactivate();
+                //ScavengerBomb.Explode(result.chunk);
+                //public void Explode(BodyChunk hitChunk)
+            }
+
+            return obj;
+        }
+
+        private static bool PuffBall_HitSomething(On.PuffBall.orig_HitSomething orig, PuffBall puffBall, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (puffBall.thrownBy == null)
+            {
+                return orig.Invoke(puffBall, result, eu);
+            }
+            //如果被命中的不是玩家
+            if (puffBall.thrownBy is not Player self)
+                return orig.Invoke(puffBall, result, eu);
+            //如果玩家不是MySlugcat则运行原程序
+            if (self.slugcatStats.name != Plugin.YourSlugID)
+                return orig.Invoke(puffBall, result, eu);
+
+            bool obj = orig.Invoke(puffBall, result, eu);
+            if (20 > UnityEngine.Random.Range(0, 100))
+            {
+                Explode(puffBall, result.chunk, self);
+                //puffBall.abstractPhysicalObject.stuckObjects[0].Deactivate();
+                //ScavengerBomb.Explode(result.chunk);
+                //public void Explode(BodyChunk hitChunk)
+            }
+
+            return obj;
+        }
+
+        private static bool FlareBomb_HitSomething(On.FlareBomb.orig_HitSomething orig, FlareBomb flareBomb, SharedPhysics.CollisionResult result, bool eu)
+        {
+            if (flareBomb.thrownBy == null)
+            {
+                return orig.Invoke(flareBomb, result, eu);
+            }
+            //如果被命中的不是玩家
+            if (flareBomb.thrownBy is not Player self)
+                return orig.Invoke(flareBomb, result, eu);
+            //如果玩家不是MySlugcat则运行原程序
+            if (self.slugcatStats.name != Plugin.YourSlugID)
+                return orig.Invoke(flareBomb, result, eu);
+
+            bool obj = orig.Invoke(flareBomb, result, eu);
+            if (18 > UnityEngine.Random.Range(0, 100))
+            {
+                Explode(flareBomb, result.chunk, self);
+                //puffBall.abstractPhysicalObject.stuckObjects[0].Deactivate();
+                //ScavengerBomb.Explode(result.chunk);
+                //public void Explode(BodyChunk hitChunk)
+            }
+
+            return obj;
+        }
+
+        private static void Player_Die(On.Player.orig_Die orig, Player self)
+        {
+            bool wasDead = self.dead;
+            //布尔值wasDead判断玩家是否死亡
+
+            orig(self);
+
+            if (self.slugcatStats.name == Plugin.YourSlugID && !wasDead && self.dead)
+            {
+                if (100 > UnityEngine.Random.Range(0, 100))
+                {
+                    Explode(self, null, self);
+                    //puffBall.abstractPhysicalObject.stuckObjects[0].Deactivate();
+                    //ScavengerBomb.Explode(result.chunk);
+                    //public void Explode(BodyChunk hitChunk)
+                }
+            }
+
+        }
 
     }
 }

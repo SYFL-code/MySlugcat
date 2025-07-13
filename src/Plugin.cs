@@ -48,6 +48,7 @@ namespace MySlugcat
             //玩家能力
             MyPlayer.Hook();
             Frame​​Skill.Hook();
+            DeflagrationSkill.Hook();
 
             Intros.Hook();
             //玩家图像

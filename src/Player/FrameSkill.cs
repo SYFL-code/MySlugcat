@@ -24,7 +24,7 @@ using static MonoMod.InlineRT.MonoModRule;
 
 namespace MySlugcat
 {
-    //嫁祸
+    //嫁祸技能
     public class Frame​​Skill
     {
         public static void Hook()
@@ -274,7 +274,7 @@ namespace MySlugcat
             int percentage = 40;
             if (probability == -1)
             {
-                percentage = 100;
+                percentage = 40;
             }
             else
             {
@@ -583,7 +583,11 @@ namespace MySlugcat
         {
             if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
             {
+                Console.WriteLine("MySlugcat:Player_Die: st");
+
                 Creature obj = Frame​​Skill.Frame(self, false, self, 12);
+
+                Console.WriteLine($"MySlugcat:Player_Die: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
                 if (obj != null)
                 {
                     self.dead = false;
@@ -621,7 +625,12 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
+            Console.WriteLine("MySlugcat:Spear_HitSomething: st");
+
             Creature obj = Frame(self, false, self);
+
+            Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
+
             //spear.thrownBy = null;
             //Creature obj = FindNearestCreature(spear., Frameobj.room, false, null);
             if (obj != null)

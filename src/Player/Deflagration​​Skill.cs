@@ -274,8 +274,6 @@ namespace MySlugcat
 
         private static void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall puffBall)
         {
-            orig(puffBall);
-
             if (15 > UnityEngine.Random.Range(0, 100))
             {
                 Explode(puffBall, null, puffBall.thrownBy);
@@ -284,6 +282,8 @@ namespace MySlugcat
                 //ScavengerBomb.Explode(result.chunk);
                 //public void Explode(BodyChunk hitChunk)
             }
+
+            orig(puffBall);
         }
 
 
@@ -316,7 +316,7 @@ namespace MySlugcat
         {
             orig(flareBomb);
 
-            if (18 > UnityEngine.Random.Range(0, 100))
+            if (18 > UnityEngine.Random.Range(0, 100) && (flareBomb.color != new Color(0.3f, 0f, 0.9f) || flareBomb.color == new Color(0.2f, 0f, 1f)))
             {
                 Explode(flareBomb, null, flareBomb.thrownBy);
                 //return true;
@@ -324,6 +324,7 @@ namespace MySlugcat
                 //ScavengerBomb.Explode(result.chunk);
                 //public void Explode(BodyChunk hitChunk)
             }
+            flareBomb.color = new Color(0.3f, 0f, 0.9f);
         }
 
         private static void Player_Die(On.Player.orig_Die orig, Player self)

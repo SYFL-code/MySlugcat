@@ -37,7 +37,7 @@ namespace MySlugcat
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
 
-            On.Spear.HitSomething += Spear_HitSomething;
+            //On.Spear.HitSomething += Spear_HitSomething;
             On.Rock.HitSomething += Rock_HitSomething;
             //On.PuffBall.HitSomething += PuffBall_HitSomething;
             On.PuffBall.Explode += PuffBall_Explode;
@@ -45,7 +45,7 @@ namespace MySlugcat
             On.FlareBomb.StartBurn += FlareBomb_StartBurn;
             On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
             //On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
-            On.Player.Die += Player_Die;
+            //On.Player.Die += Player_Die;
 
 #if MYDEBUG
             }
@@ -164,9 +164,49 @@ namespace MySlugcat
             }*/
         }
 
-        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
+        /*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
+                {
+                    Console.WriteLine($"MySlugcat:Spear_1,{spear.thrownBy == null},{spear.thrownBy is not Player},{spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}");
+                    if (spear.thrownBy == null)
+                    {
+                        return orig.Invoke(spear, result, eu);
+                    }
+                    //如果被命中的不是玩家
+                    if (spear.thrownBy is not Player self)
+                        return orig.Invoke(spear, result, eu);
+                    //如果玩家不是MySlugcat则运行原程序
+                    if (self.slugcatStats.name != Plugin.YourSlugID)
+                        return orig.Invoke(spear, result, eu);
+
+                    Weapon.Mode mode = spear.mode;
+                    bool obj = orig.Invoke(spear, result, eu);
+                    Console.WriteLine($"MySlugcat:Spear_1, mode {mode} , obj {obj}, result.chunk {result.chunk}");
+                    //if (26 > UnityEngine.Random.Range(0, 100))
+                    if (17 > UnityEngine.Random.Range(0, 100) && (obj || mode != spear.mode))
+                    {
+                        Explode(spear, result.chunk, self);
+                        //spear.abstractPhysicalObject.stuckObjects[0].Deactivate();
+                        //ScavengerBomb.Explode(result.chunk);
+                        //public void Explode(BodyChunk hitChunk)
+                    }
+
+                    Console.WriteLine($"MySlugcat:Spear_1, obj {obj}");
+                    return obj;
+                }*/
+
+        public static void Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu, bool obj, Weapon.Mode mode)
         {
-            if (spear.thrownBy == null)
+            Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
+            if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
+            {
+                Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
+                if (17 > UnityEngine.Random.Range(0, 100) && (obj || mode != spear.mode))
+                {
+                    Explode(spear, result.chunk, self);
+                }
+            }
+
+/*            if (spear.thrownBy == null)
             {
                 return orig.Invoke(spear, result, eu);
             }
@@ -188,7 +228,7 @@ namespace MySlugcat
                 //public void Explode(BodyChunk hitChunk)
             }
 
-            return obj;
+            return obj;*/
         }
 
         private static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock rock, SharedPhysics.CollisionResult result, bool eu)
@@ -207,7 +247,7 @@ namespace MySlugcat
             Weapon.Mode mode = rock.mode;
             bool obj = orig.Invoke(rock, result, eu);
             //if (26 > UnityEngine.Random.Range(0, 100))
-            if (15 > UnityEngine.Random.Range(0, 100) && (obj || mode != rock.mode))
+            if (10 > UnityEngine.Random.Range(0, 100) && (obj || mode != rock.mode))
             {
                 Explode(rock, result.chunk, self);
                 rock.Destroy();
@@ -274,6 +314,8 @@ namespace MySlugcat
 
         private static void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall puffBall)
         {
+            orig(puffBall);
+
             if (15 > UnityEngine.Random.Range(0, 100))
             {
                 Explode(puffBall, null, puffBall.thrownBy);
@@ -282,8 +324,6 @@ namespace MySlugcat
                 //ScavengerBomb.Explode(result.chunk);
                 //public void Explode(BodyChunk hitChunk)
             }
-
-            orig(puffBall);
         }
 
 

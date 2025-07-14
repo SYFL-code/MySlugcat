@@ -53,12 +53,12 @@ namespace MySlugcat
             //挣脱火虫
             On.EggBug.CarryObject += EggBug_CarryObject;
             //冰盾转换
-            On.Spear.HitSomething += Spear_HitSomething;
+            //On.Spear.HitSomething += Spear_HitSomething;
             On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
             //挣脱魔王秃鹫
             On.Vulture.Carry += Vulture_Carry;
 
-            On.Player.Die += Player_Die;
+            //On.Player.Die += Player_Die;
 
 #if MYDEBUG
             }
@@ -610,9 +610,89 @@ namespace MySlugcat
             }
         }
 
-        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
+/*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
+            Console.WriteLine($"MySlugcat:Spear_HitSomething,{result.obj == null},{result.obj is not Player},{result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}");
             if (result.obj == null)
+            {
+                return false;
+            }
+            //如果被命中的不是玩家
+            if (result.obj is not Player self)
+                return orig.Invoke(spear, result, eu);
+            //如果玩家不是Glacier则运行原程序
+            if (self.slugcatStats.name != Plugin.YourSlugID)
+                return orig.Invoke(spear, result, eu);
+            //取玩家变量
+            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+
+            Console.WriteLine("MySlugcat:Spear_HitSomething: st");
+
+            Creature obj = Frame(self, false, self);
+
+            Console.WriteLine($"MySlugcat:Spear_HitSomething: sh  Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}, {obj == null}");
+
+            //spear.thrownBy = null;
+            //Creature obj = FindNearestCreature(spear., Frameobj.room, false, null);
+            if (obj != null)
+            {
+                //(!this.dead && this.State is HealthState && (this.State as HealthState).health < 0f && UnityEngine.Random.value < -(this.State as HealthState).health && UnityEngine.Random.value < 0.025f)
+                //obj.health -= 1;
+                //if((obj.State as HealthState).health -= 1)
+                var hs = obj.State as HealthState;
+                Console.WriteLine($"MySlugcat:Spear_HitSomething: sh hs {hs == null}");
+                if (hs != null)
+                {
+                    hs.health -= spear.spearDamageBonus;
+                }
+                result.obj = obj;
+                Console.WriteLine($"MySlugcat:Spear_HitSomething: sh result.obj {result.obj}");
+            }
+
+            return orig.Invoke(spear, result, eu);
+        }*/
+
+
+        public static PhysicalObject Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
+        {
+            Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: {result.obj != null}, {result.obj is Player}, {result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}");
+            if (result.obj != null && result.obj is Player self && self.slugcatStats.name == Plugin.YourSlugID)
+            {
+                //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
+                Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: st |");
+
+                Creature obj = Frame(self, false, self);
+
+                //Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
+                Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: sh |{obj?.GetType()}, {obj?.bodyChunks?.Length}, {obj != null}");
+
+/*                if (obj != null)
+                {
+                    //(!this.dead && this.State is HealthState && (this.State as HealthState).health < 0f && UnityEngine.Random.value < -(this.State as HealthState).health && UnityEngine.Random.value < 0.025f)
+                    //obj.health -= 1;
+                    //if((obj.State as HealthState).health -= 1)
+                    var hs = obj.State as HealthState;
+                    if (hs != null)
+                    {
+                        hs.health -= spear.spearDamageBonus;
+                    }
+
+                    //result.obj = obj;
+                }*/
+
+                if (obj.State is HealthState hs)
+                {
+                    hs.health -= spear.spearDamageBonus;
+                    Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: hs {hs != null}, {hs.health} _ {spear.spearDamageBonus}");
+                }
+
+                Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: obj {obj?.GetType()}");
+                return obj;
+            }
+            Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: obj {result.obj?.GetType()}");
+            return result.obj;
+
+/*            if (result.obj == null)
             {
                 return false;
             }
@@ -647,7 +727,7 @@ namespace MySlugcat
                 result.obj = obj;
             }
 
-            return orig.Invoke(spear, result, eu);
+            return orig.Invoke(spear, result, eu);*/
         }
 
         private static bool ScavengerBomb_HitSomething(On.ScavengerBomb.orig_HitSomething orig, ScavengerBomb bomb, SharedPhysics.CollisionResult result, bool eu)

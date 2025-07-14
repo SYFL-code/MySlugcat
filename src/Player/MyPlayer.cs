@@ -23,6 +23,7 @@ using Watcher;
 
 namespace MySlugcat
 {
+    //BUG:莫名卡顿，无响应
     public class MyPlayer
     {
         //按下跳跃键的时长
@@ -36,6 +37,8 @@ namespace MySlugcat
 #endif
             On.Player.ctor += Player_ctor;
             On.Player.Update += Player_Update;
+
+            On.Spear.HitSomething += Spear_HitSomething;
 
 /*            //咬住挣脱
             On.Creature.Violence += Creature_Violence;
@@ -415,6 +418,27 @@ namespace MySlugcat
             }
 #endif
         }
+
+        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
+        {
+            Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
+            PhysicalObject obje = Frame​​Skill.Spear_HitSomething(spear, result, eu);
+            Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
+            if (obje != null)
+            {
+                result.obj = obje;
+            }
+
+            Weapon.Mode mode = spear.mode;
+            bool obj = orig.Invoke(spear, result, eu);
+
+            Console.WriteLine($"MySlugcat MyPlayer:zh Spear_HitSomething: zh , GetType {result.obj?.GetType()}, result.obj {result.obj == null}");
+            Deflagration​​Skill.Spear_HitSomething(spear, result, eu, obj, mode);
+            Console.WriteLine($"MySlugcat MyPlayer:sh Spear_HitSomething: sh {result.obj?.GetType()}, {result.obj == null}");
+
+            return obj;
+        }
+
 
 
     }

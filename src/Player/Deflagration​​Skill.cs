@@ -38,6 +38,7 @@ namespace MySlugcat
             //On.Player.Update += Player_Update;
 
             //On.Spear.HitSomething += Spear_HitSomething;
+            On.Spear.SetRandomSpin += Spear_SetRandomSpin;
             On.Rock.HitSomething += Rock_HitSomething;
             //On.PuffBall.HitSomething += PuffBall_HitSomething;
             On.PuffBall.Explode += PuffBall_Explode;
@@ -196,14 +197,15 @@ namespace MySlugcat
 
         public static void Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu, bool obj, Weapon.Mode mode)
         {
-            Log.Logger(8, $"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
+            Log.Logger(4, "Spear", "MySlugcat:Deflagration​​:Spear_HitSomething", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID})");
             //Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
             if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
             {
-                Log.Logger(8, $"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
+                Log.Logger(4, "Spear", "MySlugcat:Deflagration​​:Spear_HitSomething", $"obj ({obj}), mode ({mode}), spear.mode ({spear.mode})");
                 //Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
                 if (17 > UnityEngine.Random.Range(0, 100) && (obj || mode != spear.mode))
                 {
+                    Log.Logger(4, "Spear", "MySlugcat:Deflagration​​:Spear_HitSomething", $"thrownBy ({self})");
                     Explode(spear, result.chunk, self);
                 }
             }
@@ -231,6 +233,22 @@ namespace MySlugcat
             }
 
             return obj;*/
+        }
+
+        private static void Spear_SetRandomSpin(On.Spear.orig_SetRandomSpin orig, Spear spear)
+        {
+            orig(spear);
+
+            Log.Logger(4, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID})");
+            if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
+            {
+                if (17 > UnityEngine.Random.Range(0, 100))
+                {
+                    Log.Logger(4, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"thrownBy ({spear.thrownBy})");
+                    Explode(spear, null, spear.thrownBy);
+                }
+
+            }
         }
 
         private static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock rock, SharedPhysics.CollisionResult result, bool eu)
@@ -369,18 +387,13 @@ namespace MySlugcat
             flareBomb.color = new Color(0.3f, 0f, 0.9f);
         }
 
-        private static void Player_Die(On.Player.orig_Die orig, Player self)
+        public static void Player_Die(Creature self, bool orig)
         {
-            bool wasDead = self.dead;
-            //布尔值wasDead判断玩家是否死亡
-
-            orig(self);
-
-            if (self.slugcatStats.name == Plugin.YourSlugID && !wasDead && self.dead)
+            if (self is Player player&& player.slugcatStats.name == Plugin.YourSlugID && !orig && player.dead)
             {
                 if (100 > UnityEngine.Random.Range(0, 100))
                 {
-                    Explode(self, null, self);
+                    Explode(player, null, player);
                     //puffBall.abstractPhysicalObject.stuckObjects[0].Deactivate();
                     //ScavengerBomb.Explode(result.chunk);
                     //public void Explode(BodyChunk hitChunk)

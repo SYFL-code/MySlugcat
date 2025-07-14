@@ -39,6 +39,7 @@ namespace MySlugcat
             On.Player.Update += Player_Update;
 
             On.Spear.HitSomething += Spear_HitSomething;
+            On.Player.Die += Player_Die;
 
 /*            //咬住挣脱
             On.Creature.Violence += Creature_Violence;
@@ -421,9 +422,12 @@ namespace MySlugcat
 
         private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
+            Log.Logger(-7, "", "", "");
+            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sst", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
+            //Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
             PhysicalObject? obje = Frame​​Skill.Spear_HitSomething(spear, result, eu);
-            Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
+            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_st", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
+            //Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
             if (obje != null)
             {
                 result.obj = obje;
@@ -432,11 +436,25 @@ namespace MySlugcat
             Weapon.Mode mode = spear.mode;
             bool obj = orig.Invoke(spear, result, eu);
 
-            Console.WriteLine($"MySlugcat MyPlayer:zh Spear_HitSomething: zh , GetType {result.obj?.GetType()}, result.obj {result.obj == null}");
+            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_zh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
+            //Console.WriteLine($"MySlugcat MyPlayer:zh Spear_HitSomething: zh , GetType {result.obj?.GetType()}, result.obj {result.obj == null}");
             Deflagration​​Skill.Spear_HitSomething(spear, result, eu, obj, mode);
-            Console.WriteLine($"MySlugcat MyPlayer:sh Spear_HitSomething: sh {result.obj?.GetType()}, {result.obj == null}");
+            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
+            //Console.WriteLine($"MySlugcat MyPlayer:sh Spear_HitSomething: sh {result.obj?.GetType()}, {result.obj == null}");
 
             return obj;
+        }
+
+        private static void Player_Die(On.Player.orig_Die orig, Player self)
+        {
+            Creature obj = FrameSkill.Player_Die(self);
+
+
+            //布尔值wasDead判断动物(玩家)是否死亡
+            bool wasDead = self.dead;
+            orig(self);
+
+            DeflagrationSkill.Player_Die(obj, wasDead);
         }
 
 

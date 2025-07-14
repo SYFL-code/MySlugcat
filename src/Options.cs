@@ -233,7 +233,7 @@ namespace MySlugcat
             Configurable<bool>? configurable = Options.logDebug;
             if (configurable == null || configurable.Value)
             {
-                Log.Logger(2, "Options.PostTranslate, completed translation of options");
+                Log.Logger(2, "Options", "Options.PostTranslate", "Options.PostTranslate, completed translation of options");
             }
         }
 

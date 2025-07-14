@@ -6,7 +6,7 @@ namespace MySlugcat
 {
     public class PlayerVar
     {
-        public MyDebug myDebug = null;//调试图像
+        public MyDebug? myDebug = null;//调试图像
         //public TriangleMesh tailMesh = null;//尾巴
         //public FlyAbility flyAbility = new FlyAbility();//飞行能力变量
         //public bool InGrabUpdateProc = false;//冰矛合成能力变量

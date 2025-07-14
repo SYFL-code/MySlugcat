@@ -13,19 +13,28 @@ namespace MySlugcat
     {
         public int curTab;
 
-        public static Configurable<bool> logDebug;
+        public static Configurable<bool>? logDebug;
 
-        public static Configurable<bool> copyID;
+        public static Configurable<bool>? copyID;
+
+        public static Configurable<float>? loglevel;
+
+        OpTextBox? loglevelTextBox;
+        OpLabel? loglevelLabel;
 
         public Options()
         {
-            Options.logDebug = this.config.Bind<bool>("logDebug", true, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
+            Options.logDebug = this.config.Bind<bool>("logDebug", false, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
             {
                 "Log debug"
             }));
             Options.copyID = this.config.Bind<bool>("copyID", true, new ConfigurableInfo("Creates an exact copy of the previous object when duplicating.", null, "", new object[]
             {
                 "Copy ID duplicate"
+            }));
+            Options.loglevel = this.config.Bind<float>("loglevel", 9f, new ConfigurableInfo("The maximum value is 10, and the minimum value is 0.", null, "", new object[]
+			{
+                "Log Level"
             }));
         }
 
@@ -45,8 +54,51 @@ namespace MySlugcat
             float num = 90f;
             float num2 = 460f;
             float num3 = 40f;
-            this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
-            this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
+            if (logDebug != null && copyID != null)
+            {
+                this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
+                this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
+            }
+
+            //this.AddTextBox<float>(Options.loglevel, new Vector2(num, num2 -= num3), 50f);
+
+            if (loglevel != null)
+            {
+                Vector2 pos = new Vector2(num, num2 -= num3);
+                float width = 50f;
+                OpTextBox loglevelTextBox = new OpTextBox(Options.loglevel, pos, width)
+                {
+                    allowSpace = true,
+                    description = Options.loglevel.info.description
+                };
+                OpLabel loglevelLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, Options.loglevel.info.Tags[0] as string, false)
+                {
+                    description = Options.loglevel.info.description
+                };
+                this.Tabs[this.curTab].AddItems(new UIelement[]
+                {
+                loglevelTextBox,
+                loglevelLabel
+                });
+            }
+        }
+
+        public override void Update()
+        {
+            if (loglevelTextBox != null && loglevelLabel != null)
+            {
+                if (logDebug == null || logDebug.Value)
+                {
+                    loglevelTextBox.Show();
+                    loglevelLabel.Show();
+                }
+                else
+                {
+                    loglevelTextBox.Hide();
+                    loglevelLabel.Hide();
+                }
+            }
+
         }
 
         private void AddTitle()
@@ -83,6 +135,24 @@ namespace MySlugcat
             });
         }
 
+        private void AddTextBox<T>(Configurable<T> option, Vector2 pos, float width = 150f)
+        {
+            OpTextBox opTextBox = new OpTextBox(option, pos, width)
+            {
+                allowSpace = true,
+                description = option.info.description
+            };
+            OpLabel opLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, option.info.Tags[0] as string, false)
+            {
+                description = option.info.description
+            };
+            this.Tabs[this.curTab].AddItems(new UIelement[]
+            {
+                opTextBox,
+                opLabel
+            });
+        }
+
         public void PostTranslate()
         {
             IEnumerable<FieldInfo> enumerable = from f in base.GetType().GetFields(BindingFlags.Static | BindingFlags.Public)
@@ -95,8 +165,8 @@ namespace MySlugcat
             }
             foreach (FieldInfo fieldInfo in enumerable)
             {
-                ConfigurableBase configurableBase = (ConfigurableBase)((fieldInfo != null) ? fieldInfo.GetValue(null) : null);
-                string value;
+                ConfigurableBase? configurableBase = (ConfigurableBase?)((fieldInfo != null) ? fieldInfo.GetValue(null) : null);
+                string? value;
                 if (configurableBase == null)
                 {
                     value = null;
@@ -106,7 +176,7 @@ namespace MySlugcat
                     ConfigurableInfo info = configurableBase.info;
                     value = ((info != null) ? info.description : null);
                 }
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value) && configurableBase != null)
                 {
                     configurableBase.info.description = Custom.rainWorld.inGameTranslator.Translate(configurableBase.info.description.Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
                 }
@@ -137,7 +207,7 @@ namespace MySlugcat
                     {
                         break;
                     }
-                    if (!string.IsNullOrEmpty(configurableBase.info.Tags[num] as string))
+                    if (configurableBase != null && !string.IsNullOrEmpty(configurableBase.info.Tags[num] as string))
                     {
                         configurableBase.info.Tags[num] = Custom.rainWorld.inGameTranslator.Translate(((string)configurableBase.info.Tags[num]).Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
                     }
@@ -160,10 +230,10 @@ namespace MySlugcat
                 }
                 num5++;
             }
-            Configurable<bool> configurable = Options.logDebug;
+            Configurable<bool>? configurable = Options.logDebug;
             if (configurable == null || configurable.Value)
             {
-                Plugin.Logger.LogDebug("Options.PostTranslate, completed translation of options");
+                Log.Logger(2, "Options.PostTranslate, completed translation of options");
             }
         }
 

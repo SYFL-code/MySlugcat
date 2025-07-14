@@ -264,13 +264,13 @@ namespace MySlugcat
 
         //#nullable enable
 
-        public static Creature Frame(Player self, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
+        public static Creature? Frame(Player self, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
         {
 #if MYDEBUG
             try
             {
 #endif
-            Creature creature = MyPlayer.RandomlySelectedCreature(self.room, false, self, false);
+            Creature? creature = MyPlayer.RandomlySelectedCreature(self.room, false, self, false);
             int percentage = 40;
             if (probability == -1)
             {
@@ -585,7 +585,7 @@ namespace MySlugcat
             {
                 Console.WriteLine("MySlugcat:Player_Die: st");
 
-                Creature obj = Frame​​Skill.Frame(self, false, self, 12);
+                Creature? obj = Frame​​Skill.Frame(self, false, self, 12);
 
                 Console.WriteLine($"MySlugcat:Player_Die: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
                 if (obj != null)
@@ -653,7 +653,7 @@ namespace MySlugcat
         }*/
 
 
-        public static PhysicalObject Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
+        public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
             Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: {result.obj != null}, {result.obj is Player}, {result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}");
             if (result.obj != null && result.obj is Player self && self.slugcatStats.name == Plugin.YourSlugID)
@@ -661,7 +661,7 @@ namespace MySlugcat
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
                 Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: st |");
 
-                Creature obj = Frame(self, false, self);
+                Creature? obj = Frame(self, false, self);
 
                 //Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
                 Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: sh |{obj?.GetType()}, {obj?.bodyChunks?.Length}, {obj != null}");
@@ -680,10 +680,13 @@ namespace MySlugcat
                     //result.obj = obj;
                 }*/
 
-                if (obj.State is HealthState hs)
+                if (obj != null && obj.State is HealthState hs)
                 {
                     hs.health -= spear.spearDamageBonus;
-                    Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: hs {hs != null}, {hs.health} _ {spear.spearDamageBonus}");
+                    if (hs != null && hs.health != null)
+                    {
+                        Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: hs {hs != null}, {hs?.health} _ {spear.spearDamageBonus}");
+                    }
                 }
 
                 Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: obj {obj?.GetType()}");
@@ -741,7 +744,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature obj = Frame(self, false, self);
+            Creature? obj = Frame(self, false, self);
             //bomb.thrownBy = null;
             //Creature obj = FindNearestCreature(bomb., Frameobj.room, false, null);
             if (obj != null)
@@ -813,7 +816,7 @@ namespace MySlugcat
                     orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 else
                 {
-                    Creature newobj2 = Frame(self, false, self);
+                    Creature? newobj2 = Frame(self, false, self);
                     if (newobj2 != null)
                     {
                         hitChunk.owner = newobj2;
@@ -827,7 +830,7 @@ namespace MySlugcat
                 }
                 return;
             }
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 hitChunk.owner = newobj;
@@ -879,7 +882,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 chunk.owner = newobj;
@@ -905,13 +908,15 @@ namespace MySlugcat
                     continue;
                 if (obj.chunk.owner is Player)
                 {
-                    Player self = obj.chunk.owner as Player;
+                    Player? self = obj.chunk.owner as Player;
+                    if (self == null)
+                        continue;
                     if (self.slugcatStats.name != Plugin.YourSlugID)
                         continue;
                     //取玩家变量
                     GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-                    Creature newobj = Frame(self, false, self);
+                    Creature? newobj = Frame(self, false, self);
                     if (newobj != null)
                     {
                         obj.chunk.owner = newobj;
@@ -973,7 +978,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 centipede.grasps[g].grabbed = newobj;
@@ -1030,7 +1035,7 @@ namespace MySlugcat
                                         //取玩家变量
                                         GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-                                        Creature newobj = Frame(self, false, self);
+                                        Creature? newobj = Frame(self, false, self);
                                         if (newobj != null)
                                         {
                                             bigEel.room.physicalObjects[j][num] = newobj;
@@ -1209,7 +1214,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 tentaclePlant.grasps[0].grabbedChunk.owner = newobj;
@@ -1262,7 +1267,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 poleMimic.grasps[0].grabbedChunk.owner = newobj;
@@ -1315,7 +1320,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature newobj = Frame(self, false, self);
+            Creature? newobj = Frame(self, false, self);
             if (newobj != null)
             {
                 eggBug.grasps[0].grabbed = newobj;
@@ -1354,7 +1359,7 @@ namespace MySlugcat
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature obj = Frame(self, false, self);
+            Creature? obj = Frame(self, false, self);
             if (obj != null)
             {
                 vulture.grasps[0].grabbedChunk.owner = null;

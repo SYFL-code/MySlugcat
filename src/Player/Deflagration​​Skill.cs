@@ -62,7 +62,7 @@ namespace MySlugcat
 #endif
         }
 
-        public static void Explode(PhysicalObject self, BodyChunk hitChunk, Creature ThrownBy)
+        public static void Explode(PhysicalObject self, BodyChunk? hitChunk, Creature ThrownBy)
         {
             if (self.slatedForDeletetion)
             {
@@ -102,7 +102,7 @@ namespace MySlugcat
                 room.AddObject(new Explosion.FlashingSmoke(vector + a * 40f * UnityEngine.Random.value, a * Mathf.Lerp(4f, 20f, Mathf.Pow(UnityEngine.Random.value, 2f)), 1f + 0.05f * UnityEngine.Random.value, new Color(1f, 1f, 1f), explodeColor, UnityEngine.Random.Range(3, 11)));
             }
 
-            BombSmoke smoke = null;
+            BombSmoke? smoke = null;
             if (40 > UnityEngine.Random.Range(0, 100))
             {
                 smoke = new BombSmoke(room, self.firstChunk.pos, self.firstChunk, explodeColor);
@@ -196,10 +196,12 @@ namespace MySlugcat
 
         public static void Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu, bool obj, Weapon.Mode mode)
         {
-            Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
+            Log.Logger(8, $"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
+            //Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
             if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
             {
-                Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
+                Log.Logger(8, $"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
+                //Console.WriteLine($"MySlugcat:Deflagration​​:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
                 if (17 > UnityEngine.Random.Range(0, 100) && (obj || mode != spear.mode))
                 {
                     Explode(spear, result.chunk, self);

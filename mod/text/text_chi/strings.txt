@@ -4,7 +4,9 @@ Tools 1|工具1
 Tools 2|工具2
 Tool Settings|工具设置
 
-Useful for debugging if you share your log files.|分享你的日志文件可以方便排查错误。
 Log debug|错误日志
-Creates an exact copy of the previous object when duplicating.|复制时创建前一个对象的精确副本。
+Useful for debugging if you share your log files.|分享你的日志文件可以方便排查错误。
 Copy ID duplicate|复制 ID
+Creates an exact copy of the previous object when duplicating.|复制时创建前一个对象的精确副本。
+Log Level|日志级别
+The maximum value is 10, and the minimum value is 0.|最高值为10，最低值为0。

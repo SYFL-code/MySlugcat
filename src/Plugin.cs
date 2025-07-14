@@ -16,7 +16,7 @@ namespace MySlugcat
         //用于检查角色id
         public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("SlugcatTemplate", false);
 
-        public static ManualLogSource Logger { get; private set; }
+        public static ManualLogSource? Logger { get; private set; }
         /*-----------------------------------------------------挂钩-----------------------------------------------------*/
 
         public static readonly PlayerFeature<float> SuperJump = PlayerFloat("slugtemplate/super_jump");

@@ -181,7 +181,7 @@ namespace MySlugcat
                 MyDebug.outStr += "MySlugcat:wewe";
                 Console.WriteLine("MySlugcat:wewe");
 
-                Creature creature = RandomlySelectedCreature(self.room, false, self, false);
+                Creature? creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
                 {
                     for (int i = 0; i < 13; i++)
@@ -271,14 +271,14 @@ namespace MySlugcat
         }
 
         // 查找当前房间中距离自身最近的生物
-        public static Creature FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
+        public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
 #if MYDEBUG
             try
             {
 #endif
             // 初始化变量
-            Creature nearest = null;        // 最近生物对象
+            Creature? nearest = null;        // 最近生物对象
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
             //List<Creature> creatures = new List<Creature>();
 
@@ -343,7 +343,7 @@ namespace MySlugcat
         }
 
         // 随机查找当前房间的生物
-        public static Creature RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
+        public static Creature? RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
 #if MYDEBUG
             try
@@ -422,7 +422,7 @@ namespace MySlugcat
         private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
             Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
-            PhysicalObject obje = Frame​​Skill.Spear_HitSomething(spear, result, eu);
+            PhysicalObject? obje = Frame​​Skill.Spear_HitSomething(spear, result, eu);
             Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
             if (obje != null)
             {

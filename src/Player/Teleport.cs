@@ -33,15 +33,15 @@ namespace MySlugcat
                 {
                     break;
                 }
-                if (obj.bodyChunks[num] != null)
+                if (obj != null && obj.bodyChunks[num] != null)
                 {
                     obj.bodyChunks[num].pos = newPos;
                     obj.bodyChunks[num].lastPos = newPos;
                     obj.bodyChunks[num].lastLastPos = newPos;
                     obj.bodyChunks[num].vel = default(Vector2);
-                    if (obj is PlayerCarryableItem)
+                    if (obj is PlayerCarryableItem playerCarryableItem)
                     {
-                        (obj as PlayerCarryableItem).lastOutsideTerrainPos = null;
+                        playerCarryableItem.lastOutsideTerrainPos = null;
                     }
                 }
                 num++;
@@ -50,7 +50,7 @@ namespace MySlugcat
 
         public static void ReleaseAllGrasps(PhysicalObject obj)
         {
-            if (((obj != null) ? obj.grabbedBy : null) != null)
+            if (((obj != null) ? obj.grabbedBy : null) != null && obj != null)
             {
                 for (int i = obj.grabbedBy.Count - 1; i >= 0; i--)
                 {
@@ -61,16 +61,16 @@ namespace MySlugcat
                     }
                 }
             }
-            if (obj is Creature)
+            if (obj is Creature creature)
             {
-                if (obj is Player)
+                if (obj is Player player)
                 {
-                    Player.SlugOnBack slugOnBack = (obj as Player).slugOnBack;
+                    Player.SlugOnBack slugOnBack = player.slugOnBack;
                     if (slugOnBack != null)
                     {
                         slugOnBack.DropSlug();
                     }
-                    Player onBack = (obj as Player).onBack;
+                    Player onBack = player.onBack;
                     if (onBack != null)
                     {
                         Player.SlugOnBack slugOnBack2 = onBack.slugOnBack;
@@ -79,15 +79,15 @@ namespace MySlugcat
                             slugOnBack2.DropSlug();
                         }
                     }
-                    (obj as Player).slugOnBack = null;
-                    (obj as Player).onBack = null;
-                    Player.SpearOnBack spearOnBack = (obj as Player).spearOnBack;
+                    player.slugOnBack = null;
+                    player.onBack = null;
+                    Player.SpearOnBack spearOnBack = player.spearOnBack;
                     if (spearOnBack != null)
                     {
                         spearOnBack.DropSpear();
                     }
                 }
-                (obj as Creature).LoseAllGrasps();
+                creature.LoseAllGrasps();
             }
         }
 

@@ -12,7 +12,7 @@ namespace MySlugcat
     public static class GlobalVar
     {
         //调试字符串
-        public static string dbgstr;
+        public static string? dbgstr;
         //玩家变量
         public static ConditionalWeakTable<Player, PlayerVar> playerVar = new ConditionalWeakTable<Player, PlayerVar>();
         //冰冻能力
@@ -23,7 +23,7 @@ namespace MySlugcat
         // const string glacier2_iceshield_lock_savefield = "THEGLACIER2_ICESHIELD_LOCK";
         //public const string glacier2_iceshield_count_savefield = "THEGLACIER2_ICESHIELD_COUNT";
         //全局系统变量
-        public static RainWorldGame game = null;
+        public static RainWorldGame? game = null;
         //最后一次的存档数据
         public static bool glacier2_iceshield_lock;
         public static string savedata_glacier2_iceshield_count = "";

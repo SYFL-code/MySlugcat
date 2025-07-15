@@ -49,6 +49,7 @@ namespace MySlugcat
             MyPlayer.Hook();
             Frame​​Skill.Hook();
             DeflagrationSkill.Hook();
+            KnitmeshSkill.Hook();
 
             Intros.Hook();
             //玩家图像

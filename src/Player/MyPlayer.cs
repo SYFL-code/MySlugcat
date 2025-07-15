@@ -257,6 +257,9 @@ namespace MySlugcat
 #endif
         }
 
+
+
+
         // 禁用的生物
         public static bool DisabledCreature(Creature creature)
         {
@@ -269,6 +272,75 @@ namespace MySlugcat
                 return true;
             }
             return false;
+        }
+
+        // 查找获取一定范围内所有生物
+        public static List<Creature>? CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature)
+        {
+#if MYDEBUG
+            try
+            {
+#endif
+
+            List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
+            float radiusSquared = radius * radius;
+
+            foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)
+            {
+                Creature c = abstractCreature.realizedCreature;
+                // 排除检查：玩家、无效引用、自身、或没有身体部位的对象
+                if (!IncludePlayer)
+                {
+                    var player1 = c as Player;
+                    if (player1 != null)
+                    {
+                        continue; // 跳过无效项，继续检查下一个
+                    }
+                }
+                if (c == null ||             // 确保生物存在
+                    c == creature ||             // 排除自身
+                    c.mainBodyChunk == null) // 确保有有效的mainBodyChunk
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                if (DisabledCreature(c) && !IncludeSpecificCreature)// 禁用生物
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                if (c.dead == true && !IncludeDeadCreature)// 死亡的生物
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                // 计算平方距离（性能优化）
+                Vector2 offset = c.mainBodyChunk.pos - centerPos;
+                float sqrDist = offset.sqrMagnitude;
+
+                // 距离检测
+                if (sqrDist <= radiusSquared)
+                {
+                    results.Add((c, sqrDist));
+                }
+            }
+            // 按平方距离排序（无需计算真实距离）
+            results.Sort((a, b) => a.sqrDistance.CompareTo(b.sqrDistance));
+
+            // 转换为最终结果
+            return results.ConvertAll(x => x.creature);
+
+
+#if MYDEBUG
+            }
+            catch (Exception e)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                StackFrame sf = st.GetFrame(0);
+                var sr = sf.GetFileName().Split('\\');
+                MyDebug.outStr = sr[sr.Length - 1] + "\n";
+                MyDebug.outStr += sf.GetMethod() + "\n";
+                MyDebug.outStr += e;
+                UnityEngine.Debug.Log(e);
+            }
+#endif
         }
 
         // 查找当前房间中距离自身最近的生物

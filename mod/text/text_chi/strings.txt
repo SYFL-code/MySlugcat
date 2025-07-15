@@ -4,6 +4,12 @@ Tools 1|工具1
 Tools 2|工具2
 Tool Settings|工具设置
 
+Knitmesh Skill|缠绕技能
+Enable Knitmesh Skill (default: false)|启用缠绕技能（默认:否）
+Deflagration​​ Skill|爆燃技能
+Enable Deflagration​​ Skill (default: false)|启用爆燃技能（默认:否）
+Frame​​ Skill|嫁祸技能
+Enable Frame Skill (default: false)|启用嫁祸技能（默认:否）
 Log debug|错误日志
 Useful for debugging if you share your log files.|分享你的日志文件可以方便排查错误。
 Copy ID duplicate|复制 ID

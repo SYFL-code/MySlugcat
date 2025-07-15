@@ -270,7 +270,7 @@ namespace MySlugcat
             try
             {
 #endif
-            Creature? creature = MyPlayer.RandomlySelectedCreature(self.room, false, self, false);
+            Creature? creature = MyPlayer.RandomlySelectedCreature(self.room, true, self, false);
             int percentage = 40;
             if (probability == -1)
             {

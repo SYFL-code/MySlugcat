@@ -13,9 +13,9 @@ namespace MySlugcat
     {
         public int curTab;
 
-        public static Configurable<bool>? Frame​​Skill;
+/*        public static Configurable<bool>? Frame​​Skill;
         public static Configurable<bool>? Deflagration​​Skill;
-        public static Configurable<bool>? KnitmeshSkill;
+        public static Configurable<bool>? KnitmeshSkill;*/
 
         public static Configurable<bool>? logDebug;
 
@@ -28,7 +28,7 @@ namespace MySlugcat
 
         public Options()
         {
-            Options.Frame​​Skill = this.config.Bind<bool>("Frame​​Skill", false, new ConfigurableInfo("Enable Frame Skill (default: false)", null, "", new object[]
+/*            Options.Frame​​Skill = this.config.Bind<bool>("Frame​​Skill", false, new ConfigurableInfo("Enable Frame Skill (default: false)", null, "", new object[]
             {
                 "Frame​​ Skill"
             }));
@@ -39,7 +39,7 @@ namespace MySlugcat
             Options.KnitmeshSkill = this.config.Bind<bool>("KnitmeshSkill", false, new ConfigurableInfo("Enable Knitmesh Skill (default: false)", null, "", new object[]
             {
                 "Knitmesh Skill"
-            }));
+            }));*/
             
             Options.logDebug = this.config.Bind<bool>("logDebug", false, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
             {
@@ -71,14 +71,19 @@ namespace MySlugcat
             float num = 90f;
             float num2 = 460f;
             float num3 = 40f;
-            if (logDebug != null && copyID != null && Frame​​Skill != null && Deflagration​​Skill != null && KnitmeshSkill != null)
+            if (logDebug != null && copyID != null)
+            {
+                this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
+                this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
+            }
+/*            if (logDebug != null && copyID != null && Frame​​Skill != null && Deflagration​​Skill != null && KnitmeshSkill != null)
             {
                 this.AddCheckBox(Options.Frame​​Skill, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.Deflagration​​Skill, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
-            }
+            }*/
 
             //this.AddTextBox<float>(Options.loglevel, new Vector2(num, num2 -= num3), 50f);
 

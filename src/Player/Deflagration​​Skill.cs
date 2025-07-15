@@ -41,7 +41,7 @@ namespace MySlugcat
             On.Spear.SetRandomSpin += Spear_SetRandomSpin;
             On.Rock.HitSomething += Rock_HitSomething;
             On.Weapon.SetRandomSpin += Weapon_SetRandomSpin;
-            //On.PuffBall.HitSomething += PuffBall_HitSomething;
+            On.PuffBall.HitSomething += PuffBall_HitSomething;
             On.PuffBall.Explode += PuffBall_Explode;
             //On.FlareBomb.HitSomething += FlareBomb_HitSomething;
             On.FlareBomb.StartBurn += FlareBomb_StartBurn;
@@ -263,10 +263,11 @@ namespace MySlugcat
                 Log.Logger(7, "Rock", "MySlugcat:Deflagration​​:Rock_SetRandomSpin", $"({weapon is Rock}), ({rock.thrownBy != null}), ({rock.thrownBy is Player}), ({rock.thrownBy is Player && ((Player)rock.thrownBy).slugcatStats.name == Plugin.YourSlugID})");
                 if (rock.thrownBy != null && rock.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
                 {
-                    if (10 > UnityEngine.Random.Range(0, 100))
+                    if (10 > UnityEngine.Random.Range(0, 300))
                     {
                         Log.Logger(4, "Rock", "MySlugcat:Deflagration​​:Rock_SetRandomSpin", $"thrownBy ({rock.thrownBy})");
                         Explode(rock, null, rock.thrownBy);
+                        rock.Destroy();
                     }
 
                 }

@@ -37,7 +37,9 @@ namespace MySlugcat
 
         private static void Knitmesh(Player self, Room room, Vector2 pos)
         {
-            List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, 100f, false, self, false, true);
+            List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, 10000f, false, self, false, true);
+
+            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"creatures_Null ({creatures == null})");
 
             if (creatures != null)
             {
@@ -53,16 +55,18 @@ namespace MySlugcat
                         Vector2 V3 = new Vector2(UnityEngine.Random.Range(-30, 31), UnityEngine.Random.Range(-30, 31));
                         Vector2 V4 = new Vector2(UnityEngine.Random.Range(-30, 31), UnityEngine.Random.Range(-30, 31));
 
+                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
+
                         for (int i = 0; i < 30; i++)
                         {
                             SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                             SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V3, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            bee.blackColor = new Color(0.0002f, 0, 0.989f);
+                            bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 1.000f);
                             bee.ignoreCreature = self;
                             //bee.room.RoomRect
                             bee.forceAngry = true;
                             creature.room.AddObject(bee);
-                            bee2.blackColor = new Color(0.0002f, 0, 0.989f);
+                            bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 1.000f);
                             bee2.ignoreCreature = self;
                             //bee.room.RoomRect
                             bee2.forceAngry = true;
@@ -70,22 +74,25 @@ namespace MySlugcat
                         }
                         creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
 
-                        for (int i = 0; i < 1000 / Distance; i++)
+                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"zh");
+
+                        for (int i = 0; i < 200 / Distance; i++)
                         {
                             SporePlant.Bee bee = new SporePlant.Bee(null, true, creature.firstChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                             SporePlant.Bee bee2 = new SporePlant.Bee(null, true, creature.mainBodyChunk.pos + V4, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            bee.blackColor = new Color(0.0002f,0,0.989f);
+                            bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 1.000f);
                             bee.ignoreCreature = self;
                             //bee.room.RoomRect
                             bee.forceAngry = true;
                             creature.room.AddObject(bee);
-                            bee2.blackColor = new Color(0.0002f, 0, 0.989f);
+                            bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 1.000f);
                             bee2.ignoreCreature = self;
                             //bee.room.RoomRect
                             bee2.forceAngry = true;
                             creature.room.AddObject(bee2);
                         }
-                        
+                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"sh");
+
                     }
 
                 }
@@ -98,11 +105,17 @@ namespace MySlugcat
             orig(player, eu);
 
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (player.slugcatStats.name == Plugin.YourSlugID && Options.KnitmeshSkill != null && Options.KnitmeshSkill.Value)
+            if (player.slugcatStats.name == Plugin.YourSlugID)
             {
-                if (player.input[0].mp && !player.input[1].mp)
+                Log.Logger(7, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
+                //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;
+                //if (KnitmeshSkill != null&& KnitmeshSkill.Value)
+                if (true)
                 {
-                    Knitmesh(player, player.room, player.mainBodyChunk.pos);
+                    if (player.input[0].mp && !player.input[1].mp)
+                    {
+                        Knitmesh(player, player.room, player.mainBodyChunk.pos);
+                    }
                 }
             }
         }
@@ -126,7 +139,7 @@ namespace MySlugcat
                 if (abstractCreature.realizedCreature != null && abstractCreature.realizedCreature.room == bee.room && 
                     (abstractCreature.rippleLayer == bee.rippleLayer || abstractCreature.rippleBothSides || bee.rippleBothSides) && 
                     (bee.ignoreCreature == null || abstractCreature.realizedCreature != bee.ignoreCreature) && 
-                    SporePlant.SporePlantInterested(abstractCreature.realizedCreature.Template.type) && bee.blackColor != new Color(0.0002f, 0, 0.989f))
+                    SporePlant.SporePlantInterested(abstractCreature.realizedCreature.Template.type) && bee.blackColor != new Color(0.066f, 0.030f, 0.001f, 1.000f))
                 {
                     for (int i = 0; i < abstractCreature.realizedCreature.bodyChunks.Length; i++)
                     {
@@ -152,7 +165,7 @@ namespace MySlugcat
 
         private static void Bee_ApplyPalette(On.SporePlant.Bee.orig_ApplyPalette orig, SporePlant.Bee bee, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            if (bee.blackColor != new Color(0.0002f, 0, 0.989f))
+            if (bee.blackColor != new Color(0.066f, 0.030f, 0.001f, 1.000f))
             {
                 Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Bee_ApplyPalette", $"({palette.blackColor.ToString()})");
                 bee.blackColor = palette.blackColor;

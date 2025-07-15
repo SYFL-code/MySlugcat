@@ -447,14 +447,27 @@ namespace MySlugcat
 
         private static void Player_Die(On.Player.orig_Die orig, Player self)
         {
-            Creature obj = FrameSkill.Player_Die(self);
+            if (self.slugcatStats.name == Plugin.YourSlugID)
+            {
+                Creature obj = FrameSkill.Player_Die(self);
 
+                if (obj == self)
+                {
+                    if (obj is Player player)
+                    {
+                        //布尔值wasDead判断动物(玩家)是否死亡
+                        bool wasDead = self.dead;
+                        orig(self);
 
-            //布尔值wasDead判断动物(玩家)是否死亡
-            bool wasDead = self.dead;
-            orig(self);
+                        DeflagrationSkill.Player_Die(obj, wasDead);
+                    }
+                }
+            }
+            else
+            {
+                orig(self);
+            }
 
-            DeflagrationSkill.Player_Die(obj, wasDead);
         }
 
 

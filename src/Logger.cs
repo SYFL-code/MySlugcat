@@ -19,6 +19,27 @@ namespace MySlugcat
             Configurable<bool>? logDebug = Options.logDebug;
             Configurable<float>? loglevel = Options.loglevel;
 
+            string Disabled = "";
+            bool isContains = Disabled.IndexOf(about, StringComparison.OrdinalIgnoreCase) >= 0;//true
+
+            //if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
+            //if (true)
+            if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
+            {
+                string newContent = $"loglevel: {needloglevel.ToString()}, about: {about}, location: {location}\n   message: {message}";
+                try
+                {
+                    Console.WriteLine(newContent);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"操作失败: {ex.Message}");
+                    return;
+                }
+                return;
+            }
+
             if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
             {
                 string filePath = "LH_MySlugcat_log.txt";
@@ -53,9 +74,7 @@ namespace MySlugcat
                     Console.WriteLine($"操作失败: {ex.Message}");
                 }
             }
-
-            string Disabled = "";
-            bool isContains = Disabled.IndexOf(about, StringComparison.OrdinalIgnoreCase) >= 0;//true
+            return;
 
             if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
             {

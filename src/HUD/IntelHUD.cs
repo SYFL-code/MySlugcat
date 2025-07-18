@@ -110,7 +110,19 @@ namespace MySlugcat
             Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"st");
             // 在Update()方法中更新指针逻辑
             showPointer = false; // 默认不显示指针
-            if (hud.owner is Player player)
+
+            if (hud.owner is Player player && player.slugcatStats.name == Plugin.YourSlugID)
+            {
+                Creature? creature = MyPlayer.FindNearestCreature(player.mainBodyChunk.pos, player.room, false, player, false, 2);
+                if (creature != null)
+                {
+                    shouldPointAt = Custom.DirVec(player.mainBodyChunk.pos, creature.mainBodyChunk.pos);
+                    goalPointerColor = creature.ShortCutColor();
+                }
+                showPointer = creature != null && !player.inShortcut;
+            }
+
+            /*if (hud.owner is Player player)
             {
                 Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"player ({hud.owner is Player})");
                 // 获取玩家当前房间
@@ -128,10 +140,10 @@ namespace MySlugcat
                         // 寻找房间内最近的拾荒者作为指向目标
                         foreach (var crit in room.abstractRoom.creatures)
                         {
-                            //if (/* 是有效的拾荒者 */)
-                            /*if (!crit.state.dead &&
-                                (crit.creatureTemplate.type == CreatureTemplate.Type.Scavenger || crit.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.ScavengerElite) &&
-                                crit.realizedCreature != null && !crit.realizedCreature.inShortcut)*/
+                            //if (是有效的拾荒者)
+                            //if (!crit.state.dead &&
+                            //    (crit.creatureTemplate.type == CreatureTemplate.Type.Scavenger || crit.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.ScavengerElite) &&
+                            //    crit.realizedCreature != null && !crit.realizedCreature.inShortcut)
                             if (!crit.state.dead && crit.realizedCreature != null && !crit.realizedCreature.inShortcut && crit.realizedCreature is Creature creature1 && crit.realizedCreature is not Player)
                             {
                                 // 使用ScoreOfPointScav方法计算最佳目标
@@ -151,7 +163,8 @@ namespace MySlugcat
                     showPointer = creature != null && !player.inShortcut;
 
                 }
-            }
+            }*/
+
             // 平滑更新指针方向（使用球面线性插值）
             lastPointAt = pointAt;
             pointAt = Vector3.Slerp(pointAt, shouldPointAt, 0.3f);
@@ -185,7 +198,7 @@ namespace MySlugcat
         public override void Draw(float timeStacker)
         {
             Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"player ({hud.owner is Player})");
-            if (hud.owner is Player player)
+            if (hud.owner is Player player && player.slugcatStats.name == Plugin.YourSlugID)
             {
                 Room room = player.abstractCreature.world.game.cameras[0].room;
                 Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"Room_Null ({room == null})");

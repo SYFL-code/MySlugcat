@@ -259,6 +259,21 @@ namespace MySlugcat
 
 
 
+        // 有害的生物
+        public static bool HarmfulCreature(Creature creature)
+        {
+            if (creature == null || creature is SandGrub || creature is TentaclePlant || creature is Lizard ||
+                creature is BigEel || creature is DaddyLongLegs || creature is Vulture ||
+                creature is EggBug || creature is Centipede || creature is Spider || creature is MirosBird ||
+                creature is Scavenger || creature is BigNeedleWorm || creature is DropBug || creature is BigMoth ||
+                (creature is Inspector inspector && inspector.Consious == false) || creature is PoleMimic || 
+                creature is BigJellyFish || creature is StowawayBug || creature is Loach || creature is Frog ||
+                (creature is BoxWorm boxWorm && boxWorm.Consious == false) || creature is DrillCrab)
+            {
+                return true;// creature is Leech || 
+            }
+            return false;
+        }
 
         // 禁用的生物
         public static bool DisabledCreature(Creature creature)
@@ -344,7 +359,7 @@ namespace MySlugcat
         }
 
         // 查找当前房间中距离自身最近的生物
-        public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
+        public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature, int select)
         {
 #if MYDEBUG
             try
@@ -375,7 +390,11 @@ namespace MySlugcat
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
-                if (DisabledCreature(c))// 禁用生物
+                if (DisabledCreature(c) && select ==1)// 禁用生物
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
+                if (!HarmfulCreature(c) && select == 2)// 无害生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }

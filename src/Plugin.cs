@@ -47,6 +47,7 @@ namespace MySlugcat
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             //玩家能力
             MyPlayer.Hook();
+            IntelHUD.Hook();
             Frame​​Skill.Hook();
             DeflagrationSkill.Hook();
             KnitmeshSkill.Hook();

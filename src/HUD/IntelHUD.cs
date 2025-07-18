@@ -51,6 +51,24 @@ namespace MySlugcat
         public const float fadeSpeed = 0.2f;
 
 
+        public static void Hook()
+        {
+            On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
+            On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+        }
+
+        private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
+        {
+            orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
+            self.AddPart(new IntelHUD(self));
+        }
+
+        private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+        {
+            orig.Invoke(self, cam);
+            self.AddPart(new IntelHUD(self));
+        }
+
         public IntelHUD(HUD.HUD hud) : base(hud)
         {
             // 在构造函数中初始化指针线
@@ -236,5 +254,16 @@ namespace MySlugcat
             }
 
         }
+
+        // 清除指针精灵
+        public override void ClearSprites()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                scavPointerLines[i].RemoveFromContainer();
+            }
+        }
+
+
     }
 }

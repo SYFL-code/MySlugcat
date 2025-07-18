@@ -53,24 +53,28 @@ namespace MySlugcat
 
         public static void Hook()
         {
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:Hook", $"sst");
             On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
         }
 
         private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
         {
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSleepHud", $"st");
             orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
             self.AddPart(new IntelHUD(self));
         }
 
         private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSinglePlayerHud", $"st");
             orig.Invoke(self, cam);
             self.AddPart(new IntelHUD(self));
         }
 
         public IntelHUD(HUD.HUD hud) : base(hud)
         {
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:IntelHUD_", $"st_");
             // 在构造函数中初始化指针线
             scavPointerLines = new FSprite[9]; // 创建9个精灵用于组成3D指针
             for (int i = 0; i < 9; i++)
@@ -88,8 +92,9 @@ namespace MySlugcat
             goalPointerColor = Color.white; // 初始颜色设为白色
         }
 
-        public int ScoreOfPointScav(Player player, Scavenger scav)
+        public int ScoreOfPointScav(Player player, Creature scav)
         {
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:ScoreOfPointScav", $"st");
             int score = Custom.ManhattanDistance(player.abstractCreature.pos, scav.abstractCreature.pos);
 
             if (scav.room == null) return score;
@@ -102,20 +107,23 @@ namespace MySlugcat
 
         public override void Update()
         {
-
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"st");
             // 在Update()方法中更新指针逻辑
             showPointer = false; // 默认不显示指针
             if (hud.owner is Player player)
             {
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"player ({hud.owner is Player})");
                 // 获取玩家当前房间
                 Room room = player.abstractCreature.world.game.cameras[0].room;
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"Room_Null ({room == null})");
                 if (room != null)
                 {
-                    Scavenger? pointCreature = null;
+                    //Scavenger? pointCreature = null;
+                    Creature? creature = null;
 
                     // 如果显示指针功能开启
                     //if (Plugin.optiones.ShowPointer.Value)
-                    if (true)
+                    if (true && room.abstractRoom.creatures.Count > 0)
                     {
                         // 寻找房间内最近的拾荒者作为指向目标
                         foreach (var crit in room.abstractRoom.creatures)
@@ -124,23 +132,23 @@ namespace MySlugcat
                             /*if (!crit.state.dead &&
                                 (crit.creatureTemplate.type == CreatureTemplate.Type.Scavenger || crit.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.ScavengerElite) &&
                                 crit.realizedCreature != null && !crit.realizedCreature.inShortcut)*/
-                            if (!crit.state.dead && crit.realizedCreature != null && !crit.realizedCreature.inShortcut)
+                            if (!crit.state.dead && crit.realizedCreature != null && !crit.realizedCreature.inShortcut && crit.realizedCreature is Creature creature1 && crit.realizedCreature is not Player)
                             {
                                 // 使用ScoreOfPointScav方法计算最佳目标
-                                if (pointCreature == null || ScoreOfPointScav(player, crit.realizedCreature as Scavenger) < ScoreOfPointScav(player, pointCreature))
+                                if (creature == null || (crit.realizedCreature != null && ScoreOfPointScav(player, creature1) < ScoreOfPointScav(player, creature)))
                                 {
-                                    pointCreature = crit.realizedCreature as Scavenger;
+                                    creature = creature1;
                                 }
                             }
                         }
                     }
                     // 如果有指向目标且玩家不在捷径中，则显示指针
-                    if (pointCreature != null)
+                    if (creature != null)
                     {
                         // 计算从玩家指向目标的单位向量
-                        shouldPointAt = Custom.DirVec(player.mainBodyChunk.pos, pointCreature.mainBodyChunk.pos);
+                        shouldPointAt = Custom.DirVec(player.mainBodyChunk.pos, creature.mainBodyChunk.pos);
                     }
-                    showPointer = pointCreature != null && !player.inShortcut;
+                    showPointer = creature != null && !player.inShortcut;
 
                 }
             }
@@ -176,9 +184,11 @@ namespace MySlugcat
 
         public override void Draw(float timeStacker)
         {
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"player ({hud.owner is Player})");
             if (hud.owner is Player player)
             {
                 Room room = player.abstractCreature.world.game.cameras[0].room;
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"Room_Null ({room == null})");
                 if (room != null)
                 {
                     // 计算插值后的旋转因子
@@ -250,6 +260,8 @@ namespace MySlugcat
             // 设置指针颜色渐变
             for (int i = 0; i < 9; i++)
             {
+                scavPointerLines[i].alpha = pointerFade;
+                scavPointerLines[i].isVisible = scavPointerLines[i].alpha > 0f;
                 scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
             }
 
@@ -258,6 +270,7 @@ namespace MySlugcat
         // 清除指针精灵
         public override void ClearSprites()
         {
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:ClearSprites", $"st");
             for (int i = 0; i < 9; i++)
             {
                 scavPointerLines[i].RemoveFromContainer();

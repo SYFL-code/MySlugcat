@@ -25,6 +25,7 @@ namespace MySlugcat
 
 
         // Add hooks-添加钩子
+        //private PointerSkill PointerSkillHook = new PointerSkill();
 
         public void OnEnable()
         {
@@ -48,6 +49,7 @@ namespace MySlugcat
             //玩家能力
             MyPlayer.Hook();
             IntelHUD.Hook();
+            //PointerSkillHook.Hook();
             Frame​​Skill.Hook();
             DeflagrationSkill.Hook();
             KnitmeshSkill.Hook();

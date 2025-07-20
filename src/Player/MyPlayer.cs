@@ -92,6 +92,115 @@ namespace MySlugcat
 #endif
         }
 
+
+/*        private static void SaveState_LoadGame(On.SaveState.orig_LoadGame orig, SaveState saveState, string str, RainWorldGame game)
+        {
+            //24_2_16 保存bug
+            //if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value == false)
+            if (false)
+            {
+                orig.Invoke(saveState, str, game);
+                return;
+            }
+            //]]
+            orig.Invoke(saveState, str, game);
+            string[] array = Regex.Split(str, "<svA>");
+            foreach (var p in array)
+            {
+                string[] array2 = Regex.Split(p, "<svB>");
+                if (array2.Length != 0 && array2[0].Length > 0)
+                {
+                    if (array2[0] == GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield)
+                    {
+                        GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable = bool.Parse(array2[1]);
+                    }
+                    else if (array2[0] == GlobalVar.glacier2_iceshield_count_savefield)
+                    {
+                        GlobalVar.savedata_glacier2_iceshield_count = array2[1];
+                        GlobalVar.enableLoadData = true;
+
+                    }
+                }
+            }
+        }*/
+
+/*        private static string SaveState_SaveToString(On.SaveState.orig_SaveToString orig, SaveState saveState)
+        {
+            //24_2_16 保存bug
+            //if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value == false)
+            if (false)
+            {
+                return orig.Invoke(saveState);
+            }
+            //]]
+            string RemoveField(string dataText, string fieldName)
+            {
+                int index_start = dataText.IndexOf(fieldName);
+                //直到清除字段
+                while (index_start != -1)
+                {
+                    //清除字段数据
+                    int index_end = dataText.IndexOf("<svA>", index_start) + 5;
+                    dataText = dataText.Remove(index_start, index_end - index_start);
+                    index_start = dataText.IndexOf(fieldName);
+                }
+                return dataText;
+            }
+            var text = orig.Invoke(saveState);
+            //--------------------------------------冰盾能力解锁---------------------------------------------
+            //清除原来字段
+            text = RemoveField(text, GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield);
+            //写入能力启用数据
+            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield + "<svB>{0}<svA>", GlobalVar.glacier2_iceshield_lock);
+            //---------------------------------------冰盾计数------------------------------------------------
+            //检查玩家队伍里是否有glacier
+            List<Player> glacierList = new List<Player>();
+
+            //24_1_30 修复雨眠bug
+            if (GlobalVar.game == null ||
+                GlobalVar.game.Players == null)
+            {
+                return orig.Invoke(saveState);
+            }
+            //
+
+            foreach (var absc in GlobalVar.game.Players)
+            {
+                //24_1_30 修复雨眠bug
+                if (absc == null ||
+                    absc.realizedCreature == null)
+                    continue;
+                //
+                Player self = absc.realizedCreature as Player;
+                //如果不是glacier
+                if (self.slugcatStats.name != Plugin.YourSlugID)
+                    continue;
+                glacierList.Add(self);
+            }
+            //如果没有glacier则不保存数据
+            if (glacierList.Count == 0)
+                return orig.Invoke(saveState);
+
+            //保存所有glacier的冰盾数据
+            string numArr = "";
+            foreach (var self in glacierList)
+            {
+                //取每个glaicer玩家变量
+                GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+                //保存所有的冰盾数据
+                numArr += string.Format("{0},", pv.iceShieldList.Count);
+            }
+            //去除最后一个逗号
+            numArr = numArr.Substring(0, numArr.Length - 1);
+            //写入glacier们的冰盾数据
+            //清除原来字段
+            text = RemoveField(text, GlobalVar.glacier2_iceshield_count_savefield);
+            //写入冰盾数据
+            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.glacier2_iceshield_count_savefield + "<svB>{0}<svA>", numArr);
+            return text;
+        }*/
+
+
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
 #if MYDEBUG
@@ -300,6 +409,11 @@ namespace MySlugcat
             List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
             float radiusSquared = radius * radius;
 
+            if (!(room.abstractRoom.creatures.Count > 0))
+            {
+                return null;
+            }
+
             foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)
             {
                 Creature c = abstractCreature.realizedCreature;
@@ -369,6 +483,11 @@ namespace MySlugcat
             Creature? nearest = null;        // 最近生物对象
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
             //List<Creature> creatures = new List<Creature>();
+
+            if (!(room.abstractRoom.creatures.Count > 0))
+            {
+                return null;
+            }
 
             // 遍历当前房间所有生物
             foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)
@@ -445,6 +564,11 @@ namespace MySlugcat
             //Creature? nearest = null;        // 最近生物对象
             //float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
             List<Creature> creatures = new List<Creature>();
+
+            if (!(room.abstractRoom.creatures.Count > 0))
+            {
+                return null;
+            }
 
             // 遍历当前房间所有生物
             foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)

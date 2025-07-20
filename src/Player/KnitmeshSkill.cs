@@ -38,7 +38,7 @@ namespace MySlugcat
 
         private static void Knitmesh(Player self, Room room, Vector2 pos)
         {
-            List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, 60f, false, self, false, true);
+            List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, self, false, true);
 
             Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"creatures_Null ({creatures == null})");
 
@@ -81,7 +81,7 @@ namespace MySlugcat
                         Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"zh");
 
                         float j = UnityEngine.Random.Range(0.01f, 8.00f);
-                        for (int i = 0; i < 3600 / (Distance * Distance) * 1.5 * j; i++)
+                        for (int i = 0; i < 160000 / (Distance * Distance) * 1.5 * j; i++)
                         {
                             Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
                             Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
@@ -104,6 +104,30 @@ namespace MySlugcat
                     }
 
                 }
+            }
+            else
+            {
+                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
+
+                for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
+                {
+                    Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                    Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+
+                    SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                    SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                    bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                    bee.ignoreCreature = self;
+                    //bee.room.RoomRect
+                    bee.forceAngry = true;
+                    self.room.AddObject(bee);
+                    bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                    bee2.ignoreCreature = self;
+                    //bee.room.RoomRect
+                    bee2.forceAngry = true;
+                    self.room.AddObject(bee2);
+                }
+                self.room.PlaySound(SoundID.Spore_Bees_Emerge, self.firstChunk);
             }
 
         }

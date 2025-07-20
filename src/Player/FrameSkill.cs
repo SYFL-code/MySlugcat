@@ -20,6 +20,7 @@ using Menu.Remix;
 using MonoMod.RuntimeDetour;
 using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
+using System.Reflection;
 
 
 namespace MySlugcat
@@ -274,13 +275,16 @@ namespace MySlugcat
             int percentage = 40;
             if (probability == -1)
             {
-                percentage = 40;
+                percentage = 100;
             }
             else
             {
                 percentage = probability;
             }
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null})");
+            StackTrace stackTrace = new StackTrace();
+            StackFrame stackFrame = stackTrace.GetFrame(2);
+            MethodBase methodBase = stackFrame.GetMethod();
+            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name})");
             if (percentage > UnityEngine.Random.Range(0, 100) && creature != null)
             {
                 /*                Vector2 CV0 = creature.bodyChunks[0].pos;

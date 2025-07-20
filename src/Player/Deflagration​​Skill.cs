@@ -244,7 +244,7 @@ namespace MySlugcat
             Log.Logger(7, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID})");
             if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID)
             {
-                if (17 > UnityEngine.Random.Range(0, 300))
+                if (17 > UnityEngine.Random.Range(0, 3.00f))
                 {
                     Log.Logger(7, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"thrownBy ({spear.thrownBy})");
                     Explode(spear, null, spear.thrownBy);

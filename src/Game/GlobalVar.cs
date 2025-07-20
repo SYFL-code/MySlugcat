@@ -20,13 +20,19 @@ namespace MySlugcat
         //减速能力
         //public static ConditionalWeakTable<Creature, SlowDownAbility> slowdownCreature = new ConditionalWeakTable<Creature, SlowDownAbility>();
         //数据保存字段
-        // const string glacier2_iceshield_lock_savefield = "THEGLACIER2_ICESHIELD_LOCK";
+        public const string MySlugcat_LH_FrameSkill_Enable_savefield = "MySlugcat_LH_FrameSkill_Enable";
+        public const string MySlugcat_LH_DeflagrationSkill_Enable_savefield = "MySlugcat_LH_DeflagrationSkill_Enable";
+        public const string MySlugcat_LH_KnitmeshSkill_Enable_savefield = "MySlugcat_LH_KnitmeshSkill_Enable";
+        //public const string glacier2_iceshield_lock_savefield = "THEGLACIER2_ICESHIELD_LOCK";
         //public const string glacier2_iceshield_count_savefield = "THEGLACIER2_ICESHIELD_COUNT";
         //全局系统变量
         public static RainWorldGame? game = null;
         //最后一次的存档数据
-        public static bool glacier2_iceshield_lock;
-        public static string savedata_glacier2_iceshield_count = "";
+        public static bool MySlugcat_LH_FrameSkill_Enable;
+        public static bool MySlugcat_LH_DeflagrationSkill_Enable;
+        public static bool MySlugcat_LH_KnitmeshSkill_Enable;
+        //public static bool glacier2_iceshield_lock;
+        //public static string savedata_glacier2_iceshield_count = "";
         //是否使用存档数据载入玩家数据
         public static bool enableLoadData = false;
         //冰盾技能按键

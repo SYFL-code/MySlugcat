@@ -675,6 +675,7 @@ namespace MySlugcat
                         orig(self);
 
                         DeflagrationSkill.Player_Die(obj, wasDead);
+                        self.Destroy();
                     }
                 }
             }

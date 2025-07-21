@@ -23,7 +23,7 @@ namespace MySlugcat
         public static readonly PlayerFeature<bool> ExplodeOnDeath = PlayerBool("slugtemplate/explode_on_death");
         public static readonly GameFeature<float> MeanLizards = GameFloat("slugtemplate/mean_lizards");
 
-        private FixedSkill FixedSkillHook = new FixedSkill();
+        //private FixedSkill FixedSkillHook = new FixedSkill();
 
 
         // Add hooks-添加钩子
@@ -58,7 +58,7 @@ namespace MySlugcat
             KnitmeshSkill.Hook();
             DigestionSkill.Hook();
 
-            FixedSkillHook.Hook();
+            FixedSkill.Hook();
             Intros.Hook();
             //玩家图像
             //MyPlayerGraphics.Hook();

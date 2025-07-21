@@ -1,4 +1,255 @@
-﻿/*using On;
+﻿using On;
+using IL;
+using System;
+using Mono.Cecil;
+using MoreSlugcats;
+using RWCustom;
+using HUD;
+using Smoke;
+using static PhysicalObject;
+using UnityEngine;
+using System.Globalization;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Collections;
+using SlugBase.Features;
+using System.Diagnostics;
+using ImprovedInput;
+using System.Linq;
+using RewiredConsts;
+using Menu.Remix;
+using MonoMod.RuntimeDetour;
+using Watcher;
+using static MonoMod.InlineRT.MonoModRule;
+
+
+public class CreaturePointer
+{
+    private readonly Creature owner;
+    private readonly FContainer pointerContainer;
+    private readonly FSprite pointerSprite;
+    private readonly FSprite circleSprite;
+
+    private const float PointerLength = 20f; // 缩短指针长度
+    private const float PointerWidth = 8f;  // 增加指针宽度
+    private const float CircleRadius = 30f;
+    private const float RotationSpeed = 90f; // 度/秒
+
+    // 在CreaturePointer类中添加
+    private Color startColor = Color.green;
+    private Color endColor = Color.red;
+    private float maxDistance = 500f; // 最大距离阈值
+
+    // 在CreaturePointer类中添加
+    private float pulseSpeed = 3f; // 脉冲速度
+    private float pulseIntensity = 0.2f; // 脉冲强度
+    private float baseLength; // 存储原始长度
+
+    // 新增淡入淡出控制变量
+    private float fadeState = 0f; // 0-1表示淡入淡出进度
+    private const float FadeSpeed = 2f; // 淡入淡出速度
+    private bool isActive = false;
+
+    private List<LightSource> glowEffects = new List<LightSource>();
+
+    public CreaturePointer(Creature owner)
+    {
+        this.owner = owner;
+
+        // 创建显示容器
+        pointerContainer = new FContainer();
+        Futile.stage.AddChild(pointerContainer);
+
+        // 初始完全透明
+        pointerContainer.alpha = 0f;
+
+        // 创建指针精灵 - 使用三角形而不是矩形
+        pointerSprite = new FSprite("Triangle")
+        {
+            scaleX = PointerWidth * 0.5f,
+            scaleY = PointerLength * 0.5f,
+            color = Color.red,
+            anchorX = 0.5f,
+            anchorY = 0f // 锚点在底部中心
+        };
+
+        // 创建背景圆环 - 更透明
+        circleSprite = new FSprite("Circle20")
+        {
+            scale = CircleRadius / 20f,
+            color = new Color(1f, 1f, 1f, 0.2f) // 增加透明度
+        };
+
+        pointerContainer.AddChild(circleSprite);
+        pointerContainer.AddChild(pointerSprite);
+
+        baseLength = PointerLength;
+
+        for (int i = 0; i < 3; i++)
+        {
+            var light = new LightSource(owner.mainBodyChunk.pos, false, Color.red, owner);
+            glowEffects.Add(light);
+            owner.room.AddObject(light);
+        }
+    }
+
+    // 可以公开这些属性供外部调整
+    public void SetColorRange(Color nearColor, Color farColor, float maxDist)
+    {
+        endColor = nearColor;
+        startColor = farColor;
+        maxDistance = maxDist;
+    }
+    public void SetPulseEffect(float speed, float intensity)
+    {
+        pulseSpeed = speed;
+        pulseIntensity = intensity;
+    }
+
+    public void Update(Vector2 nearestPos, float timeStacker, AbstractCreature abstractCreature)
+    {
+        // 销毁检查
+        if (owner.room == null || owner.slatedForDeletetion)
+        {
+            Destroy();
+            return;
+        }
+
+        // 更新激活状态
+        bool shouldBeActive = (nearestPos != null);
+        if (shouldBeActive != isActive)
+        {
+            isActive = shouldBeActive;
+            fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
+        }
+
+        // 淡入淡出控制
+        fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
+        fadeState = Mathf.Clamp01(fadeState);
+        pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
+
+        // 如果没有激活或完全透明，跳过更新
+        if (fadeState <= 0f || !(nearestPos != null)) return;
+
+        // 计算指向目标的角度
+        Vector2 ownerPos = owner.mainBodyChunk.pos;
+        float targetAngle = Custom.VecToDeg(nearestPos - ownerPos);
+
+        // 平滑旋转
+        float currentAngle = Mathf.LerpAngle(
+            pointerSprite.rotation,
+            targetAngle,
+            timeStacker * RotationSpeed * 0.01f);
+
+        // 更新指针位置和旋转
+        pointerContainer.SetPosition(ownerPos);
+        pointerSprite.rotation = currentAngle;
+
+        // 调整指针位置(尖端指向目标)
+        Vector2 pointerOffset = Custom.DegToVec(currentAngle) * CircleRadius;
+        pointerSprite.SetPosition(pointerOffset);
+
+        // 根据淡入淡出状态调整大小(可选效果)
+        float scaleMod = 0.8f + EaseInOut(fadeState) * 0.4f;
+        pointerSprite.scaleX = PointerWidth * 0.5f * scaleMod;
+        pointerSprite.scaleY = PointerLength * 0.5f * scaleMod;
+
+        /*        // 计算指针位置(围绕生物旋转)
+                Vector2 ownerPos = owner.mainBodyChunk.pos;
+                float angle = Mathf.LerpAngle(
+                    pointerSprite.rotation,
+                    Custom.VecToDeg(nearestPos - ownerPos),
+                    timeStacker * RotationSpeed * 0.01f);*/
+
+        /*        // 更新指针位置和旋转
+                pointerContainer.SetPosition(ownerPos);
+                pointerSprite.rotation = angle;*/
+
+        // 危险程度指示(根据生物类型)
+        if (owner.room != null)
+        {
+            AbstractCreature target = abstractCreature;
+            if (target != null)
+            {
+                float threatLevel = CalculateThreatLevel(target);
+                pointerSprite.alpha = 0.5f + threatLevel * 0.5f;
+
+                // 危险时增加脉冲强度
+                SetPulseEffect(3f, 0.1f + threatLevel * 0.3f);
+            }
+        }
+
+        // 在Update方法中添加
+        circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);
+
+        // 在Update方法中添加
+        pointerSprite.color = Color.Lerp(
+            new Color(1f, 1f, 1f, 0f),
+            Color.red,
+            EaseInOut(fadeState));
+
+        if ((nearestPos != null))
+        {
+            float distance2 = Vector2.Distance(owner.mainBodyChunk.pos, nearestPos);
+            float shakeIntensity = Mathf.Clamp01(1f - distance2 / 300f) * fadeState;
+
+            pointerSprite.SetPosition(pointerOffset + Custom.RNV() * shakeIntensity * 3f);
+        }
+
+        // 更新发光效果
+        Vector2 pointerTip = owner.mainBodyChunk.pos +
+            Custom.DegToVec(pointerSprite.rotation) * (CircleRadius + PointerLength);
+
+        for (int i = 0; i < glowEffects.Count; i++)
+        {
+            Vector2 offset = Custom.RNV() * 5f * (i + 1);
+            glowEffects[i].pos = pointerTip + offset;
+            glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
+            glowEffects[i].setAlpha = 0.7f;
+        }
+
+        // 动态颜色变化
+        float distance = Vector2.Distance(owner.mainBodyChunk.pos, nearestPos);
+        float colorLerp = Mathf.Clamp01(distance / maxDistance);
+        pointerSprite.color = Color.Lerp(endColor, startColor, colorLerp);
+
+        // 脉冲动画
+        float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
+        pointerSprite.scaleX = baseLength * (1f + pulse * pulseIntensity);
+
+/*        // 使指针指向目标
+        Vector2 pointerDir = Custom.DegToVec(angle);
+        pointerSprite.SetPosition(pointerDir * CircleRadius);*/
+    }
+
+    private float CalculateThreatLevel(AbstractCreature creature)
+    {
+        // 根据生物类型返回威胁等级(0-1)
+        if (creature.creatureTemplate.type == CreatureTemplate.Type.RedLizard)
+            return 1f;
+        if (creature.creatureTemplate.type == CreatureTemplate.Type.BlueLizard)
+            return 0.7f;
+        return 0.3f;
+    }
+
+    // 缓动函数 - 使动画更自然
+    private float EaseInOut(float t)
+    {
+        return t < 0.5f ? 2f * t * t : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f;
+    }
+
+    public void Destroy()
+    {
+        pointerContainer.RemoveFromContainer();
+    }
+}
+
+
+
+
+
+
+/*using On;
 using IL;
 using System;
 using Mono.Cecil;

@@ -31,18 +31,20 @@ namespace MySlugcat
     {
         private static Dictionary<Creature, FreezeData> frozenCreature = new Dictionary<Creature, FreezeData>();
 
+        private static CreaturePointer[] pointer = new CreaturePointer[20];
+
         //private static SoundID freezeCreature = new SoundID("a", false);
         //private static SoundID unfreezeCreature = new SoundID("b", false);
 
 
 
-        public void Hook()
+        public static void Hook()
         {
 #if MYDEBUG
             try
             {
 #endif
-            //On.Player.ctor += Player_ctor;
+            On.Player.ctor += Player_ctor;
             On.Player.Update += Player_Update;
             On.Creature.Update += Creature_Update;
             On.Creature.Die += Creature_Die;
@@ -64,7 +66,7 @@ namespace MySlugcat
 #endif
         }
 
-        private void RoomCamera_DrawUpdate(On.RoomCamera.orig_DrawUpdate orig, RoomCamera rCamera, float timeStacker, float timeSpeed)
+        private static void RoomCamera_DrawUpdate(On.RoomCamera.orig_DrawUpdate orig, RoomCamera rCamera, float timeStacker, float timeSpeed)
         {
             orig(rCamera, timeStacker, timeSpeed);
 
@@ -86,16 +88,33 @@ namespace MySlugcat
             }
         }
 
-        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        {
+            orig.Invoke(self, abstractCreature, world);
+
+            int N = self.playerState.playerNumber;
+            pointer[N] = new CreaturePointer(self);
+        }
+
+        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
 
             if (self.slugcatStats.name == Plugin.YourSlugID && SC.FixedSkill)
             {
+                Creature? creature = MyPlayer.FindNearestCreature(self.firstChunk.pos, self.room, false, self, false, 1);
+                if (creature != null)
+                {
+                    int N = self.playerState.playerNumber;
+                    Vector2 nearestPos = creature.firstChunk.pos;
+                    pointer[N].Update(nearestPos, Time.deltaTime, creature.abstractCreature);
+                }
+                
+
                 //if ((self.input[0].pckp || self.input[0].mp) &&
                 //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)
                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({self.input[0].pckp}), bool2 ({!self.input[1].pckp}), bool3 ({self.room.abstractRoom.creatures.Count > 0})");
-                if (self.input[0].pckp && !self.input[1].pckp)
+                if (self.input[0].pckp && !self.input[1].pckp && false)
                 {
                     //self.playerState.foodInStomach -= 2;
 
@@ -120,7 +139,8 @@ namespace MySlugcat
 
                             Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_stt", $"bool1 ({distance <= 500f}), bool2 ({Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f})");
                             //normalized adj.标准化的；正常化的
-                            if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f)
+                            //if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f)
+                            if (distance <= 500f)
                             {
                                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_sh", $"T");
                                 FreezeCreature(c);
@@ -133,7 +153,7 @@ namespace MySlugcat
             }
         }
 
-        private void FreezeCreature(Creature creature)
+        private static void FreezeCreature(Creature creature)
         {
             if (frozenCreature.ContainsKey(creature)) return;
 
@@ -154,7 +174,9 @@ namespace MySlugcat
             }
 
             // 禁用AI
-            creature.abstractCreature.abstractAI = null;
+            creature.stun = 600;
+            creature.Stun(2);
+            //creature.abstractCreature.abstractAI = null;
 
             // 添加粒子效果
             for (int i = 0; i < 5; i++)
@@ -166,7 +188,7 @@ namespace MySlugcat
             frozenCreature.Add(creature, freezeData);
         }
 
-        private void UnfreezeCreature(Creature creature)
+        private static void UnfreezeCreature(Creature creature)
         {
             if (!frozenCreature.TryGetValue(creature, out var freezeData)) return;
             //if (frozenCreature.ContainsKey(creature)) return;
@@ -181,7 +203,7 @@ namespace MySlugcat
             }
 
             // 恢复AI
-            creature.abstractCreature.abstractAI = freezeData.originalAI;
+            //creature.abstractCreature.abstractAI = freezeData.originalAI;
 
             if (freezeData.particles != null)
             {
@@ -199,7 +221,7 @@ namespace MySlugcat
             frozenCreature.Remove(creature);
         }
 
-        private void Creature_Update(On.Creature.orig_Update orig, Creature self, bool eu)
+        private static void Creature_Update(On.Creature.orig_Update orig, Creature self, bool eu)
         {
             orig(self, eu);
 
@@ -234,7 +256,7 @@ namespace MySlugcat
             }
         }
 
-        private void Creature_Die(On.Creature.orig_Die orig, Creature self)
+        private static void Creature_Die(On.Creature.orig_Die orig, Creature self)
         {
             if (frozenCreature.ContainsKey(self))
             {

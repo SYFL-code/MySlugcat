@@ -275,7 +275,7 @@ namespace MySlugcat
             int percentage = 40;
             if (probability == -1)
             {
-                percentage = 100;
+                percentage = 23;
             }
             else
             {

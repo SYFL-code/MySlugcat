@@ -244,7 +244,7 @@ namespace MySlugcat
             Log.Logger(7, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
             if (spear.thrownBy != null && spear.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID && SC.DeflagrationSkill)
             {
-                if (17 > UnityEngine.Random.Range(0, 3.00f))
+                if (15 > UnityEngine.Random.Range(0, 300))
                 {
                     Log.Logger(7, "Spear", "MySlugcat:Deflagration​​:Spear_SetRandomSpin", $"thrownBy ({spear.thrownBy})");
                     Explode(spear, null, spear.thrownBy);
@@ -263,7 +263,7 @@ namespace MySlugcat
                 Log.Logger(7, "Rock", "MySlugcat:Deflagration​​:Rock_SetRandomSpin", $"({weapon is Rock}), ({rock.thrownBy != null}), ({rock.thrownBy is Player}), ({rock.thrownBy is Player && ((Player)rock.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
                 if (rock.thrownBy != null && rock.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID && SC.DeflagrationSkill)
                 {
-                    if (10 > UnityEngine.Random.Range(0, 300))
+                    if (8 > UnityEngine.Random.Range(0, 300))
                     {
                         Log.Logger(4, "Rock", "MySlugcat:Deflagration​​:Rock_SetRandomSpin", $"thrownBy ({rock.thrownBy})");
                         Explode(rock, null, rock.thrownBy);
@@ -293,7 +293,7 @@ namespace MySlugcat
             Weapon.Mode mode = rock.mode;
             bool obj = orig.Invoke(rock, result, eu);
             //if (26 > UnityEngine.Random.Range(0, 100))
-            if (10 > UnityEngine.Random.Range(0, 100) && (obj || mode != rock.mode))
+            if (8 > UnityEngine.Random.Range(0, 100) && (obj || mode != rock.mode))
             {
                 Explode(rock, result.chunk, self);
                 rock.Destroy();
@@ -322,7 +322,7 @@ namespace MySlugcat
 
             Weapon.Mode mode = lillyPuck.mode;
             bool obj = orig.Invoke(lillyPuck, result, eu);
-            if (30 > UnityEngine.Random.Range(0, 100) && (obj || mode != lillyPuck.mode))
+            if (20 > UnityEngine.Random.Range(0, 100) && (obj || mode != lillyPuck.mode))
             {
                 Explode(lillyPuck, result.chunk, self);
                 lillyPuck.Destroy();
@@ -342,7 +342,7 @@ namespace MySlugcat
             Log.Logger(7, "LillyPuck", "MySlugcat:Deflagration​​:LillyPuck_SetRandomSpin", $"({lillyPuck.thrownBy != null}), ({lillyPuck.thrownBy is Player}), ({lillyPuck.thrownBy is Player && ((Player)lillyPuck.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
             if (lillyPuck.thrownBy != null && lillyPuck.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID && SC.DeflagrationSkill)
             {
-                if (30 > UnityEngine.Random.Range(0, 300))
+                if (20 > UnityEngine.Random.Range(0, 300))
                 {
                     Log.Logger(7, "LillyPuck", "MySlugcat:Deflagration​​:LillyPuck_SetRandomSpin", $"thrownBy ({lillyPuck.thrownBy})");
                     Explode(lillyPuck, null, lillyPuck.thrownBy);
@@ -368,7 +368,7 @@ namespace MySlugcat
             return orig.Invoke(puffBall, result, eu);
 
             bool obj = orig.Invoke(puffBall, result, eu);
-        if (18 > UnityEngine.Random.Range(0, 100) && obj)
+        if (16 > UnityEngine.Random.Range(0, 100) && obj)
         {
             Explode(puffBall, result.chunk, self);
             //puffBall.abstractPhysicalObject.stuckObjects[0].Deactivate();
@@ -382,7 +382,7 @@ namespace MySlugcat
         {
             orig(puffBall);
 
-            if (15 > UnityEngine.Random.Range(0, 100))
+            if (10 > UnityEngine.Random.Range(0, 100))
             {
                 if (puffBall.thrownBy != null && puffBall.thrownBy is Player self && self.slugcatStats.name == Plugin.YourSlugID && SC.DeflagrationSkill)
                 {

@@ -30,18 +30,27 @@ public class CreaturePointer
 {
     private readonly Creature owner;
     private readonly FContainer pointerContainer;
-    private readonly FSprite pointerSprite;
+    //private readonly FSprite pointerSprite;
     private readonly FSprite circleSprite;
 
     private const float PointerLength = 20f; // 缩短指针长度
-    private const float PointerWidth = 20f;  // 增加指针宽度
+    private const float PointerWidth = 8f;  // 增加指针宽度
+    //private const float CircleRadius = 45f;
+    //private const float RotationSpeed = 90f; // 度/秒
+
+    // 调整指针尺寸参数
+    private const float PointerHeight = 30f;  // 纸飞机高度
+    private const float BaseWidth = 15f;     // 底部宽度
+    private const float NotchDepth = 5f;     // 底部凹陷深度
     private const float CircleRadius = 45f;
-    private const float RotationSpeed = 90f; // 度/秒
+    private const float RotationSpeed = 90f;
+
+    private TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
     // 在CreaturePointer类中添加
     private Color startColor = Color.green;
     private Color endColor = Color.red;
-    private float maxDistance = 500f; // 最大距离阈值
+    private float maxDistance = 750f; // 最大距离阈值
 
     // 在CreaturePointer类中添加
     private float pulseSpeed = 3f; // 脉冲速度
@@ -67,25 +76,64 @@ public class CreaturePointer
             pointerContainer.alpha = 0f; // 初始透明
 
             // 2. 使用可靠的"pixel"精灵创建指针
-            pointerSprite = new FSprite("pixel")
+            // 创建纸飞机形状的指针
+            /*pointerMesh = new TriangleMesh("pixel", new TriangleMesh.Triangle[]
+            {
+                new TriangleMesh.Triangle(0, 1, 2), // 主三角形
+                new TriangleMesh.Triangle(1, 3, 2),  // 底部凹陷部分
+                new TriangleMesh.Triangle(1, 4, 3)   // 底部凹陷部分
+            }, true, true);
+
+            // 定义顶点位置 (纸飞机形状)
+            pointerMesh.vertices[0] = new Vector2(0, PointerHeight); // 顶点
+            pointerMesh.vertices[1] = new Vector2(-BaseWidth/2, 0); // 左底角
+            pointerMesh.vertices[2] = new Vector2(BaseWidth/2, 0);  // 右底角
+            pointerMesh.vertices[3] = new Vector2(-BaseWidth/4, NotchDepth); // 左凹陷点
+            pointerMesh.vertices[4] = new Vector2(BaseWidth/4, NotchDepth);  // 右凹陷点*/
+            pointerMesh = new TriangleMesh("Futile_White", new TriangleMesh.Triangle[]
+            {
+            new TriangleMesh.Triangle(0, 1, 3),
+            new TriangleMesh.Triangle(0, 3, 4),
+            new TriangleMesh.Triangle(0, 4, 2),
+            new TriangleMesh.Triangle(1, 3, 4),
+            new TriangleMesh.Triangle(1, 4, 2)
+            }, true);
+
+            // 设置顶点位置
+            pointerMesh.vertices[0] = new Vector2(0f, 30f);
+            pointerMesh.vertices[1] = new Vector2(-15f, 0f);
+            pointerMesh.vertices[2] = new Vector2(15f, 0f);
+            pointerMesh.vertices[3] = new Vector2(-7.5f, 5f);
+            pointerMesh.vertices[4] = new Vector2(7.5f, 5f);
+
+            pointerMesh.color = Color.green;
+            pointerMesh.anchorX = 0.5f;
+            pointerMesh.anchorY = 0f; // 底部锚点
+            // 确保刷新网格
+            pointerMesh.Refresh();
+
+            /*pointerSprite = new FSprite("pixel")
             {
                 scaleX = PointerWidth,
                 scaleY = PointerLength,
                 color = Color.red,
                 anchorX = 0.5f,
                 anchorY = 0f // 中心锚点
-            };
+            };*/
 
             // 3. 创建圆环背景
             circleSprite = new FSprite("Circle20")
             {
                 scale = CircleRadius / 20f,
-                color = new Color(1f, 1f, 1f, 0.1f)
+                color = new Color(1f, 1f, 1f, 0.1f),
+                anchorX = 0.5f,
+                anchorY = 0.5f
             };
 
             // 4. 添加到容器
             pointerContainer.AddChild(circleSprite);
-            pointerContainer.AddChild(pointerSprite);
+            pointerContainer.AddChild(pointerMesh);
+            //pointerContainer.AddChild(pointerSprite);
 
             // 5. 初始化其他变量
             baseLength = PointerLength;
@@ -155,12 +203,27 @@ public class CreaturePointer
         float targetAngle = Custom.VecToDeg(nPos - ownerPos);
 
         // 平滑旋转
-            float currentAngle = Mathf.LerpAngle(
-                pointerSprite.rotation,
+        float currentAngle = Mathf.LerpAngle(
+                pointerMesh.rotation,
                 targetAngle,
                 timeStacker * RotationSpeed * 0.01f);
 
-            // 更新指针位置和旋转
+        // 计算从玩家到目标的方向向量
+        Vector2 pointerDir = Custom.DegToVec(currentAngle);
+
+        // 更新指针旋转时使用pointerMesh代替pointerSprite
+        pointerMesh.rotation = currentAngle;
+        pointerMesh.SetPosition(pointerDir * CircleRadius);
+
+        // 动态调整大小
+        //float scaleMod = 0.8f + EaseInOut(fadeState) * 0.4f;
+        //pointerMesh.scaleX = scaleMod;
+        //pointerMesh.scaleY = scaleMod;
+
+
+
+
+            /*// 更新指针位置和旋转
             pointerContainer.SetPosition(ownerPos);
             pointerSprite.rotation = currentAngle;
 
@@ -171,7 +234,7 @@ public class CreaturePointer
             // 根据淡入淡出状态调整大小(可选效果)
             float scaleMod = 0.8f + EaseInOut(fadeState) * 0.4f;
             pointerSprite.scaleX = PointerWidth * 0.5f * scaleMod;
-            pointerSprite.scaleY = PointerLength * 0.5f * scaleMod;
+            pointerSprite.scaleY = PointerLength * 0.5f * scaleMod;*/
 
             // 危险程度指示(根据生物类型)
             /*if (owner.room != null)
@@ -195,11 +258,12 @@ public class CreaturePointer
             // 目标接近时震动效果
             float distance2 = Vector2.Distance(owner.mainBodyChunk.pos, nPos);
             float shakeIntensity = Mathf.Clamp01(1f - distance2 / 300f) * fadeState;
-        pointerSprite.SetPosition(pointerOffset + Custom.RNV() * shakeIntensity * 3f);
+        //pointerMesh.SetPosition(pointerDir * CircleRadius + Custom.RNV() * shakeIntensity * 3f);
+        pointerMesh.SetPosition(new Vector2(300, 300) + Custom.RNV() * shakeIntensity * 3f);
 
-            // 更新发光效果
-            Vector2 pointerTip = owner.mainBodyChunk.pos +
-                Custom.DegToVec(pointerSprite.rotation) * (CircleRadius + PointerLength);
+        // 更新发光效果
+        Vector2 pointerTip = owner.mainBodyChunk.pos +
+                Custom.DegToVec(pointerMesh.rotation) * (CircleRadius + PointerLength);
             for (int i = 0; i < glowEffects.Count; i++)
             {
                 Vector2 offset = Custom.RNV() * 5f * (i + 1);
@@ -210,12 +274,20 @@ public class CreaturePointer
 
             // 动态颜色变化
             float distance = Vector2.Distance(owner.mainBodyChunk.pos, nPos);
-            float colorLerp = Mathf.Clamp01(distance / maxDistance);
-            pointerSprite.color = Color.Lerp(endColor, startColor, colorLerp);
+            float Lerp = Mathf.Clamp01(distance / maxDistance);
+            //pointerSprite.color = Color.Lerp(endColor, startColor, colorLerp);
+        // 颜色变化
+        pointerMesh.color = Color.Lerp(endColor, startColor, Lerp);
 
-            // 脉冲动画
-            float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
-            pointerSprite.scaleX = baseLength * (1f + pulse * pulseIntensity);
+        // 脉冲动画
+        float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
+        float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
+        if (distance >= 520)
+        {
+            pulseIntensity_ = 0f;
+        }
+        pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_);
+        pointerMesh.scaleY = 8f * (1f + pulse * pulseIntensity_);
     }
 
     private float CalculateThreatLevel(Creature target)

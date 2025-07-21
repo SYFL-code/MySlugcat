@@ -31,7 +31,7 @@ namespace MySlugcat
     {
         private static Dictionary<Creature, FreezeData> frozenCreature = new Dictionary<Creature, FreezeData>();
 
-        private static CreaturePointer[] pointer = new CreaturePointer[20];
+        
 
         //private static SoundID freezeCreature = new SoundID("a", false);
         //private static SoundID unfreezeCreature = new SoundID("b", false);
@@ -44,7 +44,6 @@ namespace MySlugcat
             try
             {
 #endif
-            On.Player.ctor += Player_ctor;
             On.Player.Update += Player_Update;
             On.Creature.Update += Creature_Update;
             On.Creature.Die += Creature_Die;
@@ -88,29 +87,12 @@ namespace MySlugcat
             }
         }
 
-        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
-        {
-            orig.Invoke(self, abstractCreature, world);
-
-            int N = self.playerState.playerNumber;
-            pointer[N] = new CreaturePointer(self);
-        }
-
         private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
 
             if (self.slugcatStats.name == Plugin.YourSlugID && SC.FixedSkill)
             {
-                Creature? creature = MyPlayer.FindNearestCreature(self.firstChunk.pos, self.room, false, self, false, 1);
-                if (creature != null)
-                {
-                    int N = self.playerState.playerNumber;
-                    Vector2 nearestPos = creature.firstChunk.pos;
-                    pointer[N].Update(nearestPos, Time.deltaTime, creature.abstractCreature);
-                }
-                
-
                 //if ((self.input[0].pckp || self.input[0].mp) &&
                 //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)
                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({self.input[0].pckp}), bool2 ({!self.input[1].pckp}), bool3 ({self.room.abstractRoom.creatures.Count > 0})");

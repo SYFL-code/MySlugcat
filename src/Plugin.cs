@@ -57,6 +57,7 @@ namespace MySlugcat
             DeflagrationSkill.Hook();
             KnitmeshSkill.Hook();
             DigestionSkill.Hook();
+            CreaturePointer.Hook();
 
             FixedSkill.Hook();
             Intros.Hook();

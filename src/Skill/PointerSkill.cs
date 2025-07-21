@@ -25,7 +25,7 @@ using static MonoMod.InlineRT.MonoModRule;
 
 namespace MySlugcat
 {
-    //感知技能
+    //感知能力
     public class PointerSkill
     {
 
@@ -242,45 +242,45 @@ namespace MySlugcat
                                             stat.Draw(timeStacker, room.game.cameras[0].pos);
                                         }*/
 
-                    /*// 设置指针颜色渐变
-                    for (int i = 0; i < 9; i++)
-                    {
-                        scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
-                    }*//*
-                }
-            }
+/*// 设置指针颜色渐变
+for (int i = 0; i < 9; i++)
+{
+    scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
+}*//*
+}
+}
 
-            // 设置指针颜色渐变
-            for (int i = 0; i < 9; i++)
-            {
-                if (scavPointerLines != null)
-                {
-                    scavPointerLines[i].alpha = pointerFade;
-                    scavPointerLines[i].isVisible = scavPointerLines[i].alpha > 0f;
-                    scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
-                }
-                
-            }
+// 设置指针颜色渐变
+for (int i = 0; i < 9; i++)
+{
+if (scavPointerLines != null)
+{
+scavPointerLines[i].alpha = pointerFade;
+scavPointerLines[i].isVisible = scavPointerLines[i].alpha > 0f;
+scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
+}
 
-        }
+}
 
-        // 清除指针精灵
-        public void ClearSprites(On.HUD.HudPart.orig_ClearSprites orig, HUD.HudPart hudPart)
-        {
-            orig(hudPart);
+}
 
-            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:ClearSprites", $"st");
-            for (int i = 0; i < 9; i++)
-            {
-                if (scavPointerLines != null)
-                {
-                    scavPointerLines[i].RemoveFromContainer();
-                }
-                    
-            }
-        }
+// 清除指针精灵
+public void ClearSprites(On.HUD.HudPart.orig_ClearSprites orig, HUD.HudPart hudPart)
+{
+orig(hudPart);
+
+Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:ClearSprites", $"st");
+for (int i = 0; i < 9; i++)
+{
+if (scavPointerLines != null)
+{
+scavPointerLines[i].RemoveFromContainer();
+}
+
+}
+}
 
 
 
-    }
+}
 }*/

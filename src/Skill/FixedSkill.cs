@@ -26,7 +26,7 @@ using System.Threading;
 
 namespace MySlugcat
 {
-    //定身技能
+    //定身能力
     public class FixedSkill
     {
         private static Dictionary<Creature, FreezeData> frozenCreature = new Dictionary<Creature, FreezeData>();
@@ -90,10 +90,11 @@ namespace MySlugcat
         {
             orig(self, eu);
 
-            if (self.slugcatStats.name == Plugin.YourSlugID)
+            if (self.slugcatStats.name == Plugin.YourSlugID && SC.FixedSkill)
             {
                 //if ((self.input[0].pckp || self.input[0].mp) &&
                 //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)
+                Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({self.input[0].pckp}), bool2 ({!self.input[1].pckp}), bool3 ({self.room.abstractRoom.creatures.Count > 0})");
                 if (self.input[0].pckp && !self.input[1].pckp)
                 {
                     //self.playerState.foodInStomach -= 2;
@@ -103,25 +104,31 @@ namespace MySlugcat
                     Vector2 direction = self.input[0].x != 0 ? new Vector2(self.input[0].x, 0) : Vector2.right;
                     Vector2 startPos = self.mainBodyChunk.pos;
 
-                    foreach (AbstractCreature abstractCreature in self.room.abstractRoom.creatures)
+                    if (self.room.abstractRoom.creatures.Count > 0)
                     {
-                        Creature c = abstractCreature.realizedCreature;
-
-                        if (c == null ||             // 确保生物存在
-                            c == self ||             // 排除自身
-                            c.dead) // 确保有有效的mainBodyChunk
-                        { continue; } // 跳过无效项，继续检查下一个
-
-                        Vector2 toCreature = c.mainBodyChunk.pos - startPos;
-                        float distance = toCreature.magnitude;//magnitude n.大小；重要；光度；（地震）级数；（星星）等级
-
-                        //normalized adj.标准化的；正常化的
-                        if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f )
+                        foreach (AbstractCreature abstractCreature in self.room.abstractRoom.creatures)
                         {
-                            FreezeCreature(c);
-                        }
+                            Creature c = abstractCreature.realizedCreature;
 
+                            if (c == null ||             // 确保生物存在
+                                c == self ||             // 排除自身
+                                c.dead) // 确保有有效的mainBodyChunk
+                            { continue; } // 跳过无效项，继续检查下一个
+
+                            Vector2 toCreature = c.mainBodyChunk.pos - startPos;
+                            float distance = toCreature.magnitude;//magnitude n.大小；重要；光度；（地震）级数；（星星）等级
+
+                            Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_stt", $"bool1 ({distance <= 500f}), bool2 ({Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f})");
+                            //normalized adj.标准化的；正常化的
+                            if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f)
+                            {
+                                Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_sh", $"T");
+                                FreezeCreature(c);
+                            }
+
+                        }
                     }
+                    
                 }
             }
         }

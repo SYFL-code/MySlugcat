@@ -114,9 +114,9 @@ namespace MySlugcat
                     {
                         GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable = bool.Parse(array2[1]);
                     }
-                    else if (array2[0] == GlobalVar.glacier2_iceshield_count_savefield)
+                    else if (array2[0] == GlobalVar.MySlugcat2_iceshield_count_savefield)
                     {
-                        GlobalVar.savedata_glacier2_iceshield_count = array2[1];
+                        GlobalVar.savedata_MySlugcat2_iceshield_count = array2[1];
                         GlobalVar.enableLoadData = true;
 
                     }
@@ -151,10 +151,10 @@ namespace MySlugcat
             //清除原来字段
             text = RemoveField(text, GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield);
             //写入能力启用数据
-            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield + "<svB>{0}<svA>", GlobalVar.glacier2_iceshield_lock);
+            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.MySlugcat_LH_KnitmeshSkill_Enable_savefield + "<svB>{0}<svA>", GlobalVar.MySlugcat2_iceshield_lock);
             //---------------------------------------冰盾计数------------------------------------------------
-            //检查玩家队伍里是否有glacier
-            List<Player> glacierList = new List<Player>();
+            //检查玩家队伍里是否有MySlugcat
+            List<Player> MySlugcatList = new List<Player>();
 
             //24_1_30 修复雨眠bug
             if (GlobalVar.game == null ||
@@ -172,18 +172,18 @@ namespace MySlugcat
                     continue;
                 //
                 Player self = absc.realizedCreature as Player;
-                //如果不是glacier
+                //如果不是MySlugcat
                 if (self.slugcatStats.name != Plugin.YourSlugID)
                     continue;
-                glacierList.Add(self);
+                MySlugcatList.Add(self);
             }
-            //如果没有glacier则不保存数据
-            if (glacierList.Count == 0)
+            //如果没有MySlugcat则不保存数据
+            if (MySlugcatList.Count == 0)
                 return orig.Invoke(saveState);
 
-            //保存所有glacier的冰盾数据
+            //保存所有MySlugcat的冰盾数据
             string numArr = "";
-            foreach (var self in glacierList)
+            foreach (var self in MySlugcatList)
             {
                 //取每个glaicer玩家变量
                 GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
@@ -192,11 +192,11 @@ namespace MySlugcat
             }
             //去除最后一个逗号
             numArr = numArr.Substring(0, numArr.Length - 1);
-            //写入glacier们的冰盾数据
+            //写入MySlugcat们的冰盾数据
             //清除原来字段
-            text = RemoveField(text, GlobalVar.glacier2_iceshield_count_savefield);
+            text = RemoveField(text, GlobalVar.MySlugcat2_iceshield_count_savefield);
             //写入冰盾数据
-            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.glacier2_iceshield_count_savefield + "<svB>{0}<svA>", numArr);
+            text += string.Format(CultureInfo.InvariantCulture, GlobalVar.MySlugcat2_iceshield_count_savefield + "<svB>{0}<svA>", numArr);
             return text;
         }*/
 
@@ -217,11 +217,11 @@ namespace MySlugcat
             }*/
 /*            if (self.room.world.game.rainWorld.ExpeditionMode)//在探险模式里开启冰盾能力
             {
-                GlobalVar.glacier2_iceshield_lock = false;
+                GlobalVar.MySlugcat2_iceshield_lock = false;
             }*/
 /*            if (self.room.world.game.session is ArenaGameSession)//在竞技场模式里也开启冰盾能力
             {
-                GlobalVar.glacier2_iceshield_lock = false;
+                GlobalVar.MySlugcat2_iceshield_lock = false;
             }*/
             //赋值给全局变量供其他函数使用
             GlobalVar.game = self.room.world.game;
@@ -313,7 +313,7 @@ namespace MySlugcat
             //吞炸弹爆炸
             //SelfExplode(self);
             //飞行能力
-            //pv.flyAbility.Glacier2_Fly(self);
+            //pv.flyAbility.MySlugcat2_Fly(self);
             /******************************24_2_16 保存bug**********************************/
 /*            if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value)
             {

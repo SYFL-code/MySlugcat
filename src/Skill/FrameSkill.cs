@@ -25,7 +25,7 @@ using System.Reflection;
 
 namespace MySlugcat
 {
-    //嫁祸技能
+    //嫁祸能力
     public class Frame​​Skill
     {
         public static void Hook()
@@ -284,8 +284,8 @@ namespace MySlugcat
             StackTrace stackTrace = new StackTrace();
             StackFrame stackFrame = stackTrace.GetFrame(2);
             MethodBase methodBase = stackFrame.GetMethod();
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name})");
-            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null)
+            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
+            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && SC.FrameSkill)
             {
                 /*                Vector2 CV0 = creature.bodyChunks[0].pos;
                                 Vector2 CV1 = creature.bodyChunks[1].pos;
@@ -587,7 +587,7 @@ namespace MySlugcat
         public static Creature Player_Die(Player self)
         {
             Creature creature = self;
-            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead)
+            if (self.slugcatStats.name == Plugin.YourSlugID && !self.dead && SC.FrameSkill)
             {
                 Log.Logger(7, "FrameDie", "MySlugcat:Frame​​Skill​​:Player_Die_st", $"");
 
@@ -620,7 +620,7 @@ namespace MySlugcat
             //如果被命中的不是玩家
             if (result.obj is not Player self)
                 return orig.Invoke(spear, result, eu);
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(spear, result, eu);
             //取玩家变量
@@ -655,8 +655,8 @@ namespace MySlugcat
 
         public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID})");
-            if (result.obj != null && result.obj is Player self && self.slugcatStats.name == Plugin.YourSlugID)
+            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}), ({SC.FrameSkill})");
+            if (result.obj != null && result.obj is Player self && self.slugcatStats.name == Plugin.YourSlugID && SC.FrameSkill)
             {
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
                 Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_st", $"");
@@ -717,7 +717,7 @@ namespace MySlugcat
             //如果被命中的不是玩家
             if (result.obj is not Player self)
                 return orig.Invoke(spear, result, eu);
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(spear, result, eu);
             //取玩家变量
@@ -753,8 +753,10 @@ namespace MySlugcat
             //如果被命中的不是玩家
             if (result.obj is not Player self)
                 return orig.Invoke(bomb, result, eu);
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+                return orig.Invoke(bomb, result, eu);
+            if (!SC.FrameSkill)
                 return orig.Invoke(bomb, result, eu);
             //取玩家变量
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
@@ -795,8 +797,13 @@ namespace MySlugcat
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
@@ -888,8 +895,13 @@ namespace MySlugcat
                 orig.Invoke(lizard, chunk);
                 return;
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(lizard, chunk);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(lizard, chunk);
                 return;
@@ -916,6 +928,13 @@ namespace MySlugcat
             try
             {
 #endif
+
+            if (!SC.FrameSkill)
+            {
+                orig.Invoke(daddyLongLegs, eu);
+                return;
+            }
+
             //List<DaddyLongLegs.EatObject> removeList = new List<DaddyLongLegs.EatObject>();
             foreach (var obj in daddyLongLegs.eatObjects)
             {
@@ -927,6 +946,8 @@ namespace MySlugcat
                     if (self == null)
                         continue;
                     if (self.slugcatStats.name != Plugin.YourSlugID)
+                        continue;
+                    if (!SC.FrameSkill)
                         continue;
                     //取玩家变量
                     GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
@@ -984,8 +1005,13 @@ namespace MySlugcat
                 orig.Invoke(centipede, g);
                 return;
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(centipede, g);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(centipede, g);
                 return;
@@ -1044,8 +1070,8 @@ namespace MySlugcat
                             {
                                 if (bigEel.room.physicalObjects[j][num] is Player self)
                                 {
-                                    //如果玩家不是Glacier则运行原程序
-                                    if (self.slugcatStats.name == Plugin.YourSlugID)
+                                    //如果玩家不是MySlugcat则运行原程序
+                                    if (self.slugcatStats.name == Plugin.YourSlugID && SC.FrameSkill)
                                     {
                                         //取玩家变量
                                         GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
@@ -1119,7 +1145,7 @@ namespace MySlugcat
                             {
                                 if (bigEel.room.physicalObjects[j][num] is Player self)
                                 {
-                                    //如果玩家不是Glacier则运行原程序
+                                    //如果玩家不是MySlugcat则运行原程序
                                     if (self.slugcatStats.name == Plugin.YourSlugID)
                                     {
                                         //取玩家变量
@@ -1220,8 +1246,13 @@ namespace MySlugcat
                 orig.Invoke(tentaclePlant, eu);
                 return;
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(tentaclePlant, eu);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(tentaclePlant, eu);
                 return;
@@ -1273,8 +1304,13 @@ namespace MySlugcat
                     return;
                 }
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(poleMimic, eu);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(poleMimic, eu);
                 return;
@@ -1326,8 +1362,13 @@ namespace MySlugcat
                 return;
             }
 
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(eggBug, eu);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(eggBug, eu);
                 return;
@@ -1365,8 +1406,13 @@ namespace MySlugcat
                 orig.Invoke(vulture);
                 return;
             }
-            //如果玩家不是Glacier则运行原程序
+            //如果玩家不是MySlugcat则运行原程序
             if (self.slugcatStats.name != Plugin.YourSlugID)
+            {
+                orig.Invoke(vulture);
+                return;
+            }
+            if (!SC.FrameSkill)
             {
                 orig.Invoke(vulture);
                 return;

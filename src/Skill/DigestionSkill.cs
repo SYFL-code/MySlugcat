@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 
 namespace MySlugcat
 {
-    //消化技能
+    //暴食能力
     public class DigestionSkill
     {
 
@@ -80,13 +80,18 @@ namespace MySlugcat
             Room room = player.room;
             float LightIntensity = Mathf.Pow(Mathf.Sin(burning[N] * 3.1415927f), 0.4f);
 
+            if (!SC.DigestionSkill)
+            {
+                burning[N] = 0f;
+            }
+
             if (burning[N] > 0f && player != null)
             {
                 burning[N] += 0.016666668f;
-/*                if (burning[N] > 1f)
+                if (burning[N] > 1f)
                 {
-                    this.Destroy();
-                }*/
+                    burning[N] = 0f;
+                }
 /*                this.lastFlickerDir = player.flickerDir;
                 this.flickerDir = Custom.DegToVec(UnityEngine.Random.value * 360f) * 50f * LightIntensity;
                 this.lastFlashAlpha = this.flashAplha;
@@ -125,8 +130,8 @@ namespace MySlugcat
 
         public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
         {
-            Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (player.slugcatStats.name == Plugin.YourSlugID && true)
+            Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
+            if (player.slugcatStats.name == Plugin.YourSlugID && SC.DigestionSkill)
             {
                 if (grasp < 0 || player.grasps[grasp] == null)
                 {

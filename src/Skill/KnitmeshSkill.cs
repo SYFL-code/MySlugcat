@@ -24,7 +24,7 @@ using static MonoMod.InlineRT.MonoModRule;
 
 namespace MySlugcat
 {
-    //缠绕技能
+    //缠绕能力
     public class KnitmeshSkill
     {
 
@@ -38,98 +38,101 @@ namespace MySlugcat
 
         private static void Knitmesh(Player self, Room room, Vector2 pos)
         {
-            List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, self, false, true);
-
-            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"creatures_Null ({creatures == null})");
-
-            if (creatures != null && creatures.Count > 0)
+            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
+            if (SC.KnitmeshSkill)
             {
-                foreach (Creature creature in creatures)
+                List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, self, false, true);
+
+                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_zh", $"creatures_Null ({creatures == null})");
+
+                if (creatures != null && creatures.Count > 0)
                 {
-                    if (creature != null)
+                    foreach (Creature creature in creatures)
                     {
-                        Vector2 offset = creature.mainBodyChunk.pos - pos;
-                        float Distance = offset.sqrMagnitude;
-
-/*                        Vector2 V1 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
-                        Vector2 V2 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
-                        Vector2 V3 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
-                        Vector2 V4 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));*/
-
-                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
-
-                        for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
+                        if (creature != null)
                         {
-                            Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
-                            Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                            Vector2 offset = creature.mainBodyChunk.pos - pos;
+                            float Distance = offset.sqrMagnitude;
 
-                            SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                            bee.ignoreCreature = self;
-                            //bee.room.RoomRect
-                            bee.forceAngry = true;
-                            creature.room.AddObject(bee);
-                            bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                            bee2.ignoreCreature = self;
-                            //bee.room.RoomRect
-                            bee2.forceAngry = true;
-                            creature.room.AddObject(bee2);
+                            /*                        Vector2 V1 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
+                                                    Vector2 V2 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
+                                                    Vector2 V3 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
+                                                    Vector2 V4 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));*/
+
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
+
+                            for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
+                            {
+                                Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                                Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+
+                                SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                                bee.ignoreCreature = self;
+                                //bee.room.RoomRect
+                                bee.forceAngry = true;
+                                creature.room.AddObject(bee);
+                                bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                                bee2.ignoreCreature = self;
+                                //bee.room.RoomRect
+                                bee2.forceAngry = true;
+                                creature.room.AddObject(bee2);
+                            }
+                            creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
+
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"zh");
+
+                            float j = UnityEngine.Random.Range(0.01f, 8.00f);
+                            for (int i = 0; i < 160000 / (Distance * Distance) * 1.5 * j; i++)
+                            {
+                                Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                                Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+
+                                SporePlant.Bee bee = new SporePlant.Bee(null, true, creature.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                SporePlant.Bee bee2 = new SporePlant.Bee(null, true, creature.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                                bee.ignoreCreature = self;
+                                //bee.room.RoomRect
+                                bee.forceAngry = true;
+                                creature.room.AddObject(bee);
+                                bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                                bee2.ignoreCreature = self;
+                                //bee.room.RoomRect
+                                bee2.forceAngry = true;
+                                creature.room.AddObject(bee2);
+                            }
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"sh");
+
                         }
-                        creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
-
-                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"zh");
-
-                        float j = UnityEngine.Random.Range(0.01f, 8.00f);
-                        for (int i = 0; i < 160000 / (Distance * Distance) * 1.5 * j; i++)
-                        {
-                            Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
-                            Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
-
-                            SporePlant.Bee bee = new SporePlant.Bee(null, true, creature.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            SporePlant.Bee bee2 = new SporePlant.Bee(null, true, creature.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                            bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                            bee.ignoreCreature = self;
-                            //bee.room.RoomRect
-                            bee.forceAngry = true;
-                            creature.room.AddObject(bee);
-                            bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                            bee2.ignoreCreature = self;
-                            //bee.room.RoomRect
-                            bee2.forceAngry = true;
-                            creature.room.AddObject(bee2);
-                        }
-                        Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"sh");
 
                     }
-
                 }
-            }
-            else
-            {
-                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
-
-                for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
+                else
                 {
-                    Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
-                    Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                    Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
 
-                    SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                    SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                    bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                    bee.ignoreCreature = self;
-                    //bee.room.RoomRect
-                    bee.forceAngry = true;
-                    self.room.AddObject(bee);
-                    bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                    bee2.ignoreCreature = self;
-                    //bee.room.RoomRect
-                    bee2.forceAngry = true;
-                    self.room.AddObject(bee2);
+                    for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
+                    {
+                        Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+                        Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
+
+                        SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                        SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                        bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                        bee.ignoreCreature = self;
+                        //bee.room.RoomRect
+                        bee.forceAngry = true;
+                        self.room.AddObject(bee);
+                        bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
+                        bee2.ignoreCreature = self;
+                        //bee.room.RoomRect
+                        bee2.forceAngry = true;
+                        self.room.AddObject(bee2);
+                    }
+                    self.room.PlaySound(SoundID.Spore_Bees_Emerge, self.firstChunk);
                 }
-                self.room.PlaySound(SoundID.Spore_Bees_Emerge, self.firstChunk);
             }
-
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
@@ -137,7 +140,7 @@ namespace MySlugcat
             orig(player, eu);
 
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (player.slugcatStats.name == Plugin.YourSlugID)
+            if (player.slugcatStats.name == Plugin.YourSlugID && SC.KnitmeshSkill)
             {
                 //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;

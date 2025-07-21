@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace MySlugcat
 {
+    // PerceptionSkill 感知能力
     public class IntelHUD : HudPart
     {
         // 指针线数组，用于绘制指向最近拾荒者的3D效果指针
@@ -122,7 +123,7 @@ namespace MySlugcat
                 showPointer = creature != null && !player.inShortcut;
             }*/
 
-            if (hud.owner is Player player)
+            if (hud.owner is Player player && SC.PerceptionSkill)
             {
                 Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"player ({hud.owner is Player})");
                 // 获取玩家当前房间
@@ -171,7 +172,7 @@ namespace MySlugcat
             pointAt = Vector3.Slerp(pointAt, shouldPointAt, 0.3f);
 
             // 更新指针淡入淡出效果
-            if (showPointer)
+            if (showPointer && SC.PerceptionSkill)
             {
                 pointerFade = Mathf.Min(1f, pointerFade + fadeSpeed * 0.1f); // 淡入
             }

@@ -4,7 +4,7 @@
 	"version": "0.1.0",
 	"authors": "Author",
 	"description": "A template for making SlugBase mods.",
-	"requirements": [ "slime-cubed.slugbase", "improved-input-config" ],
-	"requirements_names": [ "SlugBase", "Improved Input Config: Extended" ],
+	"requirements": [ "slime-cubed.slugbase", "fisobs", "improved-input-config" ],
+	"requirements_names": [ "SlugBase", "Fisobs", "Improved Input Config: Extended" ],
 	"tags": [ "Custom Slugcat" ]
 }

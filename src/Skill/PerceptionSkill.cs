@@ -34,11 +34,11 @@ public class CreaturePointer
     //private readonly FSprite pointerSprite;
     private readonly FSprite circleSprite;
 
-    private const float PointerLength = 20f; // 缩短指针长度
-    private const float PointerWidth = 8f;  // 增加指针宽度
-    //private const float CircleRadius = 45f;
-    //private const float RotationSpeed = 90f; // 度/秒
+    private const float PointerLength = 25f; // 缩短指针长度
+    private const float PointerWidth = 10f;  // 增加指针宽度
+    private const float CircleRadius = 45f;
 
+    // 摄像机坐标
     private float camX;
     private float camY;
 
@@ -46,20 +46,26 @@ public class CreaturePointer
     private const float PointerHeight = 30f;  // 纸飞机高度
     private const float BaseWidth = 20f;     // 底部宽度
     private const float NotchDepth = 5f;     // 底部凹陷深度
-    private const float CircleRadius = 45f;
     private const float RotationSpeed = 90f;
 
     private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
-    // 在CreaturePointer类中添加
+    // 平滑旋转
+    private float currentAngle;
+    private float targetAngle;
+    private const float RotationSmoothness = 0.3f; // 旋转平滑度(0-1)，值越小越平滑
+
+    // 动态颜色变化
     private Color startColor = Color.green;
     private Color endColor = Color.red;
     private float maxDistance = 750f; // 最大距离阈值
 
-    // 在CreaturePointer类中添加
+    // 脉冲动画
     private float pulseSpeed = 3f; // 脉冲速度
     private float pulseIntensity = 0.2f; // 脉冲强度
     private float baseLength; // 存储原始长度
+    private float baseWidth; // 存储原始宽度
+
 
     // 新增淡入淡出控制变量
     private float fadeState = 0f; // 0-1表示淡入淡出进度
@@ -86,9 +92,9 @@ public class CreaturePointer
             }, true, true);
 
             // 定义三角形顶点 (等腰三角形)
-            pointerMesh.vertices[0] = new Vector2(0, PointerHeight);  // 顶点
-            pointerMesh.vertices[1] = new Vector2(-BaseWidth / 2, 0);    // 左下角
-            pointerMesh.vertices[2] = new Vector2(BaseWidth / 2, 0);     // 右下角
+            pointerMesh.vertices[0] = new Vector2(0, PointerLength);  // 顶点
+            pointerMesh.vertices[1] = new Vector2(-PointerWidth / 2, 0);    // 左下角
+            pointerMesh.vertices[2] = new Vector2(PointerWidth / 2, 0);     // 右下角
 
             pointerMesh.color = Color.red;
             pointerMesh.anchorX = 0.5f;
@@ -119,6 +125,9 @@ public class CreaturePointer
 
             // 5. 初始化其他变量
             baseLength = PointerLength;
+            baseWidth = PointerWidth;
+            currentAngle = 0f;
+            targetAngle = 0f;
 
             // 6. 安全创建光效
             if (owner.room != null)
@@ -201,16 +210,22 @@ public class CreaturePointer
 
         // 2. 计算世界空间中的方向向量
         Vector2 worldDirection = (targetWorldPos - ownerWorldPos).normalized;
-        float targetAngle = Custom.VecToDeg(worldDirection);
+        targetAngle = Custom.VecToDeg(worldDirection);
+        // 使用LerpAngle实现平滑旋转(避免360度跳跃问题)
+        currentAngle = Mathf.LerpAngle(
+            currentAngle,
+            targetAngle,
+            RotationSmoothness * timeStacker);
+        //float targetAngle = Custom.VecToDeg(worldDirection);
 
         // 3. 计算屏幕空间位置
-        Vector2 camPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
-        Vector2 ownerScreenPos = ownerWorldPos - camPos;
+        Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
         Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius;
 
         // 4. 更新指针位置和旋转
         pointerMesh.SetPosition(pointerScreenPos);
-        pointerMesh.rotation = targetAngle;
+        pointerMesh.rotation = currentAngle;
+        //pointerMesh.rotation = targetAngle;
 
         // 更新圆环位置
         circleSprite.SetPosition(ownerScreenPos);
@@ -277,7 +292,7 @@ public class CreaturePointer
             pulseIntensity_ = 0f;
         }
         pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.03f;
-        pointerMesh.scaleY = 8f * (1f + pulse * pulseIntensity_) * 0.03f;
+        pointerMesh.scaleY = baseWidth * (1f + pulse * pulseIntensity_) * 0.03f;
     }
 
     private float CalculateThreatLevel(Creature target)

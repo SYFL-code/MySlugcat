@@ -506,6 +506,9 @@ public class CreaturePointer
 
             while (_isMainUpdateRunning)// 用标志位控制退出
             {
+                Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_st1",
+                    $"({1})");
+
                 double currentTime = stopwatch.Elapsed.TotalMilliseconds;
                 double deltaTime = currentTime - previousTime;
 
@@ -515,6 +518,8 @@ public class CreaturePointer
                     {
                         if (pointer[i] != null)
                         {
+                            Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_zh2",
+                                $"Null ({pointer[i].owner == null})");
                             if (pointer[i].owner == null)
                             {
                                 pointer[i].Destroy();
@@ -582,12 +587,12 @@ public class CreaturePointer
     {
         orig.Invoke(self, timeStacker, rCam, camPos);
 
-        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
-            $"Null({update0 == null})");//
+        //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
+        //    $"Null({update0 == null})");//
         if (update0 != null)
         {
-            Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_2",
-                $"({update0.N}), ({update0.i})");//
+            //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_2",
+            //    $"({update0.N}), ({update0.i})");//
         }
 
         for (int i = 0; i < 20; i++)

@@ -44,6 +44,9 @@ public class CreaturePointer
     private float camX;
     private float camY;
 
+    public int i = 0;
+    private int lasti = 0;
+
     private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
     // 平滑旋转
@@ -187,8 +190,25 @@ public class CreaturePointer
             this.Destroy();
             return;
         }
+
+        lasti += 1;
+        if (lasti - i <= 10)
+        {
+        }
+        else
+        {
+            if (owner.room == null && owner.inShortcut)
+            {
+                i = lasti;
+            }
+            else
+            {
+                this.Destroy();
+                return;
+            }
+        }
         Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
-            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut})");//
+            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut}), ({lasti}), ({i})");//
 
         bool shouldBeActive = true;
         Creature? creature = null;
@@ -628,13 +648,11 @@ public class CreaturePointer
             update0.i = UnityEngine.Random.Range(-46666, 30000);
         }*/
 
-/*        int N = self.playerState.playerNumber;
-        if (pointer != null && pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
+        int N = self.playerState.playerNumber;
+        if (pointer != null && pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID)
         {
-            Creature? creature = MyPlayer.FindNearestCreature(self.firstChunk.pos, self.room, false, self, false, 2);
-            pointer[N].Update(creature, Time.deltaTime);
-
-        }*/
+            pointer[N].i = pointer[N].lasti;
+        }
     }
 
 }

@@ -34,6 +34,9 @@
         <Reference Include="BepInEx">
           <HintPath>..\lib\BepInEx.dll</HintPath>
         </Reference>
+        <Reference Include="Fisobs">
+          <HintPath>..\lib\Fisobs.dll</HintPath>
+        </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
           <HintPath>..\lib\UPDATE\HOOKS-Assembly-CSharp.dll</HintPath>
         </Reference>

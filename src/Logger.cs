@@ -19,7 +19,7 @@ namespace MySlugcat
             Configurable<bool>? logDebug = Options.logDebug;
             Configurable<float>? loglevel = Options.loglevel;
 
-            string Disabled = "";
+            string Disabled = "FixedSkill";
             bool isContains = Disabled.IndexOf(about, StringComparison.OrdinalIgnoreCase) >= 0;//true
 
             //if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)

@@ -36,7 +36,7 @@ public class CreaturePointer
 
     private const float PointerLength = 25f; // 缩短指针长度
     private const float PointerWidth = 10f;  // 增加指针宽度
-    private const float CircleRadius = 45f;
+    private const float CircleRadius = 60f;
 
     // 摄像机坐标
     private float camX;
@@ -53,7 +53,7 @@ public class CreaturePointer
     // 平滑旋转
     private float currentAngle;
     private float targetAngle;
-    private const float RotationSmoothness = 0.3f; // 旋转平滑度(0-1)，值越小越平滑
+    private const float RotationSmoothness = 0.9f; // 旋转平滑度(0-1)，值越小越平滑
 
     // 动态颜色变化
     private Color startColor = Color.green;
@@ -69,7 +69,7 @@ public class CreaturePointer
 
     // 新增淡入淡出控制变量
     private float fadeState = 0f; // 0-1表示淡入淡出进度
-    private const float FadeSpeed = 2f; // 淡入淡出速度
+    private const float FadeSpeed = 1.5f; // 淡入淡出速度
     private bool isActive = false;
 
     private List<LightSource> glowEffects = new List<LightSource>();
@@ -96,15 +96,17 @@ public class CreaturePointer
             pointerMesh.vertices[1] = new Vector2(-PointerWidth / 2, 0);    // 左下角
             pointerMesh.vertices[2] = new Vector2(PointerWidth / 2, 0);     // 右下角
 
-            pointerMesh.color = Color.red;
+            pointerMesh.color = Color.green;
+            // 确保指针初始朝向正确
+            pointerMesh.rotation = 0f; // 初始朝向右侧
             pointerMesh.anchorX = 0.5f;
-            pointerMesh.anchorY = 0f; // 底部锚点
+            pointerMesh.anchorY = 0.5f; // 中心锚点便于旋转
 
             /*pointerSprite = new FSprite("pixel")
             {
                 scaleX = PointerWidth,
                 scaleY = PointerLength,
-                color = Color.red,
+                color = Color.green,
                 anchorX = 0.5f,
                 anchorY = 0f // 中心锚点
             };*/
@@ -139,6 +141,12 @@ public class CreaturePointer
                     owner.room.AddObject(light);
                 }
             }
+
+            // 确保初始状态完全透明且不可见
+            pointerContainer.alpha = 0f;
+            pointerContainer.isVisible = false;
+            pointerMesh.alpha = 0f;
+            circleSprite.alpha = 0f;
         }
         catch (Exception e)
         {
@@ -152,40 +160,64 @@ public class CreaturePointer
         }
     }
 
-
     public void Update_(Vector2 camPos)
     {
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update__st",
+            $"({owner == null})");
+
+        if (owner == null)
+        {
+            this.Destroy();
+            return;
+        }
+
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update__st",
+            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut})");//
+
         camX = camPos.x;
         camY = camPos.y;
-
-        if (owner == null || (owner.room == null && !owner.inShortcut) || (owner.slatedForDeletetion && !owner.inShortcut))
-        {
-            this.Destroy();
-            return;
-        }
     }
 
-    public void Update(Creature? creature, float timeStacker)
+    public void Update(bool Destroy)
     {
-        if (owner == null || owner.room == null || owner.slatedForDeletetion)
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
+            $"({owner == null})");//
+
+        if (owner == null || owner.slatedForDeletetion || Destroy)
         {
             this.Destroy();
             return;
         }
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
+            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut})");//
 
-        bool shouldBeActive = (creature != null && !owner.inShortcut);
+        bool shouldBeActive = true;
+        Creature? creature = null;
+        float timeStacker = Time.deltaTime;
 
-        if (creature != null)
+        if (owner.room == null && owner.inShortcut)
         {
-            Vector2? vector = creature.firstChunk.pos;
-            if (vector == null)
+            shouldBeActive = false;
+        }
+        if (owner is Player player && player.Sleeping)
+        {
+            shouldBeActive = false;
+        }
+        if (owner.room != null)
+        {
+            creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
+            if (creature == null)
             {
                 shouldBeActive = false;
             }
-        }
-        if (owner.inShortcut)
-        {
-            shouldBeActive = false;
+            if (creature != null)
+            {
+                Vector2? vector = creature.firstChunk.pos;
+                if (vector == null)
+                {
+                    shouldBeActive = false;
+                }
+            }
         }
 
         if (shouldBeActive != isActive)
@@ -194,10 +226,51 @@ public class CreaturePointer
             fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
         }
 
-        // 淡入淡出控制
-        fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
-        fadeState = Mathf.Clamp01(fadeState);
-        pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
+        // 改进的淡入淡出控制
+        float targetAlpha = isActive ? 1f : 0f;
+        float fadeDelta = (isActive ? FadeSpeed : -FadeSpeed) * Time.deltaTime;
+
+        // 更平滑的渐变过渡
+        fadeState = Mathf.Clamp01(fadeState + fadeDelta * 0.5f); // 降低变化速度
+
+        // 使用更明显的缓动函数
+        float currentAlpha = EnhancedEaseInOut(fadeState);
+
+        // 应用透明度到所有元素
+        pointerContainer.alpha = currentAlpha;
+        pointerMesh.alpha = currentAlpha;
+        circleSprite.alpha = currentAlpha * 0.8f;
+
+        // 更新光效透明度
+        foreach (var light in glowEffects)
+        {
+            light.setAlpha = currentAlpha * 0.7f;
+        }
+
+        // 确保当完全透明时停止更新
+        if (fadeState <= 0f)
+        {
+            pointerContainer.isVisible = false; // 直接隐藏整个容器
+            return;
+        }
+        else
+        {
+            pointerContainer.isVisible = true;
+        }
+
+
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
+            $"渐变状态: fadeState={fadeState}, alpha={currentAlpha}, isActive={isActive}");
+
+        /*        // 淡入淡出控制
+                fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
+                fadeState = Mathf.Clamp01(fadeState);
+                pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
+                pointerMesh.alpha = EaseInOut(fadeState);
+                //circleSprite.alpha = EaseInOut(fadeState) * (0.9f + EaseInOut(fadeState) * 0.2f);
+
+                // 淡入淡出圆环动画
+                circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);*/
 
         // 如果没有激活或完全透明，跳过更新
         if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
@@ -205,26 +278,38 @@ public class CreaturePointer
 
 
         // 1. 获取世界坐标
-        Vector2 targetWorldPos = creature.firstChunk.pos;
-        Vector2 ownerWorldPos = owner.mainBodyChunk.pos;
+        Vector2 targetWorldPos = creature.mainBodyChunk.pos;
+        Vector2 ownerWorldPos = owner.firstChunk.pos;
 
-        // 2. 计算世界空间中的方向向量
-        Vector2 worldDirection = (targetWorldPos - ownerWorldPos).normalized;
-        targetAngle = Custom.VecToDeg(worldDirection);
-        // 使用LerpAngle实现平滑旋转(避免360度跳跃问题)
+        // 2. 计算方向向量(从玩家指向目标)
+        Vector2 direction = (targetWorldPos - ownerWorldPos).normalized;
+
+        // 3. 计算公转位置(围绕玩家旋转)
+        float orbitRadius = CircleRadius * 0.8f; // 公转半径
+        Vector2 orbitOffset = new Vector2(
+            Mathf.Cos(currentAngle * Mathf.Deg2Rad) * orbitRadius,
+            Mathf.Sin(currentAngle * Mathf.Deg2Rad) * orbitRadius
+        );
+
+        // 4. 平滑更新角度
+        targetAngle = Custom.VecToDeg(direction);
         currentAngle = Mathf.LerpAngle(
             currentAngle,
             targetAngle,
-            RotationSmoothness * timeStacker);
-        //float targetAngle = Custom.VecToDeg(worldDirection);
+            RotationSmoothness * timeStacker
+        );
 
         // 3. 计算屏幕空间位置
         Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
-        Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius;
+        //Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius / 3 * 2;
 
-        // 4. 更新指针位置和旋转
+        // 5. 更新指针位置(公转)
+        Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
         pointerMesh.SetPosition(pointerScreenPos);
-        pointerMesh.rotation = currentAngle;
+
+        // 保持指针固定朝向(指向目标)
+        pointerMesh.rotation = Custom.VecToDeg(direction);
+
         //pointerMesh.rotation = targetAngle;
 
         // 更新圆环位置
@@ -260,29 +345,26 @@ public class CreaturePointer
             SetPulseEffect(3f, 0.1f + threatLevel * 0.3f);
         }*/
 
-        // 淡入淡出圆环动画
-        circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);
-
         // 目标接近时震动效果
-        float distance2 = Vector2.Distance(ownerWorldPos, targetWorldPos);
-        float shakeIntensity = Mathf.Clamp01(1f - distance2 / 300f) * fadeState;
-        pointerMesh.SetPosition(pointerScreenPos + Custom.RNV() * shakeIntensity * 3f);
-
-        // 更新发光效果
-        Vector2 pointerTip = owner.mainBodyChunk.pos +
-        Custom.DegToVec(pointerMesh.rotation) * (CircleRadius + PointerLength);
-        for (int i = 0; i < glowEffects.Count; i++)
-        {
-            Vector2 offset = Custom.RNV() * 5f * (i + 1);
-            glowEffects[i].pos = pointerTip + offset;
-            glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
-            glowEffects[i].setAlpha = 0.7f;
-        }
+        float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
+        float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
+        Vector2 exactPos = pointerScreenPos + Custom.RNV() * shakeIntensity * 3f;
+        pointerMesh.SetPosition(exactPos);
 
         // 动态颜色变化
-        float distance = Vector2.Distance(owner.mainBodyChunk.pos, targetWorldPos);
         float Lerp = Mathf.Clamp01(distance / maxDistance);
         pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
+
+        // 更新发光效果位置(跟随公转)
+        for (int i = 0; i < glowEffects.Count; i++)
+        {
+            Vector2 lightPos = ownerWorldPos + orbitOffset * 1.2f; // 稍微远离中心
+            glowEffects[i].pos = lightPos;
+            // ... 其他光效设置 ...
+            glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
+            glowEffects[i].setAlpha = 0.7f;
+            glowEffects[i].color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
+        }
 
         // 脉冲动画
         float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
@@ -291,8 +373,8 @@ public class CreaturePointer
         {
             pulseIntensity_ = 0f;
         }
-        pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.03f;
-        pointerMesh.scaleY = baseWidth * (1f + pulse * pulseIntensity_) * 0.03f;
+        pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.075f;
+        pointerMesh.scaleY = baseWidth * (1f + pulse * pulseIntensity_) * 0.075f;
     }
 
     private float CalculateThreatLevel(Creature target)
@@ -303,6 +385,15 @@ public class CreaturePointer
         if (target is Lizard Scavenger)
             return 0.7f;
         return 0.3f;
+    }
+
+    // 更明显的缓动函数
+    private float EnhancedEaseInOut(float t)
+    {
+        // 使用三次方缓动，效果更明显
+        return t < 0.5f ?
+            4f * t * t * t :
+            1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
     }
 
     // 缓动函数 - 使动画更自然
@@ -326,13 +417,29 @@ public class CreaturePointer
 
     public void Destroy()
     {
-        pointerContainer.RemoveFromContainer();
+        // 先隐藏再移除
+        if (pointerContainer != null)
+        {
+            pointerContainer.isVisible = false;
+            pointerContainer.RemoveFromContainer();
+        }
+
+        // 清理光效
+        foreach (var light in glowEffects)
+        {
+            if (light != null && light.room != null)
+            {
+                light.Destroy();
+            }
+        }
+        glowEffects.Clear();
     }
 
 
 
 
-    private static CreaturePointer[] pointer = new CreaturePointer[20];
+    public static CreaturePointer[] pointer = new CreaturePointer[20];
+    public static Update0? update0 = null;
 
     public static void Hook()
     {
@@ -363,6 +470,11 @@ public class CreaturePointer
     {
         orig.Invoke(self, abstractCreature, world);
 
+        if (update0 == null)
+        {
+            update0 = new Update0(0, 100);
+        }
+
         if (self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
         {
             int N = self.playerState.playerNumber;
@@ -384,11 +496,27 @@ public class CreaturePointer
     {
         orig.Invoke(self, timeStacker, rCam, camPos);
 
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
+            $"Null({update0 == null})");//
+        if (update0 != null)
+        {
+            Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_2",
+                $"({update0.N}), ({update0.i})");//
+        }
+
         for (int i = 0; i < 20; i++)
         {
             if (pointer[i] != null)
             {
-                pointer[i].Update_(camPos);
+                if (pointer[i].owner == null)
+                {
+                    pointer[i].Destroy();
+                }
+                else
+                {
+                    pointer[i].Update_(camPos);
+                    pointer[i].Update(false);
+                }
             }
         }
 
@@ -398,15 +526,104 @@ public class CreaturePointer
     {
         orig(self, eu);
 
-        int N = self.playerState.playerNumber;
+        if (update0 == null)
+        {
+            update0 = new Update0(0, 100);
+        }
+
+/*        if (self.slugcatStats.name == Plugin.YourSlugID && 1 == UnityEngine.Random.Range(0, 3000000) && update0 != null)
+        {
+            update0.N = 0;
+            update0.i = UnityEngine.Random.Range(-46666, 30000);
+        }*/
+
+/*        int N = self.playerState.playerNumber;
         if (pointer != null && pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
         {
             Creature? creature = MyPlayer.FindNearestCreature(self.firstChunk.pos, self.room, false, self, false, 2);
             pointer[N].Update(creature, Time.deltaTime);
 
-        }
+        }*/
     }
 
 }
 
+
+public class Update0: CosmeticSprite
+{
+    public int N;
+    public int i;
+
+    public  Update0(int N, int i)
+    {
+        this.N = N;
+        this.i = i;
+    }
+
+    public override void Update(bool eu)
+    {
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:Update0:Update",
+            $"({N})");//
+
+        base.Update(eu);
+
+        if (N == 0)
+        {
+            for (int j = 0; j < 20; j++)
+            {
+                if (CreaturePointer.pointer[j] != null)
+                {
+                    Log.Logger(7, "PerceptionSkill", "MySlugcat:Update0:Update",
+                        $"({j})");//
+                    CreaturePointer.pointer[j].Update(this.slatedForDeletetion);
+                }
+            }
+        }
+
+        if (i < 0)
+        {
+            i += 1;
+        }
+        if (i > 0)
+        {
+            i -= 1;
+        }
+
+    }
+
+    public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+    {
+        sLeaser.sprites = new FSprite[1];
+        
+        TriangleMesh pointerMesh;
+        pointerMesh = new TriangleMesh("pixel", new TriangleMesh.Triangle[]
+        {
+                new TriangleMesh.Triangle(0, 1, 2) // 单个三角形
+        }, true, true);
+
+        // 定义三角形顶点 (等腰三角形)
+        pointerMesh.vertices[0] = new Vector2(0, 25);  // 顶点
+        pointerMesh.vertices[1] = new Vector2(-10 / 2, 0);    // 左下角
+        pointerMesh.vertices[2] = new Vector2(10 / 2, 0);     // 右下角
+
+        pointerMesh.color = Color.green;
+        pointerMesh.anchorX = 0.5f;
+        pointerMesh.anchorY = 0f; // 底部锚点
+
+        sLeaser.sprites[0] = pointerMesh;
+        FContainer fcontainer = rCam.ReturnFContainer("HUD");
+        fcontainer.AddChild(sLeaser.sprites[0]);
+    }
+
+    public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+    {
+        base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        sLeaser.sprites[0].x = 300f;
+        sLeaser.sprites[0].y = 300f;
+        sLeaser.sprites[0].scaleX = 25 * 0.075f;
+        sLeaser.sprites[0].scaleY = 10  * 0.075f;
+        sLeaser.sprites[0].alpha = 0.2f;
+    }
+
+}
 

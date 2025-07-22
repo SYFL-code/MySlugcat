@@ -473,7 +473,7 @@ namespace MySlugcat
         }
 
         // 查找当前房间中距离自身最近的生物
-        public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature, int select)
+        public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature? creature, bool IncludeDeadCreature, int select)
         {
 #if MYDEBUG
             try
@@ -484,7 +484,7 @@ namespace MySlugcat
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
             //List<Creature> creatures = new List<Creature>();
 
-            if (!(room.abstractRoom.creatures.Count > 0))
+            if (selfPos == null || room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || room.abstractRoom.creatures.Count == null || !(room.abstractRoom.creatures.Count > 0))
             {
                 return null;
             }
@@ -495,6 +495,13 @@ namespace MySlugcat
 
                 Creature c = abstractCreature.realizedCreature;
                 // 排除检查：玩家、无效引用、自身、或没有身体部位的对象
+                if (c == null ||             // 确保生物存在
+                    (creature != null && c == creature) ||             // 排除自身
+                    c.mainBodyChunk == null ||      // 确保有有效的mainBodyChunk
+                    c.mainBodyChunk.pos == null)
+                {
+                    continue; // 跳过无效项，继续检查下一个
+                }
                 if (!IncludePlayer)
                 {
                     var player1 = c as Player;
@@ -502,12 +509,6 @@ namespace MySlugcat
                     {
                         continue; // 跳过无效项，继续检查下一个
                     }
-                }
-                if (c == null ||             // 确保生物存在
-                    c == creature ||             // 排除自身
-                    c.mainBodyChunk == null) // 确保有有效的mainBodyChunk
-                {
-                    continue; // 跳过无效项，继续检查下一个
                 }
                 if (DisabledCreature(c) && select ==1)// 禁用生物
                 {

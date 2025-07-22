@@ -30,6 +30,7 @@ namespace MySlugcat
 
     public class SC
     {
+        public static bool Exhausted = true;          // 精疲力竭
         public static bool Frame​​Skill = false;        // 嫁祸能力
         public static bool Deflagration​​Skill = false; // 爆燃能力
         public static bool KnitmeshSkill = false;     // 缠绕能力
@@ -64,6 +65,7 @@ namespace MySlugcat
         {
             orig.Invoke(self, abstractCreature, world);
 
+            Exhausted = true;
             Frame​​Skill = true;
             Deflagration​​Skill = true;
             KnitmeshSkill = true;

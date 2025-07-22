@@ -21,6 +21,7 @@ using Menu.Remix;
 using MonoMod.RuntimeDetour;
 using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
+using Kittehface.Framework20;
 
 
 namespace MySlugcat;
@@ -38,14 +39,17 @@ public class CreaturePointer
     //private const float CircleRadius = 45f;
     //private const float RotationSpeed = 90f; // 度/秒
 
+    private float camX;
+    private float camY;
+
     // 调整指针尺寸参数
     private const float PointerHeight = 30f;  // 纸飞机高度
-    private const float BaseWidth = 15f;     // 底部宽度
+    private const float BaseWidth = 20f;     // 底部宽度
     private const float NotchDepth = 5f;     // 底部凹陷深度
     private const float CircleRadius = 45f;
     private const float RotationSpeed = 90f;
 
-    private TriangleMesh pointerMesh; // 使用网格创建自定义形状
+    private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
     // 在CreaturePointer类中添加
     private Color startColor = Color.green;
@@ -76,41 +80,19 @@ public class CreaturePointer
             pointerContainer.alpha = 0f; // 初始透明
 
             // 2. 使用可靠的"pixel"精灵创建指针
-            // 创建纸飞机形状的指针
-            /*pointerMesh = new TriangleMesh("pixel", new TriangleMesh.Triangle[]
+            pointerMesh = new TriangleMesh("pixel", new TriangleMesh.Triangle[]
             {
-                new TriangleMesh.Triangle(0, 1, 2), // 主三角形
-                new TriangleMesh.Triangle(1, 3, 2),  // 底部凹陷部分
-                new TriangleMesh.Triangle(1, 4, 3)   // 底部凹陷部分
+                new TriangleMesh.Triangle(0, 1, 2) // 单个三角形
             }, true, true);
 
-            // 定义顶点位置 (纸飞机形状)
-            pointerMesh.vertices[0] = new Vector2(0, PointerHeight); // 顶点
-            pointerMesh.vertices[1] = new Vector2(-BaseWidth/2, 0); // 左底角
-            pointerMesh.vertices[2] = new Vector2(BaseWidth/2, 0);  // 右底角
-            pointerMesh.vertices[3] = new Vector2(-BaseWidth/4, NotchDepth); // 左凹陷点
-            pointerMesh.vertices[4] = new Vector2(BaseWidth/4, NotchDepth);  // 右凹陷点*/
-            pointerMesh = new TriangleMesh("Futile_White", new TriangleMesh.Triangle[]
-            {
-            new TriangleMesh.Triangle(0, 1, 3),
-            new TriangleMesh.Triangle(0, 3, 4),
-            new TriangleMesh.Triangle(0, 4, 2),
-            new TriangleMesh.Triangle(1, 3, 4),
-            new TriangleMesh.Triangle(1, 4, 2)
-            }, true);
+            // 定义三角形顶点 (等腰三角形)
+            pointerMesh.vertices[0] = new Vector2(0, PointerHeight);  // 顶点
+            pointerMesh.vertices[1] = new Vector2(-BaseWidth / 2, 0);    // 左下角
+            pointerMesh.vertices[2] = new Vector2(BaseWidth / 2, 0);     // 右下角
 
-            // 设置顶点位置
-            pointerMesh.vertices[0] = new Vector2(0f, 30f);
-            pointerMesh.vertices[1] = new Vector2(-15f, 0f);
-            pointerMesh.vertices[2] = new Vector2(15f, 0f);
-            pointerMesh.vertices[3] = new Vector2(-7.5f, 5f);
-            pointerMesh.vertices[4] = new Vector2(7.5f, 5f);
-
-            pointerMesh.color = Color.green;
+            pointerMesh.color = Color.red;
             pointerMesh.anchorX = 0.5f;
             pointerMesh.anchorY = 0f; // 底部锚点
-            // 确保刷新网格
-            pointerMesh.Refresh();
 
             /*pointerSprite = new FSprite("pixel")
             {
@@ -162,132 +144,140 @@ public class CreaturePointer
     }
 
 
+    public void Update_(Vector2 camPos)
+    {
+        camX = camPos.x;
+        camY = camPos.y;
+
+        if (owner == null || (owner.room == null && !owner.inShortcut) || (owner.slatedForDeletetion && !owner.inShortcut))
+        {
+            this.Destroy();
+            return;
+        }
+    }
+
     public void Update(Creature? creature, float timeStacker)
     {
-            if (owner == null || owner.room == null || owner.slatedForDeletetion)
+        if (owner == null || owner.room == null || owner.slatedForDeletetion)
+        {
+            this.Destroy();
+            return;
+        }
+
+        bool shouldBeActive = (creature != null && !owner.inShortcut);
+
+        if (creature != null)
+        {
+            Vector2? vector = creature.firstChunk.pos;
+            if (vector == null)
             {
-                this.Destroy();
-                return;
+                shouldBeActive = false;
             }
+        }
+        if (owner.inShortcut)
+        {
+            shouldBeActive = false;
+        }
 
-            bool shouldBeActive = (creature != null && !owner.inShortcut);
+        if (shouldBeActive != isActive)
+        {
+            isActive = shouldBeActive;
+            fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
+        }
 
-            if (creature != null)
-            {
-                Vector2? vector = creature.firstChunk.pos;
-                if (vector == null)
-                {
-                    shouldBeActive = false;
-                }
-            }
+        // 淡入淡出控制
+        fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
+        fadeState = Mathf.Clamp01(fadeState);
+        pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
 
-            if (shouldBeActive != isActive)
-            {
-                isActive = shouldBeActive;
-                fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
-            }
+        // 如果没有激活或完全透明，跳过更新
+        if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
+        if (creature == null) return;
 
-            // 淡入淡出控制
-            fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
-            fadeState = Mathf.Clamp01(fadeState);
-            pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
 
-            // 如果没有激活或完全透明，跳过更新
-            if (fadeState <= 0f || !shouldBeActive) return;
-            if (creature == null) return;
+        // 1. 获取世界坐标
+        Vector2 targetWorldPos = creature.firstChunk.pos;
+        Vector2 ownerWorldPos = owner.mainBodyChunk.pos;
 
-            Vector2 nPos = creature.firstChunk.pos;
+        // 2. 计算世界空间中的方向向量
+        Vector2 worldDirection = (targetWorldPos - ownerWorldPos).normalized;
+        float targetAngle = Custom.VecToDeg(worldDirection);
 
-        // 计算指向目标的角度
-            Vector2 ownerPos = owner.mainBodyChunk.pos;
-        float targetAngle = Custom.VecToDeg(nPos - ownerPos);
+        // 3. 计算屏幕空间位置
+        Vector2 camPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
+        Vector2 ownerScreenPos = ownerWorldPos - camPos;
+        Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius;
+
+        // 4. 更新指针位置和旋转
+        pointerMesh.SetPosition(pointerScreenPos);
+        pointerMesh.rotation = targetAngle;
+
+        // 更新圆环位置
+        circleSprite.SetPosition(ownerScreenPos);
+
+
+
+/*        // 计算指向目标的角度
+        float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
 
         // 平滑旋转
         float currentAngle = Mathf.LerpAngle(
-                pointerMesh.rotation,
-                targetAngle,
-                timeStacker * RotationSpeed * 0.01f);
+              pointerMesh.rotation,
+              targetAngle,
+              timeStacker * RotationSpeed * 0.01f);
 
         // 计算从玩家到目标的方向向量
-        Vector2 pointerDir = Custom.DegToVec(currentAngle);
+        Vector2 Direction = Custom.DegToVec(currentAngle);
 
         // 更新指针旋转时使用pointerMesh代替pointerSprite
         pointerMesh.rotation = currentAngle;
-        pointerMesh.SetPosition(pointerDir * CircleRadius);
-
-        // 动态调整大小
-        //float scaleMod = 0.8f + EaseInOut(fadeState) * 0.4f;
-        //pointerMesh.scaleX = scaleMod;
-        //pointerMesh.scaleY = scaleMod;
+        //pointerMesh.SetPosition(pos);//
+        circleSprite.SetPosition(camPos);*/
 
 
+        // 危险程度指示(根据生物类型)
+        /*if (owner.room != null)
+        {
+            float threatLevel = CalculateThreatLevel(target);
+            pointerSprite.alpha = 0.5f + threatLevel * 0.5f;
 
+            // 危险时增加脉冲强度
+            SetPulseEffect(3f, 0.1f + threatLevel * 0.3f);
+        }*/
 
-            /*// 更新指针位置和旋转
-            pointerContainer.SetPosition(ownerPos);
-            pointerSprite.rotation = currentAngle;
+        // 淡入淡出圆环动画
+        circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);
 
-            // 调整指针位置(尖端指向目标)
-            Vector2 pointerOffset = Custom.DegToVec(currentAngle) * CircleRadius;
-        pointerSprite.SetPosition(pointerOffset);
-
-            // 根据淡入淡出状态调整大小(可选效果)
-            float scaleMod = 0.8f + EaseInOut(fadeState) * 0.4f;
-            pointerSprite.scaleX = PointerWidth * 0.5f * scaleMod;
-            pointerSprite.scaleY = PointerLength * 0.5f * scaleMod;*/
-
-            // 危险程度指示(根据生物类型)
-            /*if (owner.room != null)
-            {
-                float threatLevel = CalculateThreatLevel(target);
-                pointerSprite.alpha = 0.5f + threatLevel * 0.5f;
-
-                // 危险时增加脉冲强度
-                SetPulseEffect(3f, 0.1f + threatLevel * 0.3f);
-            }*/
-
-            // 淡入淡出圆环动画
-                circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);
-
-            // 淡入淡出颜色变化
-            /*pointerSprite.color = Color.Lerp(
-                new Color(1f, 1f, 1f, 0f),
-                Color.red,
-                EaseInOut(fadeState));*/
-
-            // 目标接近时震动效果
-            float distance2 = Vector2.Distance(owner.mainBodyChunk.pos, nPos);
-            float shakeIntensity = Mathf.Clamp01(1f - distance2 / 300f) * fadeState;
-        //pointerMesh.SetPosition(pointerDir * CircleRadius + Custom.RNV() * shakeIntensity * 3f);
-        pointerMesh.SetPosition(new Vector2(300, 300) + Custom.RNV() * shakeIntensity * 3f);
+        // 目标接近时震动效果
+        float distance2 = Vector2.Distance(ownerWorldPos, targetWorldPos);
+        float shakeIntensity = Mathf.Clamp01(1f - distance2 / 300f) * fadeState;
+        pointerMesh.SetPosition(pointerScreenPos + Custom.RNV() * shakeIntensity * 3f);
 
         // 更新发光效果
         Vector2 pointerTip = owner.mainBodyChunk.pos +
-                Custom.DegToVec(pointerMesh.rotation) * (CircleRadius + PointerLength);
-            for (int i = 0; i < glowEffects.Count; i++)
-            {
-                Vector2 offset = Custom.RNV() * 5f * (i + 1);
-                glowEffects[i].pos = pointerTip + offset;
-                glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
-                glowEffects[i].setAlpha = 0.7f;
-            }
+        Custom.DegToVec(pointerMesh.rotation) * (CircleRadius + PointerLength);
+        for (int i = 0; i < glowEffects.Count; i++)
+        {
+            Vector2 offset = Custom.RNV() * 5f * (i + 1);
+            glowEffects[i].pos = pointerTip + offset;
+            glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
+            glowEffects[i].setAlpha = 0.7f;
+        }
 
-            // 动态颜色变化
-            float distance = Vector2.Distance(owner.mainBodyChunk.pos, nPos);
-            float Lerp = Mathf.Clamp01(distance / maxDistance);
-            //pointerSprite.color = Color.Lerp(endColor, startColor, colorLerp);
-        // 颜色变化
-        pointerMesh.color = Color.Lerp(endColor, startColor, Lerp);
+        // 动态颜色变化
+        float distance = Vector2.Distance(owner.mainBodyChunk.pos, targetWorldPos);
+        float Lerp = Mathf.Clamp01(distance / maxDistance);
+        pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
 
         // 脉冲动画
         float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
         float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
-        if (distance >= 520)
+        if (distance >= 800)
         {
             pulseIntensity_ = 0f;
         }
-        pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_);
-        pointerMesh.scaleY = 8f * (1f + pulse * pulseIntensity_);
+        pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.03f;
+        pointerMesh.scaleY = 8f * (1f + pulse * pulseIntensity_) * 0.03f;
     }
 
     private float CalculateThreatLevel(Creature target)
@@ -337,6 +327,7 @@ public class CreaturePointer
 #endif
         On.Player.ctor += Player_ctor;
         On.Player.Update += Player_Update;
+        On.RoomCamera.SpriteLeaser.Update += SLeaser_Update;
 
 #if MYDEBUG
             }
@@ -360,8 +351,32 @@ public class CreaturePointer
         if (self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
         {
             int N = self.playerState.playerNumber;
+            if (N == 0)
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    if (pointer[i] != null)
+                    {
+                        pointer[i].Destroy();
+                    }
+                }
+            }
             pointer[N] = new CreaturePointer(self);
         }
+    }
+
+    public static void SLeaser_Update(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self, float timeStacker, RoomCamera rCam, Vector2 camPos)
+    {
+        orig.Invoke(self, timeStacker, rCam, camPos);
+
+        for (int i = 0; i < 20; i++)
+        {
+            if (pointer[i] != null)
+            {
+                pointer[i].Update_(camPos);
+            }
+        }
+
     }
 
     private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
@@ -369,10 +384,11 @@ public class CreaturePointer
         orig(self, eu);
 
         int N = self.playerState.playerNumber;
-        if (pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
+        if (pointer != null && pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
         {
             Creature? creature = MyPlayer.FindNearestCreature(self.firstChunk.pos, self.room, false, self, false, 2);
             pointer[N].Update(creature, Time.deltaTime);
+
         }
     }
 

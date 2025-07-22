@@ -1,6 +1,7 @@
 ﻿using On;
 using IL;
 using System;
+using System.Threading.Tasks;
 using Mono.Cecil;
 using MoreSlugcats;
 using RWCustom;
@@ -22,6 +23,7 @@ using MonoMod.RuntimeDetour;
 using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
 using Kittehface.Framework20;
+using System.Threading;
 
 
 namespace MySlugcat;
@@ -42,18 +44,15 @@ public class CreaturePointer
     private float camX;
     private float camY;
 
-    // 调整指针尺寸参数
-    private const float PointerHeight = 30f;  // 纸飞机高度
-    private const float BaseWidth = 20f;     // 底部宽度
-    private const float NotchDepth = 5f;     // 底部凹陷深度
-    private const float RotationSpeed = 90f;
-
     private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
     // 平滑旋转
+    private const float OrbitRadius = 50f; // 根据视觉效果调整
+    private const float RotationSmoothness = 0.9f; // 旋转平滑度(0-1)，值越小越平滑
     private float currentAngle;
     private float targetAngle;
-    private const float RotationSmoothness = 0.9f; // 旋转平滑度(0-1)，值越小越平滑
+    //private const float CircleRadius = 30f;
+    private const float RotationSpeed = 90f; // 度/秒
 
     // 动态颜色变化
     private Color startColor = Color.green;
@@ -69,7 +68,7 @@ public class CreaturePointer
 
     // 新增淡入淡出控制变量
     private float fadeState = 0f; // 0-1表示淡入淡出进度
-    private const float FadeSpeed = 1.5f; // 淡入淡出速度
+    private const float FadeSpeed = 2f; // 淡入淡出速度
     private bool isActive = false;
 
     private List<LightSource> glowEffects = new List<LightSource>();
@@ -115,7 +114,7 @@ public class CreaturePointer
             circleSprite = new FSprite("Circle20")
             {
                 scale = CircleRadius / 20f,
-                color = new Color(1f, 1f, 1f, 0.1f),
+                color = new Color(1f, 1f, 1f, 0.01f),
                 anchorX = 0.5f,
                 anchorY = 0.5f
             };
@@ -283,37 +282,39 @@ public class CreaturePointer
 
         // 2. 计算方向向量(从玩家指向目标)
         Vector2 direction = (targetWorldPos - ownerWorldPos).normalized;
-
-        // 3. 计算公转位置(围绕玩家旋转)
-        float orbitRadius = CircleRadius * 0.8f; // 公转半径
-        Vector2 orbitOffset = new Vector2(
-            Mathf.Cos(currentAngle * Mathf.Deg2Rad) * orbitRadius,
-            Mathf.Sin(currentAngle * Mathf.Deg2Rad) * orbitRadius
-        );
-
-        // 4. 平滑更新角度
         targetAngle = Custom.VecToDeg(direction);
-        currentAngle = Mathf.LerpAngle(
-            currentAngle,
+        //targetAngle = Custom.VecToDeg(targetWorldPos - ownerWorldPos);
+
+        // 平滑旋转
+        float currentAngle = Mathf.LerpAngle(
+            pointerMesh.rotation,
             targetAngle,
-            RotationSmoothness * timeStacker
-        );
+            timeStacker * RotationSpeed * 0.01f);
+
 
         // 3. 计算屏幕空间位置
         Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
         //Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius / 3 * 2;
 
-        // 5. 更新指针位置(公转)
+/*        // 5. 更新指针位置(公转)
         Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
-        pointerMesh.SetPosition(pointerScreenPos);
+        pointerMesh.SetPosition(pointerScreenPos);*/
 
-        // 保持指针固定朝向(指向目标)
-        pointerMesh.rotation = Custom.VecToDeg(direction);
+        // 更新指针位置和旋转
+        pointerContainer.SetPosition(ownerScreenPos);
+        pointerMesh.rotation = currentAngle;
+
+        // 调整指针位置(尖端指向目标)
+        Vector2 pointerOffset = Custom.DegToVec(currentAngle) * 30f;
+        pointerMesh.SetPosition(pointerOffset);
+
+        /*// 保持指针固定朝向(指向目标)
+        pointerMesh.rotation = targetAngle;*/
 
         //pointerMesh.rotation = targetAngle;
 
         // 更新圆环位置
-        circleSprite.SetPosition(ownerScreenPos);
+        //circleSprite.SetPosition(ownerScreenPos);
 
 
 
@@ -348,15 +349,28 @@ public class CreaturePointer
         // 目标接近时震动效果
         float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
         float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
-        Vector2 exactPos = pointerScreenPos + Custom.RNV() * shakeIntensity * 3f;
+        Vector2 exactPos = pointerOffset + Custom.RNV() * shakeIntensity * 3f;
         pointerMesh.SetPosition(exactPos);
 
         // 动态颜色变化
         float Lerp = Mathf.Clamp01(distance / maxDistance);
         pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
 
-        // 更新发光效果位置(跟随公转)
+        /*// 更新光效位置
         for (int i = 0; i < glowEffects.Count; i++)
+        {
+            float offsetAngle = radianAngle + i * Mathf.PI * 0.66f;
+            Vector2 lightOffset = new Vector2(
+                Mathf.Cos(offsetAngle) * OrbitRadius * 1.3f,
+                Mathf.Sin(offsetAngle) * OrbitRadius * 1.3f
+            );
+            glowEffects[i].pos = ownerWorldPos + lightOffset;
+            glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
+            glowEffects[i].setAlpha = 0.7f;
+            glowEffects[i].color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
+        }*/
+        // 更新发光效果位置(跟随公转)
+        /*for (int i = 0; i < glowEffects.Count; i++)
         {
             Vector2 lightPos = ownerWorldPos + orbitOffset * 1.2f; // 稍微远离中心
             glowEffects[i].pos = lightPos;
@@ -364,7 +378,7 @@ public class CreaturePointer
             glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
             glowEffects[i].setAlpha = 0.7f;
             glowEffects[i].color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
-        }
+        }*/
 
         // 脉冲动画
         float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
@@ -466,9 +480,81 @@ public class CreaturePointer
 #endif
     }
 
+    private static readonly object _singletonLock = new object();
+    private static bool _isMainUpdateRunning = false;
+
+    public static void MainUpdate()
+    {
+        lock (_singletonLock)
+        {
+            // 如果已经在运行，直接返回
+            if (_isMainUpdateRunning)
+            {
+                Console.WriteLine("MainUpdate 已经在运行！");
+                return;
+            }
+
+            _isMainUpdateRunning = true; // 标记为已运行
+        }
+
+        try
+        {
+            // 真正的游戏循环
+            var stopwatch = Stopwatch.StartNew();
+            double targetFrameTime = 1000.0 / 40.0; // 40 FPS（每帧 = 25ms）
+            double previousTime = 0;
+
+            while (_isMainUpdateRunning)// 用标志位控制退出
+            {
+                double currentTime = stopwatch.Elapsed.TotalMilliseconds;
+                double deltaTime = currentTime - previousTime;
+
+                if (deltaTime >= targetFrameTime)
+                {
+                    for (int i = 0; i < 20; i++)
+                    {
+                        if (pointer[i] != null)
+                        {
+                            if (pointer[i].owner == null)
+                            {
+                                pointer[i].Destroy();
+                            }
+                            else
+                            {
+                                //pointer[i].Update_(camPos);
+                                pointer[i].Update(false);
+                            }
+                        }
+                    }
+                    //Update(deltaTime / 1000.0); // 传入 deltaTime（秒）
+                    //Render();
+                    //ProcessInput();
+
+                    previousTime = currentTime;
+                }
+                else
+                {
+                    // 如果还没到下一帧，让出 CPU 时间
+                    Thread.Sleep(0);
+                }
+            }
+        }
+        finally
+        {
+            // 确保退出时释放标志位
+            _isMainUpdateRunning = false;
+        }
+
+    }
+
     private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
     {
         orig.Invoke(self, abstractCreature, world);
+
+        if (_isMainUpdateRunning == false)
+        {
+            Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
+        }
 
         if (update0 == null)
         {

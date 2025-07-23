@@ -66,6 +66,7 @@ namespace MySlugcat
 
         private static readonly object _singletonLock = new object();
         private static bool _isMainUpdateRunning = false;
+        private static bool Running = false;
 
         public static void MainUpdate()
         {
@@ -83,6 +84,7 @@ namespace MySlugcat
 
             try
             {
+                Console.WriteLine("MainUpdate 已经在运行！1");
                 // 真正的游戏循环
                 //var stopwatch = Stopwatch.StartNew();
                 //double targetFrameTime = 1000.0 / 40.0; // 40 FPS（每帧 = 25ms）
@@ -163,6 +165,7 @@ namespace MySlugcat
                     }
                 }
                 pointer[N] = new PointerFSprite(self);
+                pointer[N].slatedForDestroy = false;
             }
         }
 
@@ -179,31 +182,37 @@ namespace MySlugcat
 
             camPos = cameraPos;
 
+            if (_isMainUpdateRunning == false && Running == false)
+            {
+                Running = true;
+                Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
+            }
+
             //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
             //    $"Null({update0 == null})");//
 
 
 
-/*            for (int i = 0; i < 20; i++)
-            {
-                if (pointer[i] != null && !pointer[i].slatedForDestroy)
-                {
-                    if (pointer[i].owner == null)
-                    {
-                        pointer[i].Destroy();
-                        pointer[i].slatedForDestroy = true;
-                    }
-                    else
-                    {
-                        if (!pointer[i].slatedForDestroy)
+            /*            for (int i = 0; i < 20; i++)
                         {
-                            pointer[i].Update_(camPos);
-                            //pointer[i].Update(i, false);
-                        }
+                            if (pointer[i] != null && !pointer[i].slatedForDestroy)
+                            {
+                                if (pointer[i].owner == null)
+                                {
+                                    pointer[i].Destroy();
+                                    pointer[i].slatedForDestroy = true;
+                                }
+                                else
+                                {
+                                    if (!pointer[i].slatedForDestroy)
+                                    {
+                                        pointer[i].Update_(camPos);
+                                        //pointer[i].Update(i, false);
+                                    }
 
-                    }
-                }
-            }*/
+                                }
+                            }
+                        }*/
 
         }
 

@@ -226,7 +226,7 @@ public class PointerFSprite
             i = lasti;
         }
 
-        if (Math.Abs(lasti - i) <= 40)
+        if (Math.Abs(lasti - i) <= 20)
         {
 
             if (itoo == i)
@@ -237,7 +237,7 @@ public class PointerFSprite
             {
                 ic = 0;
             }
-            if (ic > 40)
+            if (ic > 30)
             {
                 if (owner.room == null && owner.inShortcut)
                 {

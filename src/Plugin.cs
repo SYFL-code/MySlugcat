@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx;
+using Fisobs.Core;
 using UnityEngine;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
@@ -36,6 +37,8 @@ namespace MySlugcat
             {
 #endif
             Plugin.Logger = base.Logger;
+
+            Content.Register(new EnderPearlFisob());
 
             // Put your custom hooks here!-在此放置你自己的钩子
             //On.Player.Jump += Player_Jump;
@@ -101,6 +104,7 @@ namespace MySlugcat
             MachineConnector.SetRegisteredOI(MOD_ID, new Options());
             /*MachineConnector.SetRegisteredOI(MOD_ID, MyOption.Instance);*/ //***
             //加载玩家皮肤贴图
+            EnderPearl.HookTexture();
             //MyPlayerGraphics.HookTexture();
             //加载冰矛贴图
             //MyIceSpear.HookTexture();

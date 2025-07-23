@@ -24,7 +24,7 @@ namespace MySlugcat
 
             //if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
             //if (true)
-            if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
+            /*if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
             {
                 string newContent = $"loglevel: {needloglevel.ToString()}, about: {about}, location: {location}\n   message: {message}";
                 try
@@ -38,7 +38,7 @@ namespace MySlugcat
                     return;
                 }
                 return;
-            }
+            }*/
 
             if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
             {
@@ -74,7 +74,7 @@ namespace MySlugcat
                     Console.WriteLine($"操作失败: {ex.Message}");
                 }
             }
-            return;
+            //return;
 
             if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
             {
@@ -98,8 +98,22 @@ namespace MySlugcat
                         // 读取现有内容
                         string existingContent = File.ReadAllText(filePath);
 
-                        // 将新内容放在顶部 + 原有内容
-                        File.WriteAllText(filePath, newContent + "\n" + existingContent);
+                        //string text = "第一行\n第二行\r\n第三行";
+                        int lineCount = 0;
+                        using (var reader = new StringReader(existingContent))
+                        {
+                            while (reader.ReadLine() != null)
+                            {
+                                lineCount++;
+                            }
+                            //Console.WriteLine($"行数: {lineCount}");
+                        }
+
+                        if (lineCount <= 4000)
+                        {
+                            // 将新内容放在顶部 + 原有内容
+                            File.WriteAllText(filePath, newContent + "\n" + existingContent);
+                        }
                     }
 
                     if ((logDebug == null || logDebug.Value) && loglevel.Value >= 10)

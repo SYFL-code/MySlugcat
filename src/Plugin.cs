@@ -1,6 +1,6 @@
 ﻿using System;
 using BepInEx;
-using Fisobs.Core;
+//using Fisobs.Core;
 using UnityEngine;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
@@ -38,8 +38,6 @@ namespace MySlugcat
 #endif
             Plugin.Logger = base.Logger;
 
-            Content.Register(new EnderPearlFisob());
-
             // Put your custom hooks here!-在此放置你自己的钩子
             //On.Player.Jump += Player_Jump;
             //在玩家触发跳跃时执行Player_Jump
@@ -51,6 +49,10 @@ namespace MySlugcat
 
             //mod初始化
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            Control.Hook();
+            MySlugcatStats.Hook();
+            //Content.Register(new EnderPearlFisob());
             //玩家能力
             MyPlayer.Hook();
             Exhausted.Hook();
@@ -61,7 +63,6 @@ namespace MySlugcat
             DeflagrationSkill.Hook();
             KnitmeshSkill.Hook();
             DigestionSkill.Hook();
-            CreaturePointer.Hook();
 
             FixedSkill.Hook();
             Intros.Hook();
@@ -104,7 +105,7 @@ namespace MySlugcat
             MachineConnector.SetRegisteredOI(MOD_ID, new Options());
             /*MachineConnector.SetRegisteredOI(MOD_ID, MyOption.Instance);*/ //***
             //加载玩家皮肤贴图
-            EnderPearl.HookTexture();
+            
             //MyPlayerGraphics.HookTexture();
             //加载冰矛贴图
             //MyIceSpear.HookTexture();
@@ -133,9 +134,10 @@ namespace MySlugcat
 
 
         // Load any resources, such as sprites or sounds-加载任何资源 包括图像素材和音效
-/*        private void LoadResources(RainWorld rainWorld)
+        private void LoadResources(RainWorld rainWorld)
         {
-        }*/
+            //EnderPearl.HookTexture();
+        }
 
         private void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {

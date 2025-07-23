@@ -29,9 +29,9 @@ using System.Threading;
 namespace MySlugcat;
 
 // PerceptionSkill 感知能力
-public class CreaturePointer
+public class PointerFSprite
 {
-    private readonly Creature owner;
+    public readonly Creature owner;
     private readonly FContainer pointerContainer;
     //private readonly FSprite pointerSprite;
     private readonly FSprite circleSprite;
@@ -41,11 +41,16 @@ public class CreaturePointer
     private const float CircleRadius = 60f;
 
     // 摄像机坐标
-    private float camX;
-    private float camY;
+    private float camX = 300f;
+    private float camY = 300f;
 
-    public int i = 0;
-    private int lasti = 0;
+    public int i = -200;
+    public int lasti = -200;
+    public int itoo = -200;
+    public int ic = -200;
+    public bool start = false;
+
+    public bool slatedForDestroy = false;
 
     private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
@@ -76,7 +81,7 @@ public class CreaturePointer
 
     private List<LightSource> glowEffects = new List<LightSource>();
 
-    public CreaturePointer(Creature owner)
+    public PointerFSprite(Creature owner)
     {
         this.owner = owner;
 
@@ -162,12 +167,12 @@ public class CreaturePointer
         }
     }
 
-    public void Update_(Vector2 camPos)
+    /*public void Update_(Vector2 camPos)
     {
         Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update__st",
             $"({owner == null})");
 
-        if (owner == null)
+        if (owner == null || owner.slatedForDeletetion || slatedForDestroy)
         {
             this.Destroy();
             return;
@@ -178,22 +183,75 @@ public class CreaturePointer
 
         camX = camPos.x;
         camY = camPos.y;
-    }
+    }*/
 
-    public void Update(bool Destroy)
+    public void Update(int N, bool Destroy)
     {
         Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
-            $"({owner == null})");//
+            $"({owner == null}), ({N})");//
 
-        if (owner == null || owner.slatedForDeletetion || Destroy)
+        if (owner == null || owner.slatedForDeletetion || Destroy || slatedForDestroy)
         {
             this.Destroy();
             return;
         }
 
-        lasti += 1;
-        if (lasti - i <= 10)
+        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
+            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut}), ({N}), ({lasti}), ({i})");//
+
+        if (Control.RWG != null)
         {
+            if (Control.RWG.GamePaused)
+            {
+                return;
+            }
+        }
+        if (Control.camPos != null)
+        {
+            camX = Control.camPos.x;
+            camY = Control.camPos.y;
+        }
+
+        lasti += 1;
+        if (lasti < 0)
+        {
+            i = lasti;
+        }
+        if (owner.room == null && owner.inShortcut)
+        {
+            i = lasti;
+        }
+        if (start == false)
+        {
+            i = lasti;
+        }
+
+        if (Math.Abs(lasti - i) <= 40)
+        {
+
+            if (itoo == i)
+            {
+                ic += 1;
+            }
+            else
+            {
+                ic = 0;
+            }
+            if (ic > 40)
+            {
+                if (owner.room == null && owner.inShortcut)
+                {
+                    i = lasti;
+                }
+                else
+                {
+                    this.Destroy();
+                    return;
+                }
+            }
+
+            itoo = i;
+
         }
         else
         {
@@ -207,8 +265,6 @@ public class CreaturePointer
                 return;
             }
         }
-        Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
-            $"({owner.room == null}), ({owner.slatedForDeletetion}), ({!owner.inShortcut}), ({lasti}), ({i})");//
 
         bool shouldBeActive = true;
         Creature? creature = null;
@@ -452,6 +508,7 @@ public class CreaturePointer
     public void Destroy()
     {
         // 先隐藏再移除
+        slatedForDestroy = true;
         if (pointerContainer != null)
         {
             pointerContainer.isVisible = false;
@@ -471,268 +528,4 @@ public class CreaturePointer
 
 
 
-
-    public static CreaturePointer[] pointer = new CreaturePointer[20];
-    public static Update0? update0 = null;
-
-    public static void Hook()
-    {
-#if MYDEBUG
-            try
-            {
-#endif
-        On.Player.ctor += Player_ctor;
-        On.Player.Update += Player_Update;
-        On.RoomCamera.SpriteLeaser.Update += SLeaser_Update;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
-    }
-
-    private static readonly object _singletonLock = new object();
-    private static bool _isMainUpdateRunning = false;
-
-    public static void MainUpdate()
-    {
-        lock (_singletonLock)
-        {
-            // 如果已经在运行，直接返回
-            if (_isMainUpdateRunning)
-            {
-                Console.WriteLine("MainUpdate 已经在运行！");
-                return;
-            }
-
-            _isMainUpdateRunning = true; // 标记为已运行
-        }
-
-        try
-        {
-            // 真正的游戏循环
-            var stopwatch = Stopwatch.StartNew();
-            double targetFrameTime = 1000.0 / 40.0; // 40 FPS（每帧 = 25ms）
-            double previousTime = 0;
-
-            while (_isMainUpdateRunning)// 用标志位控制退出
-            {
-                Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_st1",
-                    $"({1})");
-
-                double currentTime = stopwatch.Elapsed.TotalMilliseconds;
-                double deltaTime = currentTime - previousTime;
-
-                if (deltaTime >= targetFrameTime)
-                {
-                    for (int i = 0; i < 20; i++)
-                    {
-                        if (pointer[i] != null)
-                        {
-                            Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_zh2",
-                                $"Null ({pointer[i].owner == null})");
-                            if (pointer[i].owner == null)
-                            {
-                                pointer[i].Destroy();
-                            }
-                            else
-                            {
-                                //pointer[i].Update_(camPos);
-                                pointer[i].Update(false);
-                            }
-                        }
-                    }
-                    //Update(deltaTime / 1000.0); // 传入 deltaTime（秒）
-                    //Render();
-                    //ProcessInput();
-
-                    previousTime = currentTime;
-                }
-                else
-                {
-                    // 如果还没到下一帧，让出 CPU 时间
-                    Thread.Sleep(0);
-                }
-            }
-        }
-        finally
-        {
-            // 确保退出时释放标志位
-            _isMainUpdateRunning = false;
-        }
-
-    }
-
-    private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
-    {
-        orig.Invoke(self, abstractCreature, world);
-
-        if (_isMainUpdateRunning == false)
-        {
-            Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
-        }
-
-        if (update0 == null)
-        {
-            update0 = new Update0(0, 100);
-        }
-
-        if (self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill)
-        {
-            int N = self.playerState.playerNumber;
-            if (N == 0)
-            {
-                for (int i = 0; i < 20; i++)
-                {
-                    if (pointer[i] != null)
-                    {
-                        pointer[i].Destroy();
-                    }
-                }
-            }
-            pointer[N] = new CreaturePointer(self);
-        }
-    }
-
-    public static void SLeaser_Update(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self, float timeStacker, RoomCamera rCam, Vector2 camPos)
-    {
-        orig.Invoke(self, timeStacker, rCam, camPos);
-
-        //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
-        //    $"Null({update0 == null})");//
-        if (update0 != null)
-        {
-            //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_2",
-            //    $"({update0.N}), ({update0.i})");//
-        }
-
-        for (int i = 0; i < 20; i++)
-        {
-            if (pointer[i] != null)
-            {
-                if (pointer[i].owner == null)
-                {
-                    pointer[i].Destroy();
-                }
-                else
-                {
-                    pointer[i].Update_(camPos);
-                    pointer[i].Update(false);
-                }
-            }
-        }
-
-    }
-
-    private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-    {
-        orig(self, eu);
-
-        if (update0 == null)
-        {
-            update0 = new Update0(0, 100);
-        }
-
-/*        if (self.slugcatStats.name == Plugin.YourSlugID && 1 == UnityEngine.Random.Range(0, 3000000) && update0 != null)
-        {
-            update0.N = 0;
-            update0.i = UnityEngine.Random.Range(-46666, 30000);
-        }*/
-
-        int N = self.playerState.playerNumber;
-        if (pointer != null && pointer[N] != null && self.slugcatStats.name == Plugin.YourSlugID)
-        {
-            pointer[N].i = pointer[N].lasti;
-        }
-    }
-
 }
-
-
-public class Update0: CosmeticSprite
-{
-    public int N;
-    public int i;
-
-    public  Update0(int N, int i)
-    {
-        this.N = N;
-        this.i = i;
-    }
-
-    public override void Update(bool eu)
-    {
-        Log.Logger(7, "PerceptionSkill", "MySlugcat:Update0:Update",
-            $"({N})");//
-
-        base.Update(eu);
-
-        if (N == 0)
-        {
-            for (int j = 0; j < 20; j++)
-            {
-                if (CreaturePointer.pointer[j] != null)
-                {
-                    Log.Logger(7, "PerceptionSkill", "MySlugcat:Update0:Update",
-                        $"({j})");//
-                    CreaturePointer.pointer[j].Update(this.slatedForDeletetion);
-                }
-            }
-        }
-
-        if (i < 0)
-        {
-            i += 1;
-        }
-        if (i > 0)
-        {
-            i -= 1;
-        }
-
-    }
-
-    public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
-    {
-        sLeaser.sprites = new FSprite[1];
-        
-        TriangleMesh pointerMesh;
-        pointerMesh = new TriangleMesh("pixel", new TriangleMesh.Triangle[]
-        {
-                new TriangleMesh.Triangle(0, 1, 2) // 单个三角形
-        }, true, true);
-
-        // 定义三角形顶点 (等腰三角形)
-        pointerMesh.vertices[0] = new Vector2(0, 25);  // 顶点
-        pointerMesh.vertices[1] = new Vector2(-10 / 2, 0);    // 左下角
-        pointerMesh.vertices[2] = new Vector2(10 / 2, 0);     // 右下角
-
-        pointerMesh.color = Color.green;
-        pointerMesh.anchorX = 0.5f;
-        pointerMesh.anchorY = 0f; // 底部锚点
-
-        sLeaser.sprites[0] = pointerMesh;
-        FContainer fcontainer = rCam.ReturnFContainer("HUD");
-        fcontainer.AddChild(sLeaser.sprites[0]);
-    }
-
-    public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-    {
-        base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
-        sLeaser.sprites[0].x = 300f;
-        sLeaser.sprites[0].y = 300f;
-        sLeaser.sprites[0].scaleX = 25 * 0.075f;
-        sLeaser.sprites[0].scaleY = 10  * 0.075f;
-        sLeaser.sprites[0].alpha = 0.2f;
-    }
-
-}
-

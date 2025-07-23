@@ -34,7 +34,8 @@ namespace MySlugcat
 
         public static void HookTexture()
         {
-            Futile.atlasManager.LoadAtlas("atlases/icon_EnderPearl");
+            //Futile.atlasManager.LoadAtlas("atlases/icon_EnderPearl");
+            Futile.atlasManager.LoadAtlas("icon_EnderPearl");
         }
 
         public EnderPearl(EnderPearlAbstract abstr, Vector2 pos) : base(abstr, abstr.world)

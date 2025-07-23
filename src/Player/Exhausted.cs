@@ -57,33 +57,39 @@ namespace MySlugcat
         {
             orig(player, eu);
 
-            player.gourmandAttackNegateTime--;
+            if (player.slugcatStats.name == Plugin.YourSlugID && (SC.MySlugcatStats == 0 && SC.Exhausted))
+            {
+                player.gourmandAttackNegateTime--;
 
-            if (player.lungsExhausted && (!player.gourmandExhausted))
-            {
-                player.aerobicLevel = 1f;
-            }
+                if (player.lungsExhausted && (!player.gourmandExhausted))
+                {
+                    player.aerobicLevel = 1f;
+                }
 
-            if (player.slugcatStats.name == Plugin.YourSlugID && SC.Exhausted && (double)player.aerobicLevel >= 0.95)
-            {
-                player.gourmandExhausted = true;
-            }
-            if (player.aerobicLevel < 0.4f)
-            {
-                player.gourmandExhausted = false;
-            }
-            if (player.gourmandExhausted)
-            {
-                player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
-                player.lungsExhausted = true;
+                if ((double)player.aerobicLevel >= 0.95)
+                {
+                    player.gourmandExhausted = true;
+                }
+                if (player.aerobicLevel < 0.4f)
+                {
+                    player.gourmandExhausted = false;
+                }
+                if (player.gourmandExhausted)
+                {
+                    player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+                    player.lungsExhausted = true;
+                }
             }
         }
 
         private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
         {
-            if (player.slugcatStats.name == Plugin.YourSlugID)
+            if (player.slugcatStats.name == Plugin.YourSlugID && SC.MySlugcatStats == 0)
             {
-                spear.spearDamageBonus = 0.7f;
+                spear.throwModeFrames = 18;
+                spear.spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
+                BodyChunk firstChunk = spear.firstChunk;
+                firstChunk.vel.x = firstChunk.vel.x * 0.77f;
                 if (!player.gourmandExhausted)
                 {
                     /*if (player.canJump != 0)
@@ -96,14 +102,14 @@ namespace MySlugcat
                     }*/
                     if ((player.room != null && player.room.gravity == 0f) || Mathf.Abs(spear.firstChunk.vel.x) < 1f)
                     {
-                        player.firstChunk.vel += spear.firstChunk.vel.normalized * 9f;
+                        //player.firstChunk.vel += spear.firstChunk.vel.normalized * 9f;
                     }
                     else
                     {
-                        player.rollDirection = (int)Mathf.Sign(spear.firstChunk.vel.x);
+                        //player.rollDirection = (int)Mathf.Sign(spear.firstChunk.vel.x);
                         player.rollCounter = 0;
-                        BodyChunk firstChunk3 = player.firstChunk;
-                        firstChunk3.vel.x = firstChunk3.vel.x + Mathf.Sign(spear.firstChunk.vel.x) * 9f;
+                        //BodyChunk firstChunk3 = player.firstChunk;
+                        //firstChunk3.vel.x = firstChunk3.vel.x + Mathf.Sign(spear.firstChunk.vel.x) * 9f;
                     }
                     player.gourmandAttackNegateTime = 80;
                 }

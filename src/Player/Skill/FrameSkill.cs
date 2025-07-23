@@ -37,6 +37,7 @@ namespace MySlugcat
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
 
+            On.Player.Destroy += Player_Destroy;
             //咬住挣脱
             On.Creature.Violence += Creature_Violence;
             //挣脱蜥蜴
@@ -583,6 +584,35 @@ namespace MySlugcat
 #endif
         }
         //#nullable disable
+
+        private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
+        {
+            if (player.slugcatStats.name == Plugin.YourSlugID && !player.dead && SC.FrameSkill)
+            {
+                Creature? obj = Frame​​Skill.Frame(player, false, player, 20);
+
+                if (obj != null)
+                {
+                    player.dead = false;
+                    player.stun = 0;
+                    obj.Destroy();
+                    //obj.Die();
+                    /*var hs = obj.State as HealthState;
+                    if (hs != null)
+                    {
+                        hs.health -= 1.5f;
+                    }*/
+                }
+                else
+                {
+                    orig(player);
+                }
+            }
+            else
+            {
+                orig(player);
+            }
+        }
 
         public static Creature Player_Die(Player self)
         {

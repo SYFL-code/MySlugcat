@@ -54,6 +54,10 @@
         </Reference>
     </ItemGroup>
     
+    <ItemGroup>
+      <Folder Include="FSprite\" />
+    </ItemGroup>
+    
     <Target Name="GenerateMod" AfterTargets="PostBuildEvent">
 		<ItemGroup>
 			<RemovePlugins Include="../mod/newest/plugins/*.dll" />

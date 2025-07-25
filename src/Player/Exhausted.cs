@@ -31,26 +31,8 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             On.Player.Update += Player_Update;
             On.Player.ThrownSpear += Player_ThrownSpear;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)

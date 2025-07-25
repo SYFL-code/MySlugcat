@@ -1,0 +1,77 @@
+{
+	"id": "theaccommodator.id.LH",
+	"name": "The accommodator",
+	"description": "An Iterator-modified biological specimen, deemed a failure, abandoned to barely cling to life alone in the wilds...<LINE>Life finds a way...",
+	"features": {
+		"color": "9cf0a4",
+
+		"custom_colors": [
+			{
+				"name": "Body",
+				"story": "9cf0a4"
+			},
+			{
+				"name": "Eyes",
+				"story": "000000"
+			}
+		],
+
+		"back_spear": false,
+		"food_min": 10,
+		"food_max": 10,
+		"karma": 1,
+		"karma_cap": 4,
+		"start_room": [ "SH_S05", "SL_S06" ],
+		"world_state": [ "Red", "Gourmand" ],
+		"timeline_before": [ "Red", "Gourmand" ],
+
+		"alignments": {
+			"All": {
+				"like": -0.35,
+				"locked": false
+			},
+			"Scavengers": {
+				"like": -0.35,
+				"locked": false
+			},
+			"Lizards": {
+				"like": -0.35,
+				"locked": false
+			},
+			"Cicadas": {
+				"like": -0.35,
+				"locked": false
+			},
+			"GarbageWorms": {
+				"like": -0.35,
+				"locked": false
+			},
+			"Deer": {
+				"like": -0.35,
+				"locked": false
+			},
+			"Jetfish": {
+				"like": -0.35,
+				"locked": false
+			}
+		},
+
+		"diet": {
+			"base": "Red",
+			"corpses": 0.75,
+			"meat": 0.75,
+			"plants": 0.5,
+			"overrides": {
+				"Scavenger": 0.75,
+				"DangleFruit": 1
+			}
+		},
+
+		"title_card": "intro_roll_c_MySlugcat_LH",
+
+		"select_menu_scene": "Slugcat_MySlugcat_LH",
+		"select_menu_scene_ascended": "Ghost_MySlugcat_LH",
+		"sleep_scene": "Sleep_MySlugcat_LH"
+
+	}
+}

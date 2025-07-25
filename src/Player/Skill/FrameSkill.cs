@@ -30,10 +30,6 @@ namespace MySlugcat
     {
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
 
@@ -61,20 +57,6 @@ namespace MySlugcat
             On.Vulture.Carry += Vulture_Carry;
 
             //On.Player.Die += Player_Die;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 /*        public static void Object(PhysicalObject obj, Room room, WorldCoordinate pos)
@@ -268,10 +250,6 @@ namespace MySlugcat
 
         public static Creature? Frame(Player self, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             Creature? creature = MyPlayer.RandomlySelectedCreature(self.room, true, self, false);
             int percentage = 40;
             if (probability == -1)
@@ -331,10 +309,7 @@ namespace MySlugcat
                 //}
                 Vector2[] Pvector = new Vector2[] { PV0, PV1 };
 
-#if MYDEBUG
-            try
-            {
-#endif
+
                 /*                for (int num12 = 0; num12 < self.bodyChunks.Count(); num12++)
                                 {
                                     //self.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
@@ -381,24 +356,7 @@ namespace MySlugcat
                 //self.bodyChunks[0].lastPos = (new Vector2(CV0.X, CV0.Y) + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 //self.bodyChunks[1].pos = (new Vector2(CV1.X, CV1.Y) + self.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 //self.bodyChunks[1].lastPos = (new Vector2(CV1.X, CV1.Y) + self.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
 
-#if MYDEBUG
-            try
-            {
-#endif
 
                 //creature.mainBodyChunk.pos = self.mainBodyChunk.pos;
                 //creature.mainBodyChunk.lastPos = self.mainBodyChunk.lastPos;
@@ -445,19 +403,6 @@ namespace MySlugcat
                 //creature.bodyChunks[1].pos = (new Vector2(PV1.X, PV1.Y) + creature.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 //creature.bodyChunks[1].lastPos = (new Vector2(PV1.X, PV1.Y) + creature.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
 
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
 
                 /*                for (int num12 = 0; num12 < 2; num12++)
                                 {
@@ -568,20 +513,6 @@ namespace MySlugcat
                 return creature;
             }
             return null;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
         //#nullable disable
 
@@ -812,10 +743,6 @@ namespace MySlugcat
 
         private static void Creature_Violence(On.Creature.orig_Violence orig, Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             if (hitChunk == null)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
@@ -897,19 +824,6 @@ namespace MySlugcat
             //Frame(self, false, self);
             //防止玩家被咬死
             orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Lizard_Bite(On.Lizard.orig_Bite orig, Lizard lizard, BodyChunk chunk)
@@ -954,11 +868,6 @@ namespace MySlugcat
 
         private static void DaddyLongLegs_Eat(On.DaddyLongLegs.orig_Eat orig, DaddyLongLegs daddyLongLegs, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
-
             if (!SC.FrameSkill)
             {
                 orig.Invoke(daddyLongLegs, eu);
@@ -1002,27 +911,10 @@ namespace MySlugcat
                                 p.grabChunk = null;
                         }*/
             orig.Invoke(daddyLongLegs, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Centipede_UpdateGrasp(On.Centipede.orig_UpdateGrasp orig, Centipede centipede, int g)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(centipede, g);
             if (centipede.grasps == null ||
                 centipede.grasps[g] == null)
@@ -1061,28 +953,10 @@ namespace MySlugcat
 
             //centipede.Stun(10);
             //Frame(self, false, self);
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel bigEel)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             for (int j = 0; j < bigEel.room.physicalObjects.Length; j++)
             {
                 for (int num = bigEel.room.physicalObjects[j].Count - 1; num >= 0; num--)
@@ -1242,27 +1116,10 @@ namespace MySlugcat
                 bigEel.clampedObjects[l].chunk.owner.ChangeCollisionLayer(0);
                 bigEel.Crush(bigEel.clampedObjects[l].chunk.owner);
             }*/
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void TentaclePlant_Carry(On.TentaclePlant.orig_Carry orig, TentaclePlant tentaclePlant, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(tentaclePlant, eu);
             if (tentaclePlant.grasps == null ||
                 tentaclePlant.grasps[0] == null ||
@@ -1298,27 +1155,10 @@ namespace MySlugcat
                 self.stun = 0;
             }
             orig.Invoke(tentaclePlant, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void PoleMimic_Carry(On.PoleMimic.orig_Carry orig, PoleMimic poleMimic, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(poleMimic, eu);
             if (poleMimic.grasps == null ||
                 poleMimic.grasps[0] == null ||
@@ -1361,19 +1201,6 @@ namespace MySlugcat
             }
 
             orig.Invoke(poleMimic, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void EggBug_CarryObject(On.EggBug.orig_CarryObject orig, EggBug eggBug, bool eu)

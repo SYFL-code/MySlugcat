@@ -26,15 +26,9 @@ namespace MySlugcat
     //BUG:莫名卡顿，无响应
     public class MyPlayer
     {
-        //按下跳跃键的时长
-        static int[] JmpCounter = Enumerable.Repeat(0, 20).ToArray();
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             On.Player.ctor += Player_ctor;
             On.Player.Update += Player_Update;
 
@@ -77,19 +71,6 @@ namespace MySlugcat
             //On.SaveState.SaveToString += SaveState_SaveToString;
             //读取数据
             //On.SaveState.LoadGame += SaveState_LoadGame;
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 
@@ -203,10 +184,6 @@ namespace MySlugcat
 
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             orig.Invoke(self, abstractCreature, world);
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return;
@@ -230,28 +207,10 @@ namespace MySlugcat
             GlobalVar.playerVar.Add(self, pv);
             /*------------------------------------------------------------------调试图像------------------------------------------------------------------------------*/
             pv.myDebug = new MyDebug(self);
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             orig.Invoke(self, eu);
             if (self.slugcatStats.name != Plugin.YourSlugID)
                 return;
@@ -265,17 +224,9 @@ namespace MySlugcat
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
             int N = self.playerState.playerNumber;
-            if (self.input[0].jmp)
-            {
-                JmpCounter[N]++;
-            }
-            else
-            {
-                JmpCounter[N] = 0;
-            }
 
             //
-            if (JmpCounter[N] >= 60)
+/*            if (Key.JmpCounter[N] >= 60)
             {
                 //self.room.AddObject(new Explosion(self.room, self, self.mainBodyChunk.pos + new Vector2(0, -10), 5, 330f, 2f, 0.4f, 100f, 0.3f, self, 0.5f, 20f, 0.8f));
                 //在 当前房间 从自己身体 在当前身体的位置 生成一个 持续时长7 半径250，力度6.2，伤害2，眩晕280，致聋0.25，判定击杀由自己造成，伤害乘数0.7，最小眩晕160，背景噪声1的爆炸
@@ -302,14 +253,11 @@ namespace MySlugcat
                     }
                     creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
                 }
+            }*/
 
-                JmpCounter[N] = 0;
-            }
-
-#if DEBUG
             //启用投掷键输出调试信息
             PutDebugMsgOnThrow(self);
-#endif
+
             //吞炸弹爆炸
             //SelfExplode(self);
             //飞行能力
@@ -326,47 +274,35 @@ namespace MySlugcat
             //披风
             //if (pv.cloak != null)
             //    pv.cloak.Update(self, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void PutDebugMsgOnThrow(Player self)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             if (self.input[0].thrw)
             {
                 UnityEngine.Debug.Log(GlobalVar.dbgstr);
             }
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 
+        // 无害的生物
+        public static bool HarmlessCreature(Creature creature)
+        {
+            // 玩家 监视者 蝉乌贼 垃圾虫 波动龟 光鼠 蛙鱼 管虫 蝠蝇 蛋虫 雨鹿 幼年面条蝇 幼年蜈蚣 射线虫 墨鱼 水母 跃客
+            // 监察者 天空鲸 藤壶 水熊虫 火精灵 箱虫 
+            if (creature == null || creature is Player || creature is Overseer || creature is Cicada ||
+                creature is GarbageWorm || creature is Snail || creature is LanternMouse ||//segments
+                creature is JetFish || creature is TubeWorm || creature is Fly || creature is EggBug ||
+                creature is Deer || creature is SmallNeedleWorm || (creature is Centipede centipede && centipede.Small) || 
+                creature is VultureGrub || creature is Hazer || creature is JellyFish || creature is Yeek ||
+                (creature is Inspector inspector && inspector.Consious == true) ||
+                creature is SkyWhale || creature is Barnacle || creature is FireSprite || creature is Tardigrade ||
+                (creature is BoxWorm boxWorm && boxWorm.Consious == true))
+            {
+                return true;// creature is Leech || 
+            }
+            return false;
+        }
 
         // 有害的生物
         public static bool HarmfulCreature(Creature creature)
@@ -401,11 +337,6 @@ namespace MySlugcat
         // 查找获取一定范围内所有生物
         public static List<Creature>? CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature)
         {
-#if MYDEBUG
-            try
-            {
-#endif
-
             List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
             float radiusSquared = radius * radius;
 
@@ -455,30 +386,11 @@ namespace MySlugcat
 
             // 转换为最终结果
             return results.ConvertAll(x => x.creature);
-
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         // 查找当前房间中距离自身最近的生物
         public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature? creature, bool IncludeDeadCreature, int select)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             // 初始化变量
             Creature? nearest = null;        // 最近生物对象
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
@@ -514,7 +426,7 @@ namespace MySlugcat
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
-                if (!HarmfulCreature(c) && select == 2)// 无害生物
+                if (HarmlessCreature(c) && select == 2)// 无害生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
@@ -539,28 +451,11 @@ namespace MySlugcat
             }
             //return creatures[UnityEngine.Random.Range(0, creatures.Count)];
             return nearest; // 返回最近生物（可能为null）
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         // 随机查找当前房间的生物
         public static Creature? RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             // 初始化变量
             //Creature? nearest = null;        // 最近生物对象
             //float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
@@ -621,19 +516,6 @@ namespace MySlugcat
             }
             return creatures[UnityEngine.Random.Range(0, creatures.Count)];
             //return nearest; // 返回最近生物（可能为null）
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)

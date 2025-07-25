@@ -1,9 +1,9 @@
 ﻿{
-	"id": "author.slugtemplate",
-	"name": "Slugcat Template",
+	"id": "theaccommodator.LH.id",
+	"name": "The accommodator",
 	"version": "0.1.0",
-	"authors": "Author",
-	"description": "A template for making SlugBase mods.",
+	"authors": "LH",
+	"description": "An Iterator-modified biological specimen, deemed a failure, abandoned to barely cling to life alone in the wilds...<LINE>Life finds a way...",
 	"requirements": [ "slime-cubed.slugbase", "fisobs", "improved-input-config" ],
 	"requirements_names": [ "SlugBase", "Fisobs", "Improved Input Config: Extended" ],
 	"tags": [ "Custom Slugcat" ]

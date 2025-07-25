@@ -40,29 +40,11 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             On.Player.Update += Player_Update;
             On.Creature.Update += Creature_Update;
             On.Creature.Die += Creature_Die;
 
             On.RoomCamera.DrawUpdate += RoomCamera_DrawUpdate;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void RoomCamera_DrawUpdate(On.RoomCamera.orig_DrawUpdate orig, RoomCamera rCamera, float timeStacker, float timeSpeed)
@@ -96,7 +78,7 @@ namespace MySlugcat
                 //if ((self.input[0].pckp || self.input[0].mp) &&
                 //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)
                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({self.input[0].pckp}), bool2 ({!self.input[1].pckp}), bool3 ({self.room.abstractRoom.creatures.Count > 0})");
-                if (self.input[0].pckp && !self.input[1].pckp && false)
+                if (self.input[0].pckp && !self.input[1].pckp && self.input[0].jmp)
                 {
                     //self.playerState.foodInStomach -= 2;
 

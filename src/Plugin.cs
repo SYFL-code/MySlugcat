@@ -1,6 +1,6 @@
 ﻿using System;
 using BepInEx;
-//using Fisobs.Core;
+using Fisobs.Core;
 using UnityEngine;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
@@ -9,20 +9,20 @@ using BepInEx.Logging;
 
 namespace MySlugcat
 {
-    [BepInPlugin(MOD_ID, "Slugcat Template", "0.1.0")]
+    [BepInPlugin(MOD_ID, "The accommodator", "0.1.0")]
     class Plugin : BaseUnityPlugin
     {
         //设置ModID
-        private const string MOD_ID = "author.slugtemplate";
+        private const string MOD_ID = "theaccommodator.LH.id";
         //用于检查角色id
-        public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("SlugcatTemplate", false);
+        public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("theaccommodator.id.LH", false);
 
         public static ManualLogSource? Logger { get; private set; }
         /*-----------------------------------------------------挂钩-----------------------------------------------------*/
 
-        public static readonly PlayerFeature<float> SuperJump = PlayerFloat("slugtemplate/super_jump");
+/*        public static readonly PlayerFeature<float> SuperJump = PlayerFloat("slugtemplate/super_jump");
         public static readonly PlayerFeature<bool> ExplodeOnDeath = PlayerBool("slugtemplate/explode_on_death");
-        public static readonly GameFeature<float> MeanLizards = GameFloat("slugtemplate/mean_lizards");
+        public static readonly GameFeature<float> MeanLizards = GameFloat("slugtemplate/mean_lizards");*/
 
         //private FixedSkill FixedSkillHook = new FixedSkill();
 
@@ -32,10 +32,6 @@ namespace MySlugcat
 
         public void OnEnable()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             Plugin.Logger = base.Logger;
 
             // Put your custom hooks here!-在此放置你自己的钩子
@@ -50,22 +46,26 @@ namespace MySlugcat
             //mod初始化
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            Intros.Hook();
             Control.Hook();
             MySlugcatStats.Hook();
-            //Content.Register(new EnderPearlFisob());
             //玩家能力
             MyPlayer.Hook();
             Exhausted.Hook();
             SC.Hook();
-            IntelHUD.Hook();
+            //IntelHUD.Hook();
             //PointerSkillHook.Hook();
             Frame​​Skill.Hook();
             DeflagrationSkill.Hook();
             KnitmeshSkill.Hook();
             DigestionSkill.Hook();
+            Key.Hook();
 
-            FixedSkill.Hook();
-            Intros.Hook();
+            //FixedSkill.Hook();
+
+            Content.Register(new EnderPearlFisob());
+            EnderPearl.HookTexture();
+
             //玩家图像
             //MyPlayerGraphics.Hook();
             //游戏内容设置
@@ -79,27 +79,10 @@ namespace MySlugcat
             //迭代器对话
             //MyFPChat.Hook();
             //MyMoonChat.Hook();
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            } 
-#endif
         }
 
         private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             orig.Invoke(self);
             //加载设置菜单
             MachineConnector.SetRegisteredOI(MOD_ID, new Options());
@@ -117,19 +100,6 @@ namespace MySlugcat
             //MySnow.HookTexture();
             //加载披风贴图
             //MyCloak.HookTexture();
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 
@@ -147,7 +117,7 @@ namespace MySlugcat
         }
 
         // Implement MeanLizards-实现激怒蜥蜴的效果
-        private void Lizard_ctor(On.Lizard.orig_ctor orig, Lizard self, AbstractCreature abstractCreature, World world)
+        /*private void Lizard_ctor(On.Lizard.orig_ctor orig, Lizard self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
 
@@ -155,11 +125,11 @@ namespace MySlugcat
             {
                 self.spawnDataEvil = Mathf.Min(self.spawnDataEvil, meanness);
             }
-        }
+        }*/
 
 
         // Implement SuperJump-实现超高跳跃的效果
-        private void Player_Jump(On.Player.orig_Jump orig, Player self)
+        /*private void Player_Jump(On.Player.orig_Jump orig, Player self)
         {
             orig(self);//总不能挂完钩子把原本该执行的东西给弄丢吧 这一句就是为了再把它塞进来让它正常运行
 
@@ -167,7 +137,7 @@ namespace MySlugcat
             {
                 self.jumpBoost *= 1f + power;
             }
-        }
+        }*/
 
         // Implement ExlodeOnDeath-实现死亡自爆效果
 /*        private void Player_Die(On.Player.orig_Die orig, Player self)

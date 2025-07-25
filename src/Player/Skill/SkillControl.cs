@@ -27,9 +27,10 @@ using System.Threading;
 namespace MySlugcat
 {
     // SkillControl 能力控制中心
-
     public class SC
     {
+        private static bool StartRunning = true;
+
         public static int  MySlugcatStats = 0;        // 蛞蝓猫数据
         public static bool Exhausted = true;          // 精疲力竭
         public static bool Frame​​Skill = false;        // 嫁祸能力
@@ -41,40 +42,35 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
-            On.Player.ctor += Player_ctor;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
+            On.RainWorldGame.Update += RainWorldGame_Update;
+            //On.Player.ctor += Player_ctor;
         }
 
-        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+        {
+            orig(rainWorldGame);
+
+            if (StartRunning)
+            {
+                MySlugcatStats = 0;
+                Exhausted = true;
+                Frame​​Skill = true;
+                Deflagration​​Skill = true;
+                KnitmeshSkill = true;
+                PerceptionSkill = true;
+                DigestionSkill = true;
+                FixedSkill = true;
+
+                StartRunning = false;
+            }
+        }
+
+        /*private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig.Invoke(self, abstractCreature, world);
 
-            MySlugcatStats = 0;
-            Exhausted = true;
-            Frame​​Skill = true;
-            Deflagration​​Skill = true;
-            KnitmeshSkill = true;
-            PerceptionSkill = true;
-            DigestionSkill = true;
-            FixedSkill = true;
-        }
+
+        }*/
 
 
     }

@@ -60,7 +60,7 @@ public class PointerFSprite
     private float currentAngle;
     private float targetAngle;
     //private const float CircleRadius = 30f;
-    private const float RotationSpeed = 90f; // 度/秒
+    private const float RotationSpeed = 10f; // 度/秒
 
     // 动态颜色变化
     private Color startColor = Color.green;
@@ -212,63 +212,69 @@ public class PointerFSprite
             camY = Control.camPos.y;
         }
 
-        lasti += 1;
-        if (lasti < 0)
-        {
-            i = lasti;
-        }
-        if (owner.room == null && owner.inShortcut)
-        {
-            i = lasti;
-        }
-        if (start == false)
-        {
-            i = lasti;
-        }
-
-        if (Math.Abs(lasti - i) <= 20)
-        {
-
-            if (itoo == i)
-            {
-                ic += 1;
-            }
-            else
-            {
-                ic = 0;
-            }
-            if (ic > 30)
-            {
+        /*        lasti += 1;
+                if (lasti < 0)
+                {
+                    i = lasti;
+                }
                 if (owner.room == null && owner.inShortcut)
                 {
                     i = lasti;
                 }
+                if (start == false)
+                {
+                    i = lasti;
+                }
+
+                if (Math.Abs(lasti - i) <= 20)
+                {
+
+                    if (itoo == i)
+                    {
+                        ic += 1;
+                    }
+                    else
+                    {
+                        ic = 0;
+                    }
+                    if (ic > 30)
+                    {
+                        if (owner.room == null && owner.inShortcut)
+                        {
+                            i = lasti;
+                        }
+                        else
+                        {
+                            this.Destroy();
+                            return;
+                        }
+                    }
+
+                    itoo = i;
+
+                }
                 else
                 {
-                    this.Destroy();
-                    return;
-                }
-            }
+                    if (owner.room == null && owner.inShortcut)
+                    {
+                        i = lasti;
+                    }
+                    else
+                    {
+                        this.Destroy();
+                        return;
+                    }
+                }*/
 
-            itoo = i;
-
-        }
-        else
+        if (!Control.isRunning[N])
         {
-            if (owner.room == null && owner.inShortcut)
-            {
-                i = lasti;
-            }
-            else
-            {
-                this.Destroy();
-                return;
-            }
+            this.Destroy();
+            return;
         }
 
         bool shouldBeActive = true;
         Creature? creature = null;
-        float timeStacker = Time.deltaTime;
+        float timeStacker = Time.deltaTime;//1秒60帧，那增量时间就是 1/60 秒  (Time.deltaTime)
 
         if (owner.room == null && owner.inShortcut)
         {
@@ -424,6 +430,7 @@ public class PointerFSprite
 
         // 目标接近时震动效果
         float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
+        distance = distance * (distance > 600 ? 0.8f : 1) * (distance > 450 ? 0.9f : 1) * (distance > 300 ? 0.94f : 1f) * (distance > 200 ? 0.98f : 1);
         float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
         Vector2 exactPos = pointerOffset + Custom.RNV() * shakeIntensity * 3f;
         pointerMesh.SetPosition(exactPos);
@@ -459,7 +466,7 @@ public class PointerFSprite
         // 脉冲动画
         float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
         float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
-        if (distance >= 800)
+        if (distance >= 1100)
         {
             pulseIntensity_ = 0f;
         }

@@ -30,10 +30,6 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
 
@@ -49,20 +45,6 @@ namespace MySlugcat
             On.MoreSlugcats.LillyPuck.SetRandomSpin += LillyPuck_SetRandomSpin;
             //On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
             //On.Player.Die += Player_Die;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         public static void Explode(PhysicalObject self, BodyChunk? hitChunk, Creature ThrownBy)

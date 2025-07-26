@@ -40,7 +40,7 @@ namespace MySlugcat
 
         public override Color SpriteColor(int data)
         {
-            return new Color(128, 128, 128, 1);
+            return new Color(0.5f, 0.5f, 0.5f, 1f);
         }
 
         public override string SpriteName(int data)

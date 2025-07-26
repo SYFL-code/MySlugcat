@@ -60,7 +60,7 @@ public class PointerFSprite
     private float currentAngle;
     private float targetAngle;
     //private const float CircleRadius = 30f;
-    private const float RotationSpeed = 90f; // 度/秒
+    private const float RotationSpeed = 10f; // 度/秒
 
     // 动态颜色变化
     private Color startColor = Color.green;
@@ -154,6 +154,39 @@ public class PointerFSprite
             pointerContainer.isVisible = false;
             pointerMesh.alpha = 0f;
             circleSprite.alpha = 0f;
+
+
+            Creature? creature = null;
+            if (owner.room != null)
+            {
+                creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
+                if (creature == null)
+                {
+                    return;
+                }
+                if (creature != null)
+                {
+                    Vector2? vector = creature.firstChunk.pos;
+                    if (vector == null)
+                    {
+                        return;
+                    }
+                }
+            }
+            if (creature == null)
+            {
+                return;
+            }
+
+            // 1. 获取世界坐标
+            Vector2 targetWorldPos = creature.mainBodyChunk.pos;
+            Vector2 ownerWorldPos = owner.firstChunk.pos;
+
+            // 2. 计算方向向量(从玩家指向目标)
+            Vector2 direction = (targetWorldPos - ownerWorldPos).normalized;
+            targetAngle = Custom.VecToDeg(direction);
+
+            pointerMesh.rotation = targetAngle;
         }
         catch (Exception e)
         {
@@ -212,63 +245,69 @@ public class PointerFSprite
             camY = Control.camPos.y;
         }
 
-        lasti += 1;
-        if (lasti < 0)
-        {
-            i = lasti;
-        }
-        if (owner.room == null && owner.inShortcut)
-        {
-            i = lasti;
-        }
-        if (start == false)
-        {
-            i = lasti;
-        }
-
-        if (Math.Abs(lasti - i) <= 20)
-        {
-
-            if (itoo == i)
-            {
-                ic += 1;
-            }
-            else
-            {
-                ic = 0;
-            }
-            if (ic > 30)
-            {
+        /*        lasti += 1;
+                if (lasti < 0)
+                {
+                    i = lasti;
+                }
                 if (owner.room == null && owner.inShortcut)
                 {
                     i = lasti;
                 }
+                if (start == false)
+                {
+                    i = lasti;
+                }
+
+                if (Math.Abs(lasti - i) <= 20)
+                {
+
+                    if (itoo == i)
+                    {
+                        ic += 1;
+                    }
+                    else
+                    {
+                        ic = 0;
+                    }
+                    if (ic > 30)
+                    {
+                        if (owner.room == null && owner.inShortcut)
+                        {
+                            i = lasti;
+                        }
+                        else
+                        {
+                            this.Destroy();
+                            return;
+                        }
+                    }
+
+                    itoo = i;
+
+                }
                 else
                 {
-                    this.Destroy();
-                    return;
-                }
-            }
+                    if (owner.room == null && owner.inShortcut)
+                    {
+                        i = lasti;
+                    }
+                    else
+                    {
+                        this.Destroy();
+                        return;
+                    }
+                }*/
 
-            itoo = i;
-
-        }
-        else
+        if (!Control.isRunning[N])
         {
-            if (owner.room == null && owner.inShortcut)
-            {
-                i = lasti;
-            }
-            else
-            {
-                this.Destroy();
-                return;
-            }
+            this.Destroy();
+            return;
         }
 
         bool shouldBeActive = true;
         Creature? creature = null;
-        float timeStacker = Time.deltaTime;
+        float timeStacker = Time.deltaTime;//1秒60帧，那增量时间就是 1/60 秒  (Time.deltaTime)
 
         if (owner.room == null && owner.inShortcut)
         {
@@ -362,7 +401,15 @@ public class PointerFSprite
         //targetAngle = Custom.VecToDeg(targetWorldPos - ownerWorldPos);
 
         // 平滑旋转
-        float currentAngle = Mathf.LerpAngle(
+        float currentVelocity = 0f;
+        float smoothTime = 0.5f; // 调整这个值（越大越慢）
+        float currentAngle2 = Mathf.SmoothDampAngle(pointerMesh.rotation, targetAngle, ref currentVelocity, smoothTime);
+
+        float degreesPerSecond = 60f; // 每秒旋转 60 度
+        float maxStep = degreesPerSecond * Time.deltaTime; // 每帧最大步长
+        float currentAngle = Mathf.MoveTowardsAngle(pointerMesh.rotation, targetAngle, maxStep);
+
+        float currentAngle1 = Mathf.LerpAngle(
             pointerMesh.rotation,
             targetAngle,
             timeStacker * RotationSpeed * 0.01f);
@@ -372,9 +419,9 @@ public class PointerFSprite
         Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
         //Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius / 3 * 2;
 
-/*        // 5. 更新指针位置(公转)
-        Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
-        pointerMesh.SetPosition(pointerScreenPos);*/
+        /*        // 5. 更新指针位置(公转)
+                Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
+                pointerMesh.SetPosition(pointerScreenPos);*/
 
         // 更新指针位置和旋转
         pointerContainer.SetPosition(ownerScreenPos);
@@ -394,22 +441,22 @@ public class PointerFSprite
 
 
 
-/*        // 计算指向目标的角度
-        float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
+        /*        // 计算指向目标的角度
+                float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
 
-        // 平滑旋转
-        float currentAngle = Mathf.LerpAngle(
-              pointerMesh.rotation,
-              targetAngle,
-              timeStacker * RotationSpeed * 0.01f);
+                // 平滑旋转
+                float currentAngle = Mathf.LerpAngle(
+                      pointerMesh.rotation,
+                      targetAngle,
+                      timeStacker * RotationSpeed * 0.01f);
 
-        // 计算从玩家到目标的方向向量
-        Vector2 Direction = Custom.DegToVec(currentAngle);
+                // 计算从玩家到目标的方向向量
+                Vector2 Direction = Custom.DegToVec(currentAngle);
 
-        // 更新指针旋转时使用pointerMesh代替pointerSprite
-        pointerMesh.rotation = currentAngle;
-        //pointerMesh.SetPosition(pos);//
-        circleSprite.SetPosition(camPos);*/
+                // 更新指针旋转时使用pointerMesh代替pointerSprite
+                pointerMesh.rotation = currentAngle;
+                //pointerMesh.SetPosition(pos);//
+                circleSprite.SetPosition(camPos);*/
 
 
         // 危险程度指示(根据生物类型)
@@ -424,6 +471,8 @@ public class PointerFSprite
 
         // 目标接近时震动效果
         float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
+        distance = distance * 1.5f;
+        //distance = distance * (distance > 600 ? 0.8f : 1) * (distance > 450 ? 0.9f : 1) * (distance > 300 ? 0.94f : 1f) * (distance > 200 ? 0.98f : 1);
         float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
         Vector2 exactPos = pointerOffset + Custom.RNV() * shakeIntensity * 3f;
         pointerMesh.SetPosition(exactPos);
@@ -459,7 +508,7 @@ public class PointerFSprite
         // 脉冲动画
         float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
         float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
-        if (distance >= 800)
+        if (distance >= 1100)
         {
             pulseIntensity_ = 0f;
         }

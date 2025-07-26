@@ -368,6 +368,25 @@ namespace MySlugcat
 
 
 
+        // 无害的生物
+        public static bool HarmlessCreature(Creature creature)
+        {
+            // 玩家 监视者 蝉乌贼 垃圾虫 波动龟 光鼠 蛙鱼 管虫 蝠蝇 蛋虫 雨鹿 幼年面条蝇 幼年蜈蚣 射线虫 墨鱼 水母 跃客
+            // 监察者 天空鲸 藤壶 水熊虫 火精灵 箱虫 
+            if (creature == null || creature is Player || creature is Overseer || creature is Cicada ||
+                creature is GarbageWorm || creature is Snail || creature is LanternMouse ||//segments
+                creature is JetFish || creature is TubeWorm || creature is Fly || creature is EggBug ||
+                creature is Deer || creature is SmallNeedleWorm || (creature is Centipede centipede && centipede.Small) ||
+                creature is VultureGrub || creature is Hazer || creature is JellyFish || creature is Yeek ||
+                (creature is Inspector inspector && inspector.Consious == true) ||
+                creature is SkyWhale || creature is Barnacle || creature is FireSprite || creature is Tardigrade ||
+                (creature is BoxWorm boxWorm && boxWorm.Consious == true))
+            {
+                return true;// creature is Leech || 
+            }
+            return false;
+        }
+
         // 有害的生物
         public static bool HarmfulCreature(Creature creature)
         {
@@ -514,7 +533,7 @@ namespace MySlugcat
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
-                if (!HarmfulCreature(c) && select == 2)// 无害生物
+                if (HarmlessCreature(c) && select == 2)// 无害生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }

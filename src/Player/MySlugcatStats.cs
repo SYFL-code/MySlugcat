@@ -37,26 +37,8 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             On.SlugcatStats.ctor += SlugcatStats_ctor;
             On.Player.MovementUpdate += Player_MovementUpdate;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats slugcatStats, SlugcatStats.Name slugcat, bool malnourished)

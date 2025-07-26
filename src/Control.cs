@@ -47,11 +47,11 @@ namespace MySlugcat
         public static PointerFSprite[] pointer = new PointerFSprite[20];
 
         // 初始化视觉系统
-        /*public static VisionSystem visionSystem = new VisionSystem()
+        public static VisionSystem visionSystem = new VisionSystem()
         {
             BaseVisionRadius = 120f,
             BackgroundColor = new Color(0f, 0f, 0f, 0f)
-        };*/
+        };
 
 
         public static void Hook()
@@ -93,7 +93,7 @@ namespace MySlugcat
                     //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_st1",
                     //    $"({1})");
 
-                    //visionSystem.Update();
+                    visionSystem.Update();
 
                     int Failure = 0;
                     for (int i = 0; i < 20; i++)
@@ -144,11 +144,11 @@ namespace MySlugcat
                         isRunning = Enumerable.Repeat(true, 20).ToArray();
                         lastTime = Enumerable.Repeat(0f, 20).ToArray();
 
-                        /*for (int i = 0; i < visionSystem.VisionSpotsCount; i++)
+                        for (int i = 0; i < visionSystem.VisionSpotsCount; i++)
                         {
                             visionSystem.RemoveVisionSpot(0);
                         }
-                        visionSystem.Hide();*/
+                        visionSystem.Hide();
                     }
 
 
@@ -268,16 +268,16 @@ namespace MySlugcat
                 pointer[N] = new PointerFSprite(self);
                 pointer[N].slatedForDestroy = false;
                 // 添加常规可视点
-                /*visionSystem.AddVisionSpot(pos);
-                visionSystem.Show();*/
+                visionSystem.AddVisionSpot(pos);
+                visionSystem.Show();
             }
 
             // 动态移动第一个点
-            /*var secondSpot = visionSystem.GetVisionSpot(N);
+            var secondSpot = visionSystem.GetVisionSpot(N);
             if (secondSpot != null)
             {
                 secondSpot.TargetPosition = pos; // 向右移动
-            }*/
+            }
 
             players[N] = self;
             lastTime[N] = Time.time;

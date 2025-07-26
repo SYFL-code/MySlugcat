@@ -1,4 +1,4 @@
-﻿/*using On;
+﻿using On;
 using IL;
 using System;
 using Mono.Cecil;
@@ -208,4 +208,3 @@ namespace MySlugcat
         }
     }
 }
-*/

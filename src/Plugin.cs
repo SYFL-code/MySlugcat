@@ -13,9 +13,9 @@ namespace MySlugcat
     class Plugin : BaseUnityPlugin
     {
         //设置ModID
-        private const string MOD_ID = "theaccommodator.LH.id";
+        private const string MOD_ID = "theaccommodator.LH";
         //用于检查角色id
-        public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("theaccommodator.id.LH", false);
+        public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("theaccommodator.LH", false);
 
         public static ManualLogSource? Logger { get; private set; }
         /*-----------------------------------------------------挂钩-----------------------------------------------------*/
@@ -32,6 +32,9 @@ namespace MySlugcat
 
         public void OnEnable()
         {
+            Intros.Hook();
+            Log.Logger(7, "OnEnable", "MySlugcat:Plugin:OnEnable",
+                $"(111)");//
             Plugin.Logger = base.Logger;
 
             // Put your custom hooks here!-在此放置你自己的钩子
@@ -46,7 +49,6 @@ namespace MySlugcat
             //mod初始化
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            Intros.Hook();
             Control.Hook();
             MySlugcatStats.Hook();
             //玩家能力
@@ -63,8 +65,8 @@ namespace MySlugcat
 
             //FixedSkill.Hook();
 
-            Content.Register(new EnderPearlFisob());
-            EnderPearl.HookTexture();
+            //Content.Register(new EnderPearlFisob());
+            //EnderPearl.HookTexture();
 
             //玩家图像
             //MyPlayerGraphics.Hook();

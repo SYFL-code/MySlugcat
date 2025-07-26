@@ -26,8 +26,6 @@ namespace MySlugcat
     //BUG:莫名卡顿，无响应
     public class MyPlayer
     {
-        //按下跳跃键的时长
-        static int[] JmpCounter = Enumerable.Repeat(0, 20).ToArray();
 
         public static void Hook()
         {
@@ -265,17 +263,9 @@ namespace MySlugcat
             GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
             int N = self.playerState.playerNumber;
-            if (self.input[0].jmp)
-            {
-                JmpCounter[N]++;
-            }
-            else
-            {
-                JmpCounter[N] = 0;
-            }
 
             //
-            if (JmpCounter[N] >= 60)
+            if (Key.JmpCounter[N] >= 60 && !self.input[0].jmp && self.input[1].jmp)
             {
                 //self.room.AddObject(new Explosion(self.room, self, self.mainBodyChunk.pos + new Vector2(0, -10), 5, 330f, 2f, 0.4f, 100f, 0.3f, self, 0.5f, 20f, 0.8f));
                 //在 当前房间 从自己身体 在当前身体的位置 生成一个 持续时长7 半径250，力度6.2，伤害2，眩晕280，致聋0.25，判定击杀由自己造成，伤害乘数0.7，最小眩晕160，背景噪声1的爆炸
@@ -283,13 +273,13 @@ namespace MySlugcat
                 //或许没那么累 在自身位置生成冲击波效果 大小330 强度0.045 时长5 false表示绘制顺序（绘制到HUD图层，True就是HUD2
                 //self.slugcatStats.runspeedFac = 1.75f;
 
-                StackTrace st = new StackTrace(new StackFrame(true));
+                /*StackTrace st = new StackTrace(new StackFrame(true));
                 StackFrame sf = st.GetFrame(0);
                 var sr = sf.GetFileName().Split('\\');
                 MyDebug.outStr = sr[sr.Length - 1] + "\n";
                 MyDebug.outStr += sf.GetMethod() + "\n";
                 MyDebug.outStr += "MySlugcat:wewe";
-                Console.WriteLine("MySlugcat:wewe");
+                Console.WriteLine("MySlugcat:wewe");*/
 
                 Creature? creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
@@ -303,7 +293,6 @@ namespace MySlugcat
                     creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
                 }
 
-                JmpCounter[N] = 0;
             }
 
 #if DEBUG

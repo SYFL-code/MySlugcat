@@ -16,13 +16,16 @@ namespace MySlugcat
         /*public static Configurable<bool>? Frame​​Skill;
         public static Configurable<bool>? Deflagration​​Skill;
         public static Configurable<bool>? KnitmeshSkill;*/
+
+        public static Configurable<float>? pixelSize;
+
         public static Configurable<bool>? FrameSkill;
         public static Configurable<bool>? DeflagrationSkill;
         public static Configurable<bool>? KnitmeshSkill;
 
         public static Configurable<bool>? logDebug;
 
-        public static Configurable<bool>? copyID;
+        //public static Configurable<bool>? copyID;
 
         public static Configurable<float>? loglevel;
 
@@ -43,19 +46,21 @@ namespace MySlugcat
             {
                 "KnitmeshSkill"
             }));
-            
+
+            Options.pixelSize = this.config.Bind<float>("PixelSize", 30f, new ConfigurableInfo("50-1", null, "", new object[]
+            {
+                "Pixel Size"
+            }));
+
             Options.logDebug = this.config.Bind<bool>("logDebug", false, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
             {
                 "Log debug"
-            }));
-            Options.copyID = this.config.Bind<bool>("copyID", true, new ConfigurableInfo("Creates an exact copy of the previous object when duplicating.", null, "", new object[]
-            {
-                "Copy ID duplicate"
             }));
             Options.loglevel = this.config.Bind<float>("loglevel", 9f, new ConfigurableInfo("The maximum value is 10, and the minimum value is 0.", null, "", new object[]
 			{
                 "Log Level"
             }));
+
         }
 
         public override void Initialize()
@@ -74,6 +79,12 @@ namespace MySlugcat
             float num = 90f;
             float num2 = 460f;
             float num3 = 40f;
+
+            if (pixelSize != null)
+            {
+                this.AddTextBox<float>(Options.pixelSize, new Vector2(num, num2 -= num3), 50f);
+            }
+
             if (FrameSkill != null)
             {
                 this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
@@ -87,10 +98,9 @@ namespace MySlugcat
                 this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
             }
 
-            if (logDebug != null && copyID != null)
+            if (logDebug != null)
             {
                 this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
             }
 
 /*            if (logDebug != null && copyID != null && Frame​​Skill != null && Deflagration​​Skill != null && KnitmeshSkill != null)

@@ -41,21 +41,29 @@ namespace MySlugcat
         public FContainer container;
         //public FSprite background;
         public FSprite[,] pixelGrid;
-        public float gridX = 750;
-        public float gridY = 300;
-        public int gridWidth = 16; // 网格宽度(像素数)
-        public int gridHeight = 10; // 网格高度(像素数)
-        public int pixelSize = 10; // 每个"像素"的大小
+
+        public float gridX = 700;
+        public float gridY = 400;
+
+        public float pixelSize = 50; // 每个"像素"的大小
+        public int gridWidth = 28; // 网格宽度(像素数)
+        public int gridHeight = 16; // 网格高度(像素数)
+
         public Vector2[] holeCenters = new Vector2[20]; // 洞的中心位置
         public float[] holeRadii = new float[20]; // 洞的半径
         public bool[] holeActive = new bool[20]; // 新增状态标志数组
 
+        public float Alpha = 0.9f; // 初始透明度
         // 添加常量定义（替代硬编码）
-        private const float HOLE_RADIUS = 60f;
-        private const float HOLE_EDGE = 80f;
+        private const float HOLE_RADIUS = 80f; // 洞半径
+        private const float HOLE_EDGE = 120f; // 洞边缘
 
         public VisionSystem(HUD.HUD hud) : base(hud)
         {
+            pixelSize = SC.pixelSize; // 每个"像素"的大小
+            gridWidth = (int)Math.Ceiling(1400 / pixelSize); // 网格宽度(像素数)
+            gridHeight = (int)Math.Ceiling(800 / pixelSize); // 网格高度(像素数)
+
             // 创建容器
             container = new FContainer();
             hud.fContainers[1].AddChild(container);
@@ -94,7 +102,7 @@ namespace MySlugcat
             // 初始化洞数据
             for (int i = 0; i < 20; i++)
             {
-                holeRadii[i] = 60f; // 默认半径
+                holeRadii[i] = HOLE_RADIUS; // 默认半径
             }
         }
 
@@ -154,12 +162,12 @@ namespace MySlugcat
                 {
                     // 计算像素在屏幕上的位置
                     Vector2 pixelPos = new Vector2(
-                        750 + (x - gridWidth / 2) * pixelSize,
-                        300 + (y - gridHeight / 2) * pixelSize
+                        gridX + (x - gridWidth / 2) * pixelSize,
+                        gridY + (y - gridHeight / 2) * pixelSize
                     );
 
                     // 初始透明度
-                    float alpha = 0.7f;
+                    float alpha = Alpha;
 
                     // 检查是否在任意洞内
                     foreach (var center in activeHoles) // 仅遍历有效洞
@@ -273,7 +281,7 @@ namespace MySlugcat
             rect.width = 800;
             rect.height = 500;
             rect.color = Color.black;
-            rect.SetPosition(new Vector2(750, 300));
+            rect.SetPosition(new Vector2(gridX, gridY));
             container.AddChild(rect);
 
             // 创建遮罩容器
@@ -286,8 +294,8 @@ namespace MySlugcat
                 width = 800,
                 height = 500,
                 color = Color.white,
-                x = 750,
-                y = 300
+                x = gridX,
+                y = gridY
             };
             maskContainer.AddChild(maskBg);
 
@@ -316,7 +324,7 @@ namespace MySlugcat
             rect.width = 800;
             rect.height = 500;
             rect.color = Color.black;
-            rect.SetPosition(new Vector2(750, 300));
+            rect.SetPosition(new Vector2(gridX, gridY));
             container.AddChild(rect);
 
             // 创建遮罩纹理
@@ -335,7 +343,7 @@ namespace MySlugcat
 
             // 创建遮罩精灵
             FSprite mask = new FSprite(maskTexture);
-            mask.SetPosition(new Vector2(750, 300));
+            mask.SetPosition(new Vector2(gridX, gridY));
             mask.shader = Custom.rainWorld.Shaders["Basic"]; // 使用基本着色器
 
             // 获取 Futile 的混合着色器
@@ -364,7 +372,7 @@ namespace MySlugcat
     rect.width = 800;
     rect.height = 500;
     rect.color = new Color(0, 0, 0, 0.99f); // 70%不透明
-    rect.SetPosition(new Vector2(750, 300));
+    rect.SetPosition(new Vector2(gridX, gridY));
     container.AddChild(rect);
 
     // 创建"洞"（实际上是白色圆形）
@@ -400,7 +408,7 @@ namespace MySlugcat
     rect.width = 800; // 设置宽度
     rect.height = 500; // 设置高度
     rect.color = Color.black; // 设置颜色
-    rect.SetPosition(new Vector2(750, 300));
+    rect.SetPosition(new Vector2(gridX, gridY));
     container.AddChild(rect);
 
     circles = new FSprite[20];
@@ -480,7 +488,7 @@ public override void Draw(float timeStacker)
         Room room = cre.abstractCreature.world.game.cameras[0].room;
         if (room != null)
         {
-            //rect.SetPosition(new Vector2(750, 750) - room.game.cameras[0].pos);
+            //rect.SetPosition(new Vector2(gridX, gridY) - room.game.cameras[0].pos);
             for (int i = 0; i < 20; i++)
             {
                 if (poss[i] != null && poss[i] != Vector2.zero && circles[i] != null)

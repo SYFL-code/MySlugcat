@@ -31,7 +31,9 @@ namespace MySlugcat
     {
         private static bool StartRunning = true;
 
-        public static int MySlugcatStats = 0;        // 蛞蝓猫数据
+        public static float pixelSize = 30f;          // 像素大小
+
+        public static int  MySlugcatStats = 0;        // 蛞蝓猫数据
         public static bool Exhausted = true;          // 精疲力竭
         public static bool Frame​​Skill = false;        // 嫁祸能力
         public static bool Deflagration​​Skill = false; // 爆燃能力
@@ -52,6 +54,11 @@ namespace MySlugcat
 
             if (StartRunning)
             {
+                if (Options.pixelSize != null && Options.pixelSize.Value != null)
+                {
+                    pixelSize = Options.pixelSize.Value;
+                }
+
                 MySlugcatStats = 0;
                 Exhausted = true;
                 Frame​​Skill = true;
@@ -65,12 +72,24 @@ namespace MySlugcat
             }
         }
 
-        /*private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig.Invoke(self, abstractCreature, world);
 
+            if (Options.pixelSize != null && Options.pixelSize.Value != null)
+            {
+                pixelSize = Options.pixelSize.Value;
+            }
 
-        }*/
+            MySlugcatStats = 0;
+            Exhausted = true;
+            Frame​​Skill = true;
+            Deflagration​​Skill = true;
+            KnitmeshSkill = true;
+            PerceptionSkill = true;
+            DigestionSkill = true;
+            FixedSkill = true;
+        }
 
 
     }

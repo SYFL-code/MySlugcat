@@ -317,6 +317,10 @@ public class PointerFSprite
         {
             shouldBeActive = false;
         }
+        if (owner is Player player1 && player1.dead)
+        {
+            shouldBeActive = false;
+        }
         if (owner.room != null)
         {
             creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);

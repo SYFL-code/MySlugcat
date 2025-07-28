@@ -257,7 +257,7 @@ namespace MySlugcat
                 //visionSystem.Show();
             }
 
-            if (self.slugcatStats.name == Plugin.YourSlugID && SC.PerceptionSkill && isStart[N])
+            if ((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.PerceptionSkill && isStart[N])
             {
                 /*if (N == 0)
                 {
@@ -289,7 +289,7 @@ namespace MySlugcat
             lastTime[N] = Time.time;
             isStart[N] = false;
 
-            if (pointer != null && pointer[N] != null && !pointer[N].slatedForDestroy && self.slugcatStats.name == Plugin.YourSlugID)
+            if (pointer != null && pointer[N] != null && !pointer[N].slatedForDestroy && (self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
             {
                 //pointer[N].start = true;
                 //pointer[N].i = pointer[N].lasti;

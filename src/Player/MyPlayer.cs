@@ -206,7 +206,7 @@ namespace MySlugcat
             {
 #endif
             orig.Invoke(self, abstractCreature, world);
-            if (self.slugcatStats.name != Plugin.YourSlugID)
+            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                 return;
             /*------------------------------------------------------------------剧情模式游戏变量设置------------------------------------------------------------------------------*/
 /*            if (self.room.world.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
@@ -251,7 +251,7 @@ namespace MySlugcat
             {
 #endif
             orig.Invoke(self, eu);
-            if (self.slugcatStats.name != Plugin.YourSlugID)
+            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                 return;
             /******************************24_2_16 保存bug**********************************/
 /*            if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value)
@@ -671,7 +671,7 @@ namespace MySlugcat
 
         private static void Player_Die(On.Player.orig_Die orig, Player self)
         {
-            if (self.slugcatStats.name == Plugin.YourSlugID)
+            if ((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
             {
                 Creature obj = FrameSkill.Player_Die(self);
 

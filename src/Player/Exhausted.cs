@@ -57,7 +57,7 @@ namespace MySlugcat
         {
             orig(player, eu);
 
-            if (player.slugcatStats.name == Plugin.YourSlugID && (SC.MySlugcatStats == 0 && SC.Exhausted))
+            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && (SC.MySlugcatStats == 0 && SC.Exhausted))
             {
                 player.gourmandAttackNegateTime--;
 
@@ -84,7 +84,7 @@ namespace MySlugcat
 
         private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
         {
-            if (player.slugcatStats.name == Plugin.YourSlugID && SC.MySlugcatStats == 0)
+            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats == 0)
             {
                 spear.throwModeFrames = 18;
                 spear.spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);

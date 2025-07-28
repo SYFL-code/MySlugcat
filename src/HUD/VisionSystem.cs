@@ -67,8 +67,8 @@ namespace MySlugcat
         public VisionSystem(HUD.HUD hud) : base(hud)
         {
             pixelSize = SC.pixelSize; // 每个"像素"的大小
-            gridWidth = (int)Math.Ceiling(1400 / pixelSize); // 网格宽度(像素数)
-            gridHeight = (int)Math.Ceiling(800 / pixelSize); // 网格高度(像素数)
+            gridWidth = (int)Math.Ceiling(gridX * 2 / pixelSize); // 网格宽度(像素数)
+            gridHeight = (int)Math.Ceiling(gridY * 2 / pixelSize); // 网格高度(像素数)
             Alpha = SC.Alpha;
 
             // 创建容器
@@ -175,6 +175,7 @@ namespace MySlugcat
             if (allPlayerDead == true && Clear == 0)
             {
                 Clear = 0.025f;
+                HOLE_COLOR = new Color(1f, 1f, 1f);
             }
 
             if (Clear != 0)

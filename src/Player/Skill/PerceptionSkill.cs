@@ -220,6 +220,8 @@ public class PointerFSprite
 
     public void Update(int N, bool Destroy)
     {
+        return;
+
         Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
             $"({owner == null}), ({N})");//
 

@@ -141,7 +141,7 @@ namespace MySlugcat
 
             int N = player.playerState.playerNumber;
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (player.slugcatStats.name == Plugin.YourSlugID && SC.KnitmeshSkill)
+            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.KnitmeshSkill)
             {
                 //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;

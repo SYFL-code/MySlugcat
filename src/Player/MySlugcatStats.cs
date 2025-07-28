@@ -43,7 +43,7 @@ namespace MySlugcat
 
         private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats slugcatStats, SlugcatStats.Name slugcat, bool malnourished)
         {
-            if (slugcat == Plugin.YourSlugID && SC.MySlugcatStats == 0)
+            if ((slugcat == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats == 0)
             {
                 orig(slugcatStats, slugcat, malnourished);
 
@@ -63,7 +63,7 @@ namespace MySlugcat
 
         private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player player, bool eu)
         {
-            if (player.slugcatStats.name == Plugin.YourSlugID && SC.MySlugcatStats == 1)
+            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats == 1)
             {
                 int num2 = 0;
                 for (int i = 0; i < 4; i++)

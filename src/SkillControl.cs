@@ -31,6 +31,8 @@ namespace MySlugcat
     {
         private static bool StartRunning = true;
 
+        public static bool  AllPlayerSkill = false;
+
         public static float pixelSize = 15f;          // 像素大小
         public static float Alpha = 0.9f;             // 像素不透明度
 
@@ -60,6 +62,7 @@ namespace MySlugcat
                     pixelSize = Options.pixelSize.Value;
                 }
 
+                AllPlayerSkill = true;
                 MySlugcatStats = 0;
                 Exhausted = true;
                 Frame​​Skill = true;
@@ -82,6 +85,7 @@ namespace MySlugcat
                 pixelSize = Options.pixelSize.Value;
             }
 
+            AllPlayerSkill = true;
             MySlugcatStats = 0;
             Exhausted = true;
             Frame​​Skill = true;

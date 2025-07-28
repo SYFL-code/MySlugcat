@@ -200,7 +200,7 @@ namespace MySlugcat
         public override void Draw(float timeStacker)
         {
             Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"player ({hud.owner is Player})");
-            if (hud.owner is Player player && player.slugcatStats.name == Plugin.YourSlugID)
+            if (hud.owner is Player player && (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
             {
                 Room room = player.abstractCreature.world.game.cameras[0].room;
                 Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"Room_Null ({room == null})");

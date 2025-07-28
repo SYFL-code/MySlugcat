@@ -91,7 +91,7 @@ namespace MySlugcat
         {
             orig(self, eu);
 
-            if (self.slugcatStats.name == Plugin.YourSlugID && SC.FixedSkill)
+            if (((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && SC.FixedSkill)
             {
                 //if ((self.input[0].pckp || self.input[0].mp) &&
                 //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)

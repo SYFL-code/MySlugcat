@@ -131,7 +131,7 @@ namespace MySlugcat
         public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
         {
             Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
-            if (player.slugcatStats.name == Plugin.YourSlugID && SC.DigestionSkill)
+            if (((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && SC.DigestionSkill)
             {
                 if (grasp < 0 || player.grasps[grasp] == null)
                 {

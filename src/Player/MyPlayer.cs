@@ -234,13 +234,13 @@ namespace MySlugcat
                 //或许没那么累 在自身位置生成冲击波效果 大小330 强度0.045 时长5 false表示绘制顺序（绘制到HUD图层，True就是HUD2
                 //self.slugcatStats.runspeedFac = 1.75f;
 
-                StackTrace st = new StackTrace(new StackFrame(true));
+                /*StackTrace st = new StackTrace(new StackFrame(true));
                 StackFrame sf = st.GetFrame(0);
                 var sr = sf.GetFileName().Split('\\');
                 MyDebug.outStr = sr[sr.Length - 1] + "\n";
                 MyDebug.outStr += sf.GetMethod() + "\n";
                 MyDebug.outStr += "MySlugcat:wewe";
-                Console.WriteLine("MySlugcat:wewe");
+                Console.WriteLine("MySlugcat:wewe");*/
 
                 Creature? creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
@@ -294,6 +294,25 @@ namespace MySlugcat
                 creature is GarbageWorm || creature is Snail || creature is LanternMouse ||//segments
                 creature is JetFish || creature is TubeWorm || creature is Fly || creature is EggBug ||
                 creature is Deer || creature is SmallNeedleWorm || (creature is Centipede centipede && centipede.Small) || 
+                creature is VultureGrub || creature is Hazer || creature is JellyFish || creature is Yeek ||
+                (creature is Inspector inspector && inspector.Consious == true) ||
+                creature is SkyWhale || creature is Barnacle || creature is FireSprite || creature is Tardigrade ||
+                (creature is BoxWorm boxWorm && boxWorm.Consious == true))
+            {
+                return true;// creature is Leech || 
+            }
+            return false;
+        }
+
+        // 无害的生物
+        public static bool HarmlessCreature(Creature creature)
+        {
+            // 玩家 监视者 蝉乌贼 垃圾虫 波动龟 光鼠 蛙鱼 管虫 蝠蝇 蛋虫 雨鹿 幼年面条蝇 幼年蜈蚣 射线虫 墨鱼 水母 跃客
+            // 监察者 天空鲸 藤壶 水熊虫 火精灵 箱虫 
+            if (creature == null || creature is Player || creature is Overseer || creature is Cicada ||
+                creature is GarbageWorm || creature is Snail || creature is LanternMouse ||//segments
+                creature is JetFish || creature is TubeWorm || creature is Fly || creature is EggBug ||
+                creature is Deer || creature is SmallNeedleWorm || (creature is Centipede centipede && centipede.Small) ||
                 creature is VultureGrub || creature is Hazer || creature is JellyFish || creature is Yeek ||
                 (creature is Inspector inspector && inspector.Consious == true) ||
                 creature is SkyWhale || creature is Barnacle || creature is FireSprite || creature is Tardigrade ||

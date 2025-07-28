@@ -185,6 +185,7 @@ namespace MySlugcat
 
 /*            if (_isMainUpdateRunning == false)
             {
+                Running = true;
                 Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
             }*/
         }

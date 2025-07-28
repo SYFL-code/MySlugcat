@@ -154,6 +154,39 @@ public class PointerFSprite
             pointerContainer.isVisible = false;
             pointerMesh.alpha = 0f;
             circleSprite.alpha = 0f;
+
+
+            Creature? creature = null;
+            if (owner.room != null)
+            {
+                creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
+                if (creature == null)
+                {
+                    return;
+                }
+                if (creature != null)
+                {
+                    Vector2? vector = creature.firstChunk.pos;
+                    if (vector == null)
+                    {
+                        return;
+                    }
+                }
+            }
+            if (creature == null)
+            {
+                return;
+            }
+
+            // 1. 获取世界坐标
+            Vector2 targetWorldPos = creature.mainBodyChunk.pos;
+            Vector2 ownerWorldPos = owner.firstChunk.pos;
+
+            // 2. 计算方向向量(从玩家指向目标)
+            Vector2 direction = (targetWorldPos - ownerWorldPos).normalized;
+            targetAngle = Custom.VecToDeg(direction);
+
+            pointerMesh.rotation = targetAngle;
         }
         catch (Exception e)
         {
@@ -203,14 +236,15 @@ public class PointerFSprite
         {
             if (Control.RWG.GamePaused)
             {
+                pointerMesh.color = Color.black;
                 return;
             }
         }
-        if (Control.camPos != null)
+        /*if (Control.camPos != null)
         {
             camX = Control.camPos.x;
             camY = Control.camPos.y;
-        }
+        }*/
 
         /*        lasti += 1;
                 if (lasti < 0)
@@ -281,6 +315,10 @@ public class PointerFSprite
             shouldBeActive = false;
         }
         if (owner is Player player && player.Sleeping)
+        {
+            shouldBeActive = false;
+        }
+        if (owner is Player player1 && player1.dead)
         {
             shouldBeActive = false;
         }
@@ -357,6 +395,11 @@ public class PointerFSprite
         if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
         if (creature == null) return;
 
+        if (owner.room != null)
+        {
+            camX = owner.room.game.cameras[0].pos.x;
+            camY = owner.room.game.cameras[0].pos.y;
+        }
 
         // 1. 获取世界坐标
         Vector2 targetWorldPos = creature.mainBodyChunk.pos;
@@ -368,7 +411,15 @@ public class PointerFSprite
         //targetAngle = Custom.VecToDeg(targetWorldPos - ownerWorldPos);
 
         // 平滑旋转
-        float currentAngle = Mathf.LerpAngle(
+        float currentVelocity = 0f;
+        float smoothTime = 0.5f; // 调整这个值（越大越慢）
+        float currentAngle2 = Mathf.SmoothDampAngle(pointerMesh.rotation, targetAngle, ref currentVelocity, smoothTime);
+
+        float degreesPerSecond = 60f; // 每秒旋转 60 度
+        float maxStep = degreesPerSecond * Time.deltaTime; // 每帧最大步长
+        float currentAngle = Mathf.MoveTowardsAngle(pointerMesh.rotation, targetAngle, maxStep);
+
+        float currentAngle1 = Mathf.LerpAngle(
             pointerMesh.rotation,
             targetAngle,
             timeStacker * RotationSpeed * 0.01f);
@@ -378,9 +429,9 @@ public class PointerFSprite
         Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
         //Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius / 3 * 2;
 
-/*        // 5. 更新指针位置(公转)
-        Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
-        pointerMesh.SetPosition(pointerScreenPos);*/
+        /*        // 5. 更新指针位置(公转)
+                Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
+                pointerMesh.SetPosition(pointerScreenPos);*/
 
         // 更新指针位置和旋转
         pointerContainer.SetPosition(ownerScreenPos);
@@ -400,22 +451,22 @@ public class PointerFSprite
 
 
 
-/*        // 计算指向目标的角度
-        float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
+        /*        // 计算指向目标的角度
+                float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
 
-        // 平滑旋转
-        float currentAngle = Mathf.LerpAngle(
-              pointerMesh.rotation,
-              targetAngle,
-              timeStacker * RotationSpeed * 0.01f);
+                // 平滑旋转
+                float currentAngle = Mathf.LerpAngle(
+                      pointerMesh.rotation,
+                      targetAngle,
+                      timeStacker * RotationSpeed * 0.01f);
 
-        // 计算从玩家到目标的方向向量
-        Vector2 Direction = Custom.DegToVec(currentAngle);
+                // 计算从玩家到目标的方向向量
+                Vector2 Direction = Custom.DegToVec(currentAngle);
 
-        // 更新指针旋转时使用pointerMesh代替pointerSprite
-        pointerMesh.rotation = currentAngle;
-        //pointerMesh.SetPosition(pos);//
-        circleSprite.SetPosition(camPos);*/
+                // 更新指针旋转时使用pointerMesh代替pointerSprite
+                pointerMesh.rotation = currentAngle;
+                //pointerMesh.SetPosition(pos);//
+                circleSprite.SetPosition(camPos);*/
 
 
         // 危险程度指示(根据生物类型)

@@ -35,7 +35,7 @@ namespace MySlugcat
             {
 #endif
             //On.Player.ctor += Player_ctor;
-            //On.Player.Update += Player_Update;
+            On.Player.Update += Player_Update;
 
             //On.Spear.HitSomething += Spear_HitSomething;
             On.Spear.SetRandomSpin += Spear_SetRandomSpin;
@@ -196,6 +196,31 @@ namespace MySlugcat
                     Console.WriteLine($"MySlugcat:Spear_1, obj {obj}");
                     return obj;
                 }*/
+
+        private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+        {
+            orig(player, eu);
+
+            if (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)
+            {
+                if (player.input[0].jmp && player.input[0].pckp)
+                {
+                    if (player.room != null && player.room.updateList != null && player.room.updateList.Count > 0)
+                    {
+                        foreach (var item in player.room.updateList)
+                        {
+                            //if (item is ScavengerBomb || item is ExplosiveSpear)
+                            if (item is PhysicalObject physical && physical is not Creature)
+                            {
+                                Explode(physical, null, player);
+                                physical.Destroy();
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
 
         public static void Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu, bool obj, Weapon.Mode mode)
         {

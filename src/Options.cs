@@ -47,7 +47,7 @@ namespace MySlugcat
                 "KnitmeshSkill"
             }));
 
-            Options.pixelSize = this.config.Bind<float>("PixelSize", 30f, new ConfigurableInfo("50-1", null, "", new object[]
+            Options.pixelSize = this.config.Bind<float>("PixelSize", 15f, new ConfigurableInfo("50-1", null, "", new object[]
             {
                 "Pixel Size"
             }));

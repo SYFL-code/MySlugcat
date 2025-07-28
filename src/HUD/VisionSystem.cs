@@ -49,20 +49,27 @@ namespace MySlugcat
         public int gridWidth = 28; // 网格宽度(像素数)
         public int gridHeight = 16; // 网格高度(像素数)
 
-        public Vector2[] holeCenters = new Vector2[20]; // 洞的中心位置
-        public float[] holeRadii = new float[20]; // 洞的半径
-        public bool[] holeActive = new bool[20]; // 新增状态标志数组
+        public bool[] holeActive = new bool[100]; // 新增状态标志数组
+        public Vector2[] holeCenters = new Vector2[100]; // 洞的中心位置
+        public float[] holeRadii = new float[100]; // 洞的半径
+        public float[] holeEdge = new float[100]; // 洞的半径
+        public Color[] holeColor = new Color[100]; // 洞的颜色
+        //public List<bool, Vector2, float, Color> values = new List<bool, Vector2, float, Color>;
 
-        public float Alpha = 0.9f; // 初始透明度
+        public float Clear = 0;
+
+        public static float Alpha = 0.9f; // 初始透明度
         // 添加常量定义（替代硬编码）
         private const float HOLE_RADIUS = 80f; // 洞半径
         private const float HOLE_EDGE = 120f; // 洞边缘
+        public static Color HOLE_COLOR = new Color(0f, 0f, 0f); // 洞颜色
 
         public VisionSystem(HUD.HUD hud) : base(hud)
         {
             pixelSize = SC.pixelSize; // 每个"像素"的大小
             gridWidth = (int)Math.Ceiling(1400 / pixelSize); // 网格宽度(像素数)
             gridHeight = (int)Math.Ceiling(800 / pixelSize); // 网格高度(像素数)
+            Alpha = SC.Alpha;
 
             // 创建容器
             container = new FContainer();
@@ -100,9 +107,11 @@ namespace MySlugcat
             }
 
             // 初始化洞数据
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 100; i++)
             {
                 holeRadii[i] = HOLE_RADIUS; // 默认半径
+                holeEdge[i] = HOLE_EDGE;
+                holeColor[i] = HOLE_COLOR;
             }
         }
 
@@ -112,9 +121,12 @@ namespace MySlugcat
 
             // 更新洞的位置 (这里简化处理，实际应根据游戏逻辑更新)
             // 重置所有洞状态
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 100; i++)
             {
                 holeActive[i] = false;
+                holeRadii[i] = HOLE_RADIUS; // 默认半径
+                holeEdge[i] = HOLE_EDGE;
+                holeColor[i] = HOLE_COLOR;
             }
 
             if (hud.owner is Creature cre)
@@ -131,9 +143,12 @@ namespace MySlugcat
                             if (creature is Player player && !player.inShortcut)
                             {
                                 int N = player.playerState.playerNumber;
-                                if (N >= 0 && N < 20 && validCount < 20)
+                                if (N >= 0 && N < 100 && validCount < 100)
                                 {
                                     holeCenters[N] = creature.mainBodyChunk.pos - room.game.cameras[0].pos;
+                                    holeRadii[N] = HOLE_RADIUS; // 默认半径
+                                    holeEdge[N] = HOLE_EDGE;
+                                    holeColor[N] = HOLE_COLOR;
                                     holeActive[N] = true; // 标记有效洞
                                     validCount++;
                                 }
@@ -143,18 +158,54 @@ namespace MySlugcat
                 }
             }
 
+            bool allPlayerDead = true;
+
+            foreach (var pla in Control.players)
+            {
+                if (pla != null)
+                {
+                    if (pla.dead == false)
+                    {
+                        allPlayerDead = false;
+                    }
+                }
+
+            }
+
+            if (allPlayerDead == true && Clear == 0)
+            {
+                Clear = 0.025f;
+            }
+
+            if (Clear != 0)
+            {
+                holeCenters[99] = new Vector2(gridX, gridY);
+                holeRadii[99] = (gridX + 50) * Clear; // 默认半径
+                holeEdge[99] = (gridX + 50) + 40;
+                holeColor[99] = new Color(1f, 1f, 1f);
+                holeActive[99] = true; // 标记有效洞
+                Clear += 0.025f;
+            }
+
+            if (Clear >= 1.01f)
+            {
+                ClearSprites();
+                return;
+            }
+
+
             // 更新像素透明度
             UpdatePixelTransparency();
         }
 
         private void UpdatePixelTransparency()
         {
-            // 预先构建有效玩家位置列表（避免遍历整个20元素数组）
-            var activeHoles = new List<Vector2>();
-            for (int i = 0; i < 20; i++)
+            // 预先构建有效玩家位置列表（避免遍历整个100元素数组）
+            /*var activeHoles = new List<Vector2>();
+            for (int i = 0; i < 100; i++)
             {
                 if (holeActive[i]) activeHoles.Add(holeCenters[i]);
-            }
+            }*/
 
             for (int x = 0; x < gridWidth; x++)
             {
@@ -167,10 +218,11 @@ namespace MySlugcat
                     );
 
                     // 初始透明度
+                    Color color = HOLE_COLOR;
                     float alpha = Alpha;
 
                     // 检查是否在任意洞内
-                    foreach (var center in activeHoles) // 仅遍历有效洞
+                    /*foreach (var center in activeHoles) // 仅遍历有效洞
                     {
                         float distance = Vector2.Distance(pixelPos, center);
                         if (distance < HOLE_RADIUS) // 使用常量更安全
@@ -183,7 +235,32 @@ namespace MySlugcat
                             float edgeAlpha = (distance - HOLE_RADIUS) / (HOLE_EDGE - HOLE_RADIUS);
                             alpha = Mathf.Min(alpha, edgeAlpha);
                         }
+                    }*/
+
+                    for (int i = 0; i < 100; i++)
+                    {
+                        Vector2 holeCenter = holeCenters[i];
+
+                        if (holeCenter == Vector2.zero) continue;
+                        if (!holeActive[i]) continue;
+
+                        float distance = Vector2.Distance(pixelPos, holeCenter);
+                        if (distance < holeRadii[i]) // 洞半径
+                        {
+                            // 在洞内，完全透明
+                            color = holeColor[i];
+                            alpha = 0f;
+                            break;
+                        }
+                        else if (distance < holeEdge[i]) // 洞边缘，渐变
+                        {
+                            // 计算渐变透明度
+                            float edgeAlpha = (distance - holeRadii[i]) / (holeEdge[i] - holeRadii[i]);
+                            alpha = Mathf.Min(alpha, edgeAlpha);
+                            color = holeColor[i];
+                        }
                     }
+
 
                     /*foreach (var holeCenter in holeCenters)
                     {
@@ -205,7 +282,7 @@ namespace MySlugcat
                     }*/
 
                     // 更新像素透明度
-                    Color color = pixelGrid[x, y].color;
+                    //Color color = pixelGrid[x, y].color;
                     color.a = alpha;
                     pixelGrid[x, y].color = color;
                 }
@@ -220,6 +297,8 @@ namespace MySlugcat
 
         public override void ClearSprites()
         {
+            container.isVisible = false;
+            container.alpha = 0f;
             container.RemoveFromContainer();
             //background.RemoveFromContainer();
 
@@ -265,7 +344,7 @@ namespace MySlugcat
         public FContainer container;
         public FSprite rect;
         public FSprite[] circles;
-        Vector2[] poss = new Vector2[20];
+        Vector2[] poss = new Vector2[100];
 
         // 自定义着色器
         private static FShader _holeShader;
@@ -300,8 +379,8 @@ namespace MySlugcat
             maskContainer.AddChild(maskBg);
 
             // 创建圆形洞
-            circles = new FSprite[20];
-            for (int i = 0; i < 20; i++)
+            circles = new FSprite[100];
+            for (int i = 0; i < 100; i++)
             {
                 circles[i] = new FSprite("Circle20")
                 {
@@ -350,8 +429,8 @@ namespace MySlugcat
             FShader multiplyShader = Custom.rainWorld.Shaders["Multiply"];
 
             // 创建圆形洞
-            circles = new FSprite[20];
-            for (int i = 0; i < 20; i++)
+            circles = new FSprite[100];
+            for (int i = 0; i < 100; i++)
             {
                 circles[i] = new FSprite("Circle20")
                 {
@@ -376,8 +455,8 @@ namespace MySlugcat
     container.AddChild(rect);
 
     // 创建"洞"（实际上是白色圆形）
-    circles = new FSprite[20];
-    for (int i = 0; i < 20; i++)
+    circles = new FSprite[100];
+    for (int i = 0; i < 100; i++)
     {
         circles[i] = new FSprite("Circle20")
         {
@@ -411,8 +490,8 @@ namespace MySlugcat
     rect.SetPosition(new Vector2(gridX, gridY));
     container.AddChild(rect);
 
-    circles = new FSprite[20];
-    for (int i = 0; i < 20; i++)
+    circles = new FSprite[100];
+    for (int i = 0; i < 100; i++)
     {
         // 3. 添加一个圆形（作为“透明”部分）
         circles[i] = new FSprite("Circle20")
@@ -489,7 +568,7 @@ public override void Draw(float timeStacker)
         if (room != null)
         {
             //rect.SetPosition(new Vector2(gridX, gridY) - room.game.cameras[0].pos);
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 100; i++)
             {
                 if (poss[i] != null && poss[i] != Vector2.zero && circles[i] != null)
                 {
@@ -508,7 +587,7 @@ public override void ClearSprites()
     container.isVisible = false;
     container.RemoveFromContainer();
     rect.RemoveFromContainer();
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 100; i++)
     {
         circles[i].RemoveFromContainer();
     }

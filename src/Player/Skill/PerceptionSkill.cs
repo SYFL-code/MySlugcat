@@ -236,14 +236,15 @@ public class PointerFSprite
         {
             if (Control.RWG.GamePaused)
             {
+                pointerMesh.color = Color.black;
                 return;
             }
         }
-        if (Control.camPos != null)
+        /*if (Control.camPos != null)
         {
             camX = Control.camPos.x;
             camY = Control.camPos.y;
-        }
+        }*/
 
         /*        lasti += 1;
                 if (lasti < 0)
@@ -394,6 +395,11 @@ public class PointerFSprite
         if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
         if (creature == null) return;
 
+        if (owner.room != null)
+        {
+            camX = owner.room.game.cameras[0].pos.x;
+            camY = owner.room.game.cameras[0].pos.y;
+        }
 
         // 1. 获取世界坐标
         Vector2 targetWorldPos = creature.mainBodyChunk.pos;

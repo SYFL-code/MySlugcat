@@ -149,7 +149,7 @@ namespace MySlugcat
                 if (SC.KnitmeshSkill)
                 {
                     float timeStacker = Time.deltaTime;
-                    if (((1 / timeStacker / 4) + 3) > Key.mpCounter[N] && !player.input[0].mp && player.input[1].mp)
+                    if (15 > Key.mpCounter[N] && !player.input[0].mp && player.input[1].mp)
                     {
                         Knitmesh(player, player.room, player.mainBodyChunk.pos);
                     }

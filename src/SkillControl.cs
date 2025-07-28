@@ -31,7 +31,8 @@ namespace MySlugcat
     {
         private static bool StartRunning = true;
 
-        public static float pixelSize = 30f;          // 像素大小
+        public static float pixelSize = 15f;          // 像素大小
+        public static float Alpha = 0.9f;             // 像素不透明度
 
         public static int  MySlugcatStats = 0;        // 蛞蝓猫数据
         public static bool Exhausted = true;          // 精疲力竭
@@ -45,7 +46,7 @@ namespace MySlugcat
         public static void Hook()
         {
             On.RainWorldGame.Update += RainWorldGame_Update;
-            //On.Player.ctor += Player_ctor;
+            On.Player.ctor += Player_ctor;
         }
 
         public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)

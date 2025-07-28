@@ -65,8 +65,12 @@ namespace MySlugcat
             KnitmeshSkill.Hook();
             DigestionSkill.Hook();
 
-            FixedSkill.Hook();
+            //游戏内容设置
+            MyGame.Hook();
+
             Intros.Hook();
+            FixedSkill.Hook();
+
             //玩家图像
             //MyPlayerGraphics.Hook();
             //游戏内容设置

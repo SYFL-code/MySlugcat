@@ -186,6 +186,15 @@ namespace MySlugcat
 
         public override void Update()
         {
+            if (SC.PerceptionSkill)
+            {
+
+            }
+            else
+            {
+                fadeState = 0f;
+            }
+
             if (hud.owner is Player owner)
             {
                 int N = owner.playerState.playerNumber;

@@ -1,7 +1,7 @@
 {
-	"id": "SlugcatTemplate",
-	"name": "Slugcat Template",
-	"description": "A recolored copy of The Survivor that demonstrates some custom SlugBase features.<LINE>This is a template mod for SlugBase.",
+	"id": "theaccommodator.LH",
+	"name": "The accommodator",
+	"description": "An Iterator-modified biological specimen, deemed a failure, abandoned to barely cling to life alone in the wilds...<LINE>Life finds a way...",
 	"features": {
 		"color": "9cf0a4",
 
@@ -17,9 +17,13 @@
 		],
 
 		"back_spear": false,
+		"auto_grab_batflies": false,
+		"can_maul": false,
+		"the_mark": true,
+		"the_glow": false,
 		"food_min": 10,
-		"food_max": 10,
-		"karma": 1,
+		"food_max": 12,
+		"karma": 0,
 		"karma_cap": 4,
 		"start_room": [ "SH_S05", "SL_S06" ],
 		"world_state": [ "Red", "Gourmand" ],
@@ -63,14 +67,15 @@
 			"plants": 0.5,
 			"overrides": {
 				"Scavenger": 0.75,
-				"DangleFruit": 1
+				"DangleFruit": 0.75
 			}
 		},
 
-		"title_card": "intro_roll_c_MySlugcat",
+		"title_card": "intro_roll_c_MySlugcat_LH",
 
-		"select_menu_scene": "Slugcat_Prototype",
-		"select_menu_scene_ascended": "Ghost_Prototype"
+		"select_menu_scene": "Slugcat_MySlugcat_LH",
+		"select_menu_scene_ascended": "Ghost_MySlugcat_LH",
+		"sleep_scene": "Sleep_MySlugcat_LH"
 
 	}
 }

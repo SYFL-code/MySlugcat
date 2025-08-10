@@ -288,6 +288,12 @@ namespace MySlugcat
             Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
             if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && SC.FrameSkill)
             {
+                if (Vector2.Distance(self.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(self.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(self.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
+                {
+                    Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"pos_Distance < 10");
+                    return null;
+                }
+
                 /*                Vector2 CV0 = creature.bodyChunks[0].pos;
                                 Vector2 CV1 = creature.bodyChunks[1].pos;
                                 Vector2 PV0 = self.bodyChunks[0].pos;
@@ -360,6 +366,11 @@ namespace MySlugcat
                 Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_zh", $"P({self})， PV({self.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
                 Teleport.SetObjectPosition(self, creaturepos);
                 Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_sh", $"P({self})， PV({self.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+
+                if (creature is Lizard lizard)
+                {
+                    lizard.spawnDataEvil = 0.8f;
+                }
 
 
                 //Object(self, creatureroom, creaturepos);
@@ -714,6 +725,10 @@ namespace MySlugcat
 
                 if (obj != null && obj.State is HealthState hs)
                 {
+                    Vector2 creaturepos = obj.mainBodyChunk.pos;
+
+                    Teleport.SetObjectPosition(spear, creaturepos);
+
                     hs.health -= spear.spearDamageBonus;
                     if (hs != null && hs.health != null)
                     {
@@ -796,6 +811,10 @@ namespace MySlugcat
             //Creature obj = FindNearestCreature(bomb., Frameobj.room, false, null);
             if (obj != null)
             {
+                Vector2 creaturepos = obj.mainBodyChunk.pos;
+
+                Teleport.SetObjectPosition(bomb, creaturepos);
+
                 result.obj = obj;
                 self.stun = 0;
             }

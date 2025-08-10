@@ -25,124 +25,140 @@ using static MonoMod.InlineRT.MonoModRule;
 
 namespace MySlugcat
 {
-    //精疲力竭
-    public class Exhausted
-    {
+	//精疲力竭
+	public class Exhausted
+	{
 
-        public static void Hook()
-        {
+		public static void Hook()
+		{
 #if MYDEBUG
-            try
-            {
+			try
+			{
 #endif
-            On.Player.Update += Player_Update;
-            On.Player.ThrownSpear += Player_ThrownSpear;
+			On.Player.Update += Player_Update;
+			On.Player.ThrownSpear += Player_ThrownSpear;
 
 #if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
+			}
+			catch (Exception e)
+			{
+				StackTrace st = new StackTrace(new StackFrame(true));
+				StackFrame sf = st.GetFrame(0);
+				var sr = sf.GetFileName().Split('\\');
+				MyDebug.outStr = sr[sr.Length - 1] + "\n";
+				MyDebug.outStr += sf.GetMethod() + "\n";
+				MyDebug.outStr += e;
+				UnityEngine.Debug.Log(e);
+			}
 #endif
-        }
+		}
 
-        private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
-        {
-            orig(player, eu);
-
-            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && (SC.MySlugcatStats == 0 && SC.Exhausted))
+		/*private static void Hungry_Update(On.Player.orig_Update orig, Player player, bool eu)
+		{
+            orig.Invoke(player, eu);
+            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module))
             {
-                player.gourmandAttackNegateTime--;
+                module.OnPlayerUpdate(player);
+                // 饥饿
+                if (player.FoodInStomach > 0 || player.playerState.quarterFoodPoints > 0)
+                {
 
-                if (player.lungsExhausted && (!player.gourmandExhausted))
-                {
-                    player.aerobicLevel = 1f;
-                }
-
-                if ((double)player.aerobicLevel >= 0.95)
-                {
-                    player.gourmandExhausted = true;
-                }
-                if (player.aerobicLevel < 0.4f)
-                {
-                    player.gourmandExhausted = false;
-                }
-                if (player.gourmandExhausted)
-                {
-                    player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
-                    player.lungsExhausted = true;
                 }
             }
-        }
 
-        private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
-        {
-            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats == 0)
-            {
-                spear.throwModeFrames = 18;
-                spear.spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
-                BodyChunk firstChunk = spear.firstChunk;
-                firstChunk.vel.x = firstChunk.vel.x * 0.77f;
-                if (!player.gourmandExhausted)
-                {
-                    /*if (player.canJump != 0)
-                    {
-                        player.animation = Player.AnimationIndex.Roll;
-                    }
-                    else
-                    {
-                        player.animation = Player.AnimationIndex.Flip;
-                    }*/
-                    if ((player.room != null && player.room.gravity == 0f) || Mathf.Abs(spear.firstChunk.vel.x) < 1f)
-                    {
-                        //player.firstChunk.vel += spear.firstChunk.vel.normalized * 9f;
-                    }
-                    else
-                    {
-                        //player.rollDirection = (int)Mathf.Sign(spear.firstChunk.vel.x);
-                        player.rollCounter = 0;
-                        //BodyChunk firstChunk3 = player.firstChunk;
-                        //firstChunk3.vel.x = firstChunk3.vel.x + Mathf.Sign(spear.firstChunk.vel.x) * 9f;
-                    }
-                    player.gourmandAttackNegateTime = 80;
-                }
+        }*/
 
-                if (player.gourmandExhausted)
-                {
-                    spear.spearDamageBonus = 0.25f;
-                }
+		private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+		{
+			orig(player, eu);
 
-                /*                //风之祝福
-                                if (spear.thrownBy == player)
-                                {
-                                    int N = player.playerState.playerNumber;
-                                    spear.spearDamageBonus = 1.5f;
-                                    BodyChunk firstChunk = spear.firstChunk;
-                                    firstChunk.vel.x = firstChunk.vel.x * 1.2f;
-                                    if (ModManager.MSC && player.gourmandExhausted)
-                                    {
-                                        spear.spearDamageBonus = 0.3f;
-                                    }
-                                    if (WindBlessingCooling[N] == 1)
-                                    {
-                                        spear.spearDamageBonus = 2.5f;
-                                        spear.firstChunk.vel *= 1.2f;
-                                    }
+			if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && (SC.MySlugcatStats == 0 && SC.Exhausted))
+			{
+				// 精疲力竭
+				player.gourmandAttackNegateTime--;
 
-                                }*/
-            }
-            else
-            {
-                orig(player, spear);
-            }
-        }
+				if (player.lungsExhausted && (!player.gourmandExhausted))
+				{
+					player.aerobicLevel = 1f;
+				}
 
-    }
+				if ((double)player.aerobicLevel >= 0.95)
+				{
+					player.gourmandExhausted = true;
+				}
+				if (player.aerobicLevel < 0.4f)
+				{
+					player.gourmandExhausted = false;
+				}
+				if (player.gourmandExhausted)
+				{
+					player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+					player.lungsExhausted = true;
+				}
+			}
+		}
+
+		private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
+		{
+			if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats == 0)
+			{
+				spear.throwModeFrames = 18;
+				spear.spearDamageBonus = 0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
+				BodyChunk firstChunk = spear.firstChunk;
+				firstChunk.vel.x = firstChunk.vel.x * 0.77f;
+				if (!player.gourmandExhausted)
+				{
+					/*if (player.canJump != 0)
+					{
+						player.animation = Player.AnimationIndex.Roll;
+					}
+					else
+					{
+						player.animation = Player.AnimationIndex.Flip;
+					}*/
+					if ((player.room != null && player.room.gravity == 0f) || Mathf.Abs(spear.firstChunk.vel.x) < 1f)
+					{
+						//player.firstChunk.vel += spear.firstChunk.vel.normalized * 9f;
+					}
+					else
+					{
+						//player.rollDirection = (int)Mathf.Sign(spear.firstChunk.vel.x);
+						player.rollCounter = 0;
+						//BodyChunk firstChunk3 = player.firstChunk;
+						//firstChunk3.vel.x = firstChunk3.vel.x + Mathf.Sign(spear.firstChunk.vel.x) * 9f;
+					}
+					player.gourmandAttackNegateTime = 80;
+				}
+
+				if (player.gourmandExhausted)
+				{
+					spear.spearDamageBonus = 0.25f;
+				}
+
+				/*                //风之祝福
+								if (spear.thrownBy == player)
+								{
+									int N = player.playerState.playerNumber;
+									spear.spearDamageBonus = 1.5f;
+									BodyChunk firstChunk = spear.firstChunk;
+									firstChunk.vel.x = firstChunk.vel.x * 1.2f;
+									if (ModManager.MSC && player.gourmandExhausted)
+									{
+										spear.spearDamageBonus = 0.3f;
+									}
+									if (WindBlessingCooling[N] == 1)
+									{
+										spear.spearDamageBonus = 2.5f;
+										spear.firstChunk.vel *= 1.2f;
+									}
+
+								}*/
+			}
+			else
+			{
+				orig(player, spear);
+			}
+		}
+
+	}
 }

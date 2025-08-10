@@ -1,3 +1,13 @@
+THE ACCOMMODATOR|适应者
+THEACCOMMODATOR|适应者
+ACCOMMODATOR|适应者
+Accommodator|适应者
+accommodator|适应者
+The accommodator|适应者
+Theaccommodator|适应者
+
+An Iterator-modified biological specimen, deemed a failure, abandoned to barely cling to life alone in the wilds...<LINE>Life finds a way...|迭代器改造失败的生物实验品，在遭遗弃后独自在野外苟延残喘...<LINE>生命会找到自己的出路...
+
 General 1|通用设置1
 General 2|通用设置2
 Tools 1|工具1

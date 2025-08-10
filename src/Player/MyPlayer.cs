@@ -356,6 +356,29 @@ namespace MySlugcat
         }
 
 
+        //减去四分之一的食物
+        static public void SubtractQuarterFood(int a, Player player)
+        {
+            for (int i = 0; i < a; i++)
+            {
+                if (player.playerState.quarterFoodPoints > 0)
+                {
+                    player.playerState.quarterFoodPoints--;
+                    player.room.game.cameras[0].hud.PlaySound(SoundID.HUD_Food_Meter_Deplete_Plop_A);
+                    player.room.game.cameras[0].hud.foodMeter.quarterPipShower.Reset();
+                }
+                else
+                {
+                    player.SubtractFood(1);
+                    player.room.game.cameras[0].hud.PlaySound(SoundID.HUD_Food_Meter_Deplete_Plop_A);
+                    player.room.game.cameras[0].hud.foodMeter.Update();
+                    player.AddQuarterFood();
+                    player.AddQuarterFood();
+                    player.AddQuarterFood();
+                    player.room.game.cameras[0].hud.foodMeter.quarterPipShower.Reset();
+                }
+            }
+        }
 
         // 无害的生物
         public static bool HarmlessCreature(Creature creature)

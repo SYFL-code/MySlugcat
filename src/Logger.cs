@@ -85,11 +85,13 @@ namespace MySlugcat
 
                 try
                 {
+                    Debug.Log(newContent);
                     Console.WriteLine(newContent);
                     // 如果文件不存在，直接创建并写入 或 新进游戏
                     if (!File.Exists(filePath) || LogReset)
                     {
                         File.WriteAllText(filePath, newContent + "\n" + $"=== 新日志 {DateTime.Now.ToString()} ===\n");
+                        Debug.Log($"已创建新文件,文件路径: {Path.GetFullPath(filePath)}");
                         Console.WriteLine($"已创建新文件,文件路径: {Path.GetFullPath(filePath)}");
                         LogReset = false;
                     }
@@ -118,12 +120,13 @@ namespace MySlugcat
 
                     if ((logDebug == null || logDebug.Value) && loglevel.Value >= 10)
                     {
+                        Debug.Log($"内容已添加到文件顶部: {Path.GetFullPath(filePath)}");
                         Console.WriteLine($"内容已添加到文件顶部: {Path.GetFullPath(filePath)}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"操作失败: {ex.Message}");
+                    Console.WriteLine($"操作失败: {ex}");
                 }
             }
 

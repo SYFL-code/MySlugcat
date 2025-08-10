@@ -1,23 +1,23 @@
 ﻿using System;
 using BepInEx;
-//using Fisobs.Core;
 using UnityEngine;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
 using BepInEx.Logging;
+using static PlayerModuleManager;
 
 
 namespace MySlugcat
 {
-    [BepInPlugin(MOD_ID, "Slugcat Template", "0.1.0")]
+    [BepInPlugin(MOD_ID, "The accommodator", "0.1.0")]
     class Plugin : BaseUnityPlugin
     {
         //设置ModID
-        private const string MOD_ID = "author.slugtemplate";
+        private const string MOD_ID = "theaccommodator.LH";
         //用于检查角色id
         public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("SlugcatTemplate", false);
 
-        public static ManualLogSource? Logger { get; private set; }
+        //public static ManualLogSource? Logger { get; private set; }
         /*-----------------------------------------------------挂钩-----------------------------------------------------*/
 
         /*public static readonly PlayerFeature<float> SuperJump = PlayerFloat("slugtemplate/super_jump");
@@ -36,7 +36,7 @@ namespace MySlugcat
             try
             {
 #endif
-            Plugin.Logger = base.Logger;
+            //Plugin.Logger = base.Logger;
 
             // Put your custom hooks here!-在此放置你自己的钩子
             //On.Player.Jump += Player_Jump;
@@ -55,6 +55,7 @@ namespace MySlugcat
             //Content.Register(new EnderPearlFisob());
             //玩家能力
             MyPlayer.Hook();
+            PlayerHooks.HookOn();
             Exhausted.Hook();
             SC.Hook();
             VisionSystem.Hook();

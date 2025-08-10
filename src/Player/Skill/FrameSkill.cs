@@ -531,7 +531,7 @@ namespace MySlugcat
 
         private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
         {
-            if (((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && !player.dead && SC.FrameSkill)
+            if (((player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)) && !player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 Creature? obj = Frame​​Skill.Frame(player, false, player, 20);
 
@@ -629,8 +629,8 @@ namespace MySlugcat
 
         public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({SC.FrameSkill})");
-            if (result.obj != null && result.obj is Player player && (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            //Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({Control.FrameSkill})");
+            if (result.obj != null && result.obj is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
                 Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_st", $"");
@@ -731,9 +731,7 @@ namespace MySlugcat
             //如果被命中的不是玩家
             if (result.obj is not Player player)
                 return orig.Invoke(bomb, result, eu);
-            //如果玩家不是MySlugcat则运行原程序
-            if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-                return orig.Invoke(bomb, result, eu);
+
             if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
                 return orig.Invoke(bomb, result, eu);
 
@@ -773,12 +771,12 @@ namespace MySlugcat
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
-            //如果玩家不是MySlugcat则运行原程序
+/*            //如果玩家不是MySlugcat则运行原程序
             if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
-            }
+            }*/
             if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
@@ -858,12 +856,12 @@ namespace MySlugcat
                 orig.Invoke(lizard, chunk);
                 return;
             }
-            //如果玩家不是MySlugcat则运行原程序
+            /*//如果玩家不是MySlugcat则运行原程序
             if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(lizard, chunk);
                 return;
-            }
+            }*/
             if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(lizard, chunk);
@@ -887,11 +885,11 @@ namespace MySlugcat
 
         private static void DaddyLongLegs_Eat(On.DaddyLongLegs.orig_Eat orig, DaddyLongLegs daddyLongLegs, bool eu)
         {
-            if (!SC.FrameSkill)
+            /*if (!SC.FrameSkill)
             {
                 orig.Invoke(daddyLongLegs, eu);
                 return;
-            }
+            }*/
 
             //List<DaddyLongLegs.EatObject> removeList = new List<DaddyLongLegs.EatObject>();
             foreach (var obj in daddyLongLegs.eatObjects)
@@ -903,8 +901,8 @@ namespace MySlugcat
                     Player? player = obj.chunk.owner as Player;
                     if (player == null)
                         continue;
-                    if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-                        continue;
+                    /*if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+                        continue;*/
                     if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
                         continue;
                     //取玩家变量
@@ -946,12 +944,12 @@ namespace MySlugcat
                 orig.Invoke(centipede, g);
                 return;
             }
-            //如果玩家不是MySlugcat则运行原程序
+            /*//如果玩家不是MySlugcat则运行原程序
             if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(centipede, g);
                 return;
-            }
+            }*/
             if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(centipede, g);

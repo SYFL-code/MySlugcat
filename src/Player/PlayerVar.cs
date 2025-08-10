@@ -1,4 +1,4 @@
-﻿using MySlugcat;
+﻿/*using MySlugcat;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,4 +15,4 @@ namespace MySlugcat
         //public int iceShield_craft = 120;//合成时间
         //public MyCloak cloak = null;
     }
-}
+}*/

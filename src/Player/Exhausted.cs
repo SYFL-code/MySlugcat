@@ -1,4 +1,4 @@
-﻿using On;
+﻿/*using On;
 using IL;
 using System;
 using Mono.Cecil;
@@ -31,42 +31,24 @@ namespace MySlugcat
 
 		public static void Hook()
 		{
-#if MYDEBUG
-			try
-			{
-#endif
 			On.Player.Update += Player_Update;
 			On.Player.ThrownSpear += Player_ThrownSpear;
-
-#if MYDEBUG
-			}
-			catch (Exception e)
-			{
-				StackTrace st = new StackTrace(new StackFrame(true));
-				StackFrame sf = st.GetFrame(0);
-				var sr = sf.GetFileName().Split('\\');
-				MyDebug.outStr = sr[sr.Length - 1] + "\n";
-				MyDebug.outStr += sf.GetMethod() + "\n";
-				MyDebug.outStr += e;
-				UnityEngine.Debug.Log(e);
-			}
-#endif
 		}
 
-		/*private static void Hungry_Update(On.Player.orig_Update orig, Player player, bool eu)
+		*//*private static void Hungry_Update(On.Player.orig_Update orig, Player player, bool eu)
 		{
-            orig.Invoke(player, eu);
-            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module))
-            {
-                module.OnPlayerUpdate(player);
-                // 饥饿
-                if (player.FoodInStomach > 0 || player.playerState.quarterFoodPoints > 0)
-                {
+			orig.Invoke(player, eu);
+			if (PlayerModuleManager.playerModules.TryGetValue(player, out var module))
+			{
+				module.OnPlayerUpdate(player);
+				// 饥饿
+				if (player.FoodInStomach > 0 || player.playerState.quarterFoodPoints > 0)
+				{
 
-                }
-            }
+				}
+			}
 
-        }*/
+		}*//*
 
 		private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
 		{
@@ -108,14 +90,14 @@ namespace MySlugcat
 				firstChunk.vel.x = firstChunk.vel.x * 0.77f;
 				if (!player.gourmandExhausted)
 				{
-					/*if (player.canJump != 0)
+					*//*if (player.canJump != 0)
 					{
 						player.animation = Player.AnimationIndex.Roll;
 					}
 					else
 					{
 						player.animation = Player.AnimationIndex.Flip;
-					}*/
+					}*//*
 					if ((player.room != null && player.room.gravity == 0f) || Mathf.Abs(spear.firstChunk.vel.x) < 1f)
 					{
 						//player.firstChunk.vel += spear.firstChunk.vel.normalized * 9f;
@@ -135,7 +117,7 @@ namespace MySlugcat
 					spear.spearDamageBonus = 0.25f;
 				}
 
-				/*                //风之祝福
+				*//*                //风之祝福
 								if (spear.thrownBy == player)
 								{
 									int N = player.playerState.playerNumber;
@@ -152,7 +134,7 @@ namespace MySlugcat
 										spear.firstChunk.vel *= 1.2f;
 									}
 
-								}*/
+								}*//*
 			}
 			else
 			{
@@ -161,4 +143,4 @@ namespace MySlugcat
 		}
 
 	}
-}
+}*/

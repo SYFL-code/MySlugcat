@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using RWCustom;
 using HUD;
 using MoreSlugcats;
@@ -112,7 +112,7 @@ namespace MySlugcat
             // 在Update()方法中更新指针逻辑
             showPointer = false; // 默认不显示指针
 
-            /*if (hud.owner is Player player && player.slugcatStats.name == Plugin.YourSlugID)
+            *//*if (hud.owner is Player player && player.slugcatStats.name == Plugin.YourSlugID)
             {
                 Creature? creature = MyPlayer.FindNearestCreature(player.mainBodyChunk.pos, player.room, false, player, false, 2);
                 if (creature != null)
@@ -121,7 +121,7 @@ namespace MySlugcat
                     goalPointerColor = creature.ShortCutColor();
                 }
                 showPointer = creature != null && !player.inShortcut;
-            }*/
+            }*//*
 
             if (hud.owner is Player player && SC.PerceptionSkill)
             {
@@ -259,7 +259,7 @@ namespace MySlugcat
                     scavPointerLines[0].scaleX = pointer3DWidth * rotationFac;
                     scavPointerLines[0].rotation = Custom.VecToDeg(pointerDir);
 
-                    /*foreach (var stat in scavStats)
+                    *//*foreach (var stat in scavStats)
                     {
                         stat.Draw(timeStacker, room.game.cameras[0].pos);
                     }*/
@@ -268,7 +268,7 @@ namespace MySlugcat
                     for (int i = 0; i < 9; i++)
                     {
                         scavPointerLines[i].color = Color.Lerp(scavPointerLines[i].color, goalPointerColor, 0.2f);
-                    }*/
+                    }*//*
                 }
             }
 
@@ -294,4 +294,4 @@ namespace MySlugcat
 
 
     }
-}
+}*/

@@ -29,12 +29,8 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
-            On.Player.ctor += Player_ctor;
-            On.Player.Update += Player_Update;
+            //On.Player.ctor += Player_ctor;
+            //On.Player.Update += Player_Update;
 
             On.Spear.HitSomething += Spear_HitSomething;
             On.Player.Die += Player_Die;
@@ -75,19 +71,6 @@ namespace MySlugcat
             //On.SaveState.SaveToString += SaveState_SaveToString;
             //读取数据
             //On.SaveState.LoadGame += SaveState_LoadGame;
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 
@@ -199,16 +182,12 @@ namespace MySlugcat
         }*/
 
 
-        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        /*private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             orig.Invoke(self, abstractCreature, world);
             if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                 return;
-            /*------------------------------------------------------------------剧情模式游戏变量设置------------------------------------------------------------------------------*/
+            *//*------------------------------------------------------------------剧情模式游戏变量设置------------------------------------------------------------------------------*/
 /*            if (self.room.world.game.manager.menuSetup.startGameCondition == ProcessManager.MenuSetup.StoryGameInitCondition.New)
             {
                 GlobalVar.NewGameGlobalVarSet();
@@ -220,47 +199,29 @@ namespace MySlugcat
 /*            if (self.room.world.game.session is ArenaGameSession)//在竞技场模式里也开启冰盾能力
             {
                 GlobalVar.MySlugcat2_iceshield_lock = false;
-            }*/
+            }*//*
             //赋值给全局变量供其他函数使用
-            GlobalVar.game = self.room.world.game;
-            /*------------------------------------------------------------------玩家变量初始化------------------------------------------------------------------------------*/
-            var pv = new PlayerVar();
-            GlobalVar.playerVar.Add(self, pv);
-            /*------------------------------------------------------------------调试图像------------------------------------------------------------------------------*/
-            pv.myDebug = new MyDebug(self);
+            //GlobalVar.game = self.room.world.game;
+            *//*------------------------------------------------------------------玩家变量初始化------------------------------------------------------------------------------*//*
+            //var pv = new PlayerVar();
+            //GlobalVar.playerVar.Add(self, pv);
+            *//*------------------------------------------------------------------调试图像------------------------------------------------------------------------------*//*
+            //pv.myDebug = new MyDebug(self);
+        }*/
 
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
-        }
-
-        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        /*private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             orig.Invoke(self, eu);
             if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                 return;
-            /******************************24_2_16 保存bug**********************************/
+            *//******************************24_2_16 保存bug**********************************/
 /*            if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value)
             {
                 LoadMyData();
-            }*/
+            }*//*
             //]]
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
             int N = self.playerState.playerNumber;
 
@@ -273,13 +234,13 @@ namespace MySlugcat
                 //或许没那么累 在自身位置生成冲击波效果 大小330 强度0.045 时长5 false表示绘制顺序（绘制到HUD图层，True就是HUD2
                 //self.slugcatStats.runspeedFac = 1.75f;
 
-                /*StackTrace st = new StackTrace(new StackFrame(true));
+                *//*StackTrace st = new StackTrace(new StackFrame(true));
                 StackFrame sf = st.GetFrame(0);
                 var sr = sf.GetFileName().Split('\\');
                 MyDebug.outStr = sr[sr.Length - 1] + "\n";
                 MyDebug.outStr += sf.GetMethod() + "\n";
                 MyDebug.outStr += "MySlugcat:wewe";
-                Console.WriteLine("MySlugcat:wewe");*/
+                Console.WriteLine("MySlugcat:wewe");*//*
 
                 Creature? creature = RandomlySelectedCreature(self.room, false, self, false);
                 if (creature != null)
@@ -295,65 +256,24 @@ namespace MySlugcat
 
             }
 
-#if DEBUG
-            //启用投掷键输出调试信息
-            PutDebugMsgOnThrow(self);
-#endif
             //吞炸弹爆炸
             //SelfExplode(self);
             //飞行能力
             //pv.flyAbility.MySlugcat2_Fly(self);
-            /******************************24_2_16 保存bug**********************************/
+            *//******************************24_2_16 保存bug**********************************/
 /*            if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value)
             {
                 //靠近生物减速
                 SlowDownCreature(self);
-            }*/
+            }*//*
             //]]  
             //冰盾合成
             //MyIceShield.IceShieldCraft(self);
             //披风
             //if (pv.cloak != null)
             //    pv.cloak.Update(self, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
-        }
+        }*/
 
-        private static void PutDebugMsgOnThrow(Player self)
-        {
-#if MYDEBUG
-            try
-            {
-#endif
-            if (self.input[0].thrw)
-            {
-                UnityEngine.Debug.Log(GlobalVar.dbgstr);
-            }
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
-        }
 
 
         //减去四分之一的食物
@@ -432,11 +352,6 @@ namespace MySlugcat
         // 查找获取一定范围内所有生物
         public static List<Creature>? CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature)
         {
-#if MYDEBUG
-            try
-            {
-#endif
-
             List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
             float radiusSquared = radius * radius;
 
@@ -486,30 +401,11 @@ namespace MySlugcat
 
             // 转换为最终结果
             return results.ConvertAll(x => x.creature);
-
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         // 查找当前房间中距离自身最近的生物
         public static Creature? FindNearestCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature? creature, bool IncludeDeadCreature, int select)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             // 初始化变量
             Creature? nearest = null;        // 最近生物对象
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
@@ -570,28 +466,11 @@ namespace MySlugcat
             }
             //return creatures[UnityEngine.Random.Range(0, creatures.Count)];
             return nearest; // 返回最近生物（可能为null）
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         // 随机查找当前房间的生物
         public static Creature? RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             // 初始化变量
             //Creature? nearest = null;        // 最近生物对象
             //float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
@@ -651,20 +530,6 @@ namespace MySlugcat
                 return null;
             }
             return creatures[UnityEngine.Random.Range(0, creatures.Count)];
-            //return nearest; // 返回最近生物（可能为null）
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
@@ -692,19 +557,19 @@ namespace MySlugcat
             return obj;
         }
 
-        private static void Player_Die(On.Player.orig_Die orig, Player self)
+        private static void Player_Die(On.Player.orig_Die orig, Player player)
         {
-            if ((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
+            if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
             {
-                Creature obj = FrameSkill.Player_Die(self);
+                Creature obj = FrameSkill.Player_Die(player);
 
-                if (obj == self)
+                if (obj == player)
                 {
-                    if (obj is Player player)
+                    if (obj is Player)
                     {
                         //布尔值wasDead判断动物(玩家)是否死亡
-                        bool wasDead = self.dead;
-                        orig(self);
+                        bool wasDead = player.dead;
+                        orig(player);
 
                         DeflagrationSkill.Player_Die(obj, wasDead);
                         //self.Destroy();
@@ -713,7 +578,7 @@ namespace MySlugcat
             }
             else
             {
-                orig(self);
+                orig(player);
             }
 
         }

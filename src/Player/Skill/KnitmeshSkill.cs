@@ -36,12 +36,12 @@ namespace MySlugcat
             On.SporePlant.Bee.Update += Bee_Update;
         }
 
-        private static void Knitmesh(Player self, Room room, Vector2 pos)
+        private static void Knitmesh(Player player, Room room, Vector2 pos)
         {
-            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
-            if (SC.KnitmeshSkill)
+            //Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
+            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
             {
-                List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, self, false, true);
+                List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, player, false, true);
 
                 Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_zh", $"creatures_Null ({creatures == null})");
 
@@ -66,15 +66,15 @@ namespace MySlugcat
                                 Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
                                 Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
 
-                                SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                                SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                SporePlant.Bee bee = new SporePlant.Bee(null, true, player.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                                SporePlant.Bee bee2 = new SporePlant.Bee(null, true, player.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                                 bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                                bee.ignoreCreature = self;
+                                bee.ignoreCreature = player;
                                 //bee.room.RoomRect
                                 bee.forceAngry = true;
                                 creature.room.AddObject(bee);
                                 bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                                bee2.ignoreCreature = self;
+                                bee2.ignoreCreature = player;
                                 //bee.room.RoomRect
                                 bee2.forceAngry = true;
                                 creature.room.AddObject(bee2);
@@ -92,12 +92,12 @@ namespace MySlugcat
                                 SporePlant.Bee bee = new SporePlant.Bee(null, true, creature.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                                 SporePlant.Bee bee2 = new SporePlant.Bee(null, true, creature.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                                 bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                                bee.ignoreCreature = self;
+                                bee.ignoreCreature = player;
                                 //bee.room.RoomRect
                                 bee.forceAngry = true;
                                 creature.room.AddObject(bee);
                                 bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                                bee2.ignoreCreature = self;
+                                bee2.ignoreCreature = player;
                                 //bee.room.RoomRect
                                 bee2.forceAngry = true;
                                 creature.room.AddObject(bee2);
@@ -117,20 +117,20 @@ namespace MySlugcat
                         Vector2 V1 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
                         Vector2 V2 = new Vector2(UnityEngine.Random.Range(-120, 121), UnityEngine.Random.Range(-120, 121));
 
-                        SporePlant.Bee bee = new SporePlant.Bee(null, true, self.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
-                        SporePlant.Bee bee2 = new SporePlant.Bee(null, true, self.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                        SporePlant.Bee bee = new SporePlant.Bee(null, true, player.firstChunk.pos + V1, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
+                        SporePlant.Bee bee2 = new SporePlant.Bee(null, true, player.mainBodyChunk.pos + V2, new Vector2(0f, 0f), SporePlant.Bee.Mode.Hunt);
                         bee.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                        bee.ignoreCreature = self;
+                        bee.ignoreCreature = player;
                         //bee.room.RoomRect
                         bee.forceAngry = true;
-                        self.room.AddObject(bee);
+                        player.room.AddObject(bee);
                         bee2.blackColor = new Color(0.066f, 0.030f, 0.001f, 0.000f);
-                        bee2.ignoreCreature = self;
+                        bee2.ignoreCreature = player;
                         //bee.room.RoomRect
                         bee2.forceAngry = true;
-                        self.room.AddObject(bee2);
+                        player.room.AddObject(bee2);
                     }
-                    self.room.PlaySound(SoundID.Spore_Bees_Emerge, self.firstChunk);
+                    player.room.PlaySound(SoundID.Spore_Bees_Emerge, player.firstChunk);
                 }
             }
         }
@@ -141,18 +141,15 @@ namespace MySlugcat
 
             int N = player.playerState.playerNumber;
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.KnitmeshSkill)
+            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
             {
                 //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;
                 //if (KnitmeshSkill != null&& KnitmeshSkill.Value)
-                if (SC.KnitmeshSkill)
+                float timeStacker = Time.deltaTime;
+                if (15 > Key.mpCounter[N] && !player.input[0].mp && player.input[1].mp)
                 {
-                    float timeStacker = Time.deltaTime;
-                    if (15 > Key.mpCounter[N] && !player.input[0].mp && player.input[1].mp)
-                    {
-                        Knitmesh(player, player.room, player.mainBodyChunk.pos);
-                    }
+                    Knitmesh(player, player.room, player.mainBodyChunk.pos);
                 }
             }
         }

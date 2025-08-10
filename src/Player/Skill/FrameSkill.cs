@@ -30,10 +30,6 @@ namespace MySlugcat
     {
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
 
@@ -61,20 +57,6 @@ namespace MySlugcat
             On.Vulture.Carry += Vulture_Carry;
 
             //On.Player.Die += Player_Die;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
 /*        public static void Object(PhysicalObject obj, Room room, WorldCoordinate pos)
@@ -266,13 +248,9 @@ namespace MySlugcat
 
         //#nullable enable
 
-        public static Creature? Frame(Player self, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
+        public static Creature? Frame(Player player, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
         {
-#if MYDEBUG
-            try
-            {
-#endif
-            Creature? creature = MyPlayer.RandomlySelectedCreature(self.room, true, self, false);
+            Creature? creature = MyPlayer.RandomlySelectedCreature(player.room, true, player, false);
             int percentage = 40;
             if (probability == -1)
             {
@@ -285,10 +263,10 @@ namespace MySlugcat
             StackTrace stackTrace = new StackTrace();
             StackFrame stackFrame = stackTrace.GetFrame(2);
             MethodBase methodBase = stackFrame.GetMethod();
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
-            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && SC.FrameSkill)
+            //Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
+            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
-                if (Vector2.Distance(self.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(self.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(self.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
+                if (Vector2.Distance(player.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(player.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(player.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
                 {
                     Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"pos_Distance < 10");
                     return null;
@@ -296,38 +274,38 @@ namespace MySlugcat
 
                 /*                Vector2 CV0 = creature.bodyChunks[0].pos;
                                 Vector2 CV1 = creature.bodyChunks[1].pos;
-                                Vector2 PV0 = self.bodyChunks[0].pos;
-                                Vector2 PV1 = self.bodyChunks[1].pos;
+                                Vector2 PV0 = player.bodyChunks[0].pos;
+                                Vector2 PV1 = player.bodyChunks[1].pos;
                                 Vector2[] Cvector = new Vector2[] { CV0, CV1 };
                                 Vector2[] Pvector = new Vector2[] { PV0, PV1 };*/
 
                 /*                var CV0 = new PositionContainer(creature.bodyChunks[0].pos);
                                 var CV1 = new PositionContainer(creature.bodyChunks[1].pos);
-                                var PV0 = new PositionContainer(self.bodyChunks[0].pos);
-                                var PV1 = new PositionContainer(self.bodyChunks[1].pos);*/
+                                var PV0 = new PositionContainer(player.bodyChunks[0].pos);
+                                var PV1 = new PositionContainer(player.bodyChunks[1].pos);*/
 
                 /*                Vector2Ref ACV0 = new Vector2Ref(creature.bodyChunks[0].pos.x, creature.bodyChunks[0].pos.y);
                                 Vector2Ref ACV1 = new Vector2Ref(creature.bodyChunks[1].pos.x, creature.bodyChunks[1].pos.y);
-                                Vector2Ref APV0 = new Vector2Ref(self.bodyChunks[0].pos.x, self.bodyChunks[0].pos.y);
-                                Vector2Ref APV1 = new Vector2Ref(self.bodyChunks[1].pos.x, self.bodyChunks[1].pos.y);
+                                Vector2Ref APV0 = new Vector2Ref(player.bodyChunks[0].pos.x, player.bodyChunks[0].pos.y);
+                                Vector2Ref APV1 = new Vector2Ref(player.bodyChunks[1].pos.x, player.bodyChunks[1].pos.y);
                                 Vector2Ref CV0 = ACV0.DeepCopy(); // 创建独立副本
                                 Vector2Ref CV1 = ACV1.DeepCopy();
                                 Vector2Ref PV0 = APV0.DeepCopy();
                                 Vector2Ref PV1 = APV1.DeepCopy();*/
 
-                if (self.tongue != null)
+                if (player.tongue != null)
                 {
-                    self.tongue.resetRopeLength();
-                    self.tongue.mode = Player.Tongue.Mode.Retracted;
-                    self.tongue.rope.Reset();
+                    player.tongue.resetRopeLength();
+                    player.tongue.mode = Player.Tongue.Mode.Retracted;
+                    player.tongue.rope.Reset();
                 }
-                self.room.AddObject(new ExplosionSpikes(self.room, self.mainBodyChunk.pos, 14, 30f, 9f, 7f, 170f, creature.ShortCutColor()));
-                self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 500f, 0.080f, 10, false));
+                player.room.AddObject(new ExplosionSpikes(player.room, player.mainBodyChunk.pos, 14, 30f, 9f, 7f, 170f, creature.ShortCutColor()));
+                player.room.AddObject(new ShockWave(player.mainBodyChunk.pos, 500f, 0.080f, 10, false));
 
                 Vector2 CV0 = creature.bodyChunks[0].pos;
                 Vector2 CV1 = creature.bodyChunks[1].pos;
-                Vector2 PV0 = self.bodyChunks[0].pos;
-                Vector2 PV1 = self.bodyChunks[1].pos;
+                Vector2 PV0 = player.bodyChunks[0].pos;
+                Vector2 PV1 = player.bodyChunks[1].pos;
                 Vector2[] Cvector = new Vector2[] { CV0, CV1 };
                 //Vector2[] Cvector = new Vector2[100];
                 //for (int num12 = 0; num12 < creature.bodyChunks.Count(); num12++)
@@ -337,35 +315,32 @@ namespace MySlugcat
                 //}
                 Vector2[] Pvector = new Vector2[] { PV0, PV1 };
 
-#if MYDEBUG
-            try
-            {
-#endif
-                /*                for (int num12 = 0; num12 < self.bodyChunks.Count(); num12++)
+
+                /*                for (int num12 = 0; num12 < player.bodyChunks.Count(); num12++)
                                 {
-                                    //self.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
-                                    self.bodyChunks[num12].pos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                    self.bodyChunks[num12].lastPos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                    self.bodyChunks[num12].vel = new Vector2(0, 0);
-                                    self.mainBodyChunk.vel = new Vector2(0, 0);
-                                    self.firstChunk.vel = new Vector2(0, 0);
+                                    //player.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
+                                    player.bodyChunks[num12].pos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                    player.bodyChunks[num12].lastPos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                    player.bodyChunks[num12].vel = new Vector2(0, 0);
+                                    player.mainBodyChunk.vel = new Vector2(0, 0);
+                                    player.firstChunk.vel = new Vector2(0, 0);
                                 }*/
                 //***
                 //new CommandBuilder("md_pause_all").Help("md_pause_all [types] [action]").RunGame(delegate(RainWorldGame game, string[] args)
 
-                //Room selfroom = self.room;
+                //Room playerroom = player.room;
                 //Room creatureroom = creature.room;
-                //WorldCoordinate selfpos = self.abstractPhysicalObject.pos;
+                //WorldCoordinate playerpos = player.abstractPhysicalObject.pos;
                 //WorldCoordinate creaturepos = creature.abstractPhysicalObject.pos;
 
-                Vector2 selfpos = self.mainBodyChunk.pos;
+                Vector2 playerpos = player.mainBodyChunk.pos;
                 Vector2 creaturepos = creature.mainBodyChunk.pos;
 
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_st", $"P({self})， PV({self.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
-                Teleport.SetObjectPosition(creature, selfpos);
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_zh", $"P({self})， PV({self.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
-                Teleport.SetObjectPosition(self, creaturepos);
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_sh", $"P({self})， PV({self.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_st", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Teleport.SetObjectPosition(creature, playerpos);
+                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_zh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Teleport.SetObjectPosition(player, creaturepos);
+                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_sh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
 
                 if (creature is Lizard lizard)
                 {
@@ -373,46 +348,30 @@ namespace MySlugcat
                 }
 
 
-                //Object(self, creatureroom, creaturepos);
-                //Object(creature, selfroom, selfpos);
+                //Object(player, creatureroom, creaturepos);
+                //Object(creature, playerroom, playerpos);
 
 /*                Console.WriteLine("MySlugcat:st");
                 Clipboard.CutObject(creature);
                 Console.WriteLine($"MySlugcat:CutObject_C {Clipboard.cutObjects}");
-                Clipboard.CutObject(self);
+                Clipboard.CutObject(player);
                 Console.WriteLine($"MySlugcat:CutObject_P {Clipboard.cutObjects}");
-                Clipboard.PasteObject(selfroom, creaturepos);
+                Clipboard.PasteObject(playerroom, creaturepos);
                 Console.WriteLine($"MySlugcat:PasteObject_P {Clipboard.cutObjects}");
-                Clipboard.PasteObject(creatureroom, selfpos);
+                Clipboard.PasteObject(creatureroom, playerpos);
                 Console.WriteLine($"MySlugcat:PasteObject_C {Clipboard.cutObjects}");
                 Console.WriteLine("sh");*/
                 //return;
 
-                //self.bodyChunks[0].pos = (new Vector2(CV0.X, CV0.Y) + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                //self.bodyChunks[0].lastPos = (new Vector2(CV0.X, CV0.Y) + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                //self.bodyChunks[1].pos = (new Vector2(CV1.X, CV1.Y) + self.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                //self.bodyChunks[1].lastPos = (new Vector2(CV1.X, CV1.Y) + self.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
+                //player.bodyChunks[0].pos = (new Vector2(CV0.X, CV0.Y) + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                //player.bodyChunks[0].lastPos = (new Vector2(CV0.X, CV0.Y) + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                //player.bodyChunks[1].pos = (new Vector2(CV1.X, CV1.Y) + player.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                //player.bodyChunks[1].lastPos = (new Vector2(CV1.X, CV1.Y) + player.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
 
-#if MYDEBUG
-            try
-            {
-#endif
 
-                //creature.mainBodyChunk.pos = self.mainBodyChunk.pos;
-                //creature.mainBodyChunk.lastPos = self.mainBodyChunk.lastPos;
+
+                //creature.mainBodyChunk.pos = player.mainBodyChunk.pos;
+                //creature.mainBodyChunk.lastPos = player.mainBodyChunk.lastPos;
                 /*                for (int num12 = 0; num12 < 2; num12++)
                                 {
                                     creature.bodyChunks[num12].pos = (Pvector[num12] + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
@@ -427,25 +386,25 @@ namespace MySlugcat
                 //for (int num12 = 0; num12 < creature.bodyChunks.Count(); num12++)
                 //{
                 //    //creature.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
-                //    creature.bodyChunks[num12].pos = (self.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                //    creature.bodyChunks[num12].lastPos = (self.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                //    creature.bodyChunks[num12].pos = (player.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                //    creature.bodyChunks[num12].lastPos = (player.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
 
-                /*                    if (self.bodyChunks[num12].pos == null || self.bodyChunks[num12].lastPos == null)
+                /*                    if (player.bodyChunks[num12].pos == null || player.bodyChunks[num12].lastPos == null)
                                     {
-                                        creature.bodyChunks[num12].pos = (self.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                        creature.bodyChunks[num12].lastPos = (self.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                        creature.bodyChunks[num12].pos = (player.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                        creature.bodyChunks[num12].lastPos = (player.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                                     }
                                     else
                                     {
                                         try
                                         {
-                                            creature.bodyChunks[num12].pos = (self.bodyChunks[num12].pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                            creature.bodyChunks[num12].lastPos = (self.bodyChunks[num12].lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                            creature.bodyChunks[num12].pos = (player.bodyChunks[num12].pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                            creature.bodyChunks[num12].lastPos = (player.bodyChunks[num12].lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                                         }
                                         catch (Exception ex)
                                         {
-                                            creature.bodyChunks[num12].pos = (self.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                            creature.bodyChunks[num12].lastPos = (self.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                            creature.bodyChunks[num12].pos = (player.mainBodyChunk.pos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                            creature.bodyChunks[num12].lastPos = (player.mainBodyChunk.lastPos + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                                         }
                                     }*/
 
@@ -456,24 +415,11 @@ namespace MySlugcat
                 //creature.bodyChunks[1].pos = (new Vector2(PV1.X, PV1.Y) + creature.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 //creature.bodyChunks[1].lastPos = (new Vector2(PV1.X, PV1.Y) + creature.room.game.cameras[1].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
 
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
 
                 /*                for (int num12 = 0; num12 < 2; num12++)
                                 {
-                                    self.bodyChunks[num12].pos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                                    self.bodyChunks[num12].lastPos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                    player.bodyChunks[num12].pos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                                    player.bodyChunks[num12].lastPos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                                 }
                                 for (int num12 = 0; num12 < 2; num12++)
                                 {
@@ -481,19 +427,19 @@ namespace MySlugcat
                                     creature.bodyChunks[num12].lastPos = (Pvector[num12] + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                                 }*/
 
-                self.room.AddObject(new ExplosionSpikes(self.room, self.mainBodyChunk.pos + new Vector2(0, -10), 14, 30f, 9f, 7f, 170f, self.ShortCutColor()));
-                self.room.AddObject(new ShockWave(self.mainBodyChunk.pos + new Vector2(0, -10), 500f, 0.080f, 10, false));
+                player.room.AddObject(new ExplosionSpikes(player.room, player.mainBodyChunk.pos + new Vector2(0, -10), 14, 30f, 9f, 7f, 170f, player.ShortCutColor()));
+                player.room.AddObject(new ShockWave(player.mainBodyChunk.pos + new Vector2(0, -10), 500f, 0.080f, 10, false));
                 return creature;
             }
             return null;
 
 
-            if (100 > UnityEngine.Random.Range(0, 100) && 1 < self.room.abstractRoom.creatures.Count)
+            if (100 > UnityEngine.Random.Range(0, 100) && 1 < player.room.abstractRoom.creatures.Count)
             {
             RandomlySelected:
-                int num = UnityEngine.Random.Range(0, self.room.abstractRoom.creatures.Count);
-                //Creature creature = self.room.abstractRoom.creatures[num].realizedCreature;
-                creature = self.room.abstractRoom.creatures[num].realizedCreature;
+                int num = UnityEngine.Random.Range(0, player.room.abstractRoom.creatures.Count);
+                //Creature creature = player.room.abstractRoom.creatures[num].realizedCreature;
+                creature = player.room.abstractRoom.creatures[num].realizedCreature;
                 if (IncludePlayer)
                 {
                     //T
@@ -531,10 +477,10 @@ namespace MySlugcat
                     goto RandomlySelected;
                 }
 
-                /*              for (num = Random.Range(0, self.room.abstractRoom.creatures.Count); i < length; num = Random.Range(0, self.room.abstractRoom.creatures.Count))
+                /*              for (num = Random.Range(0, player.room.abstractRoom.creatures.Count); i < length; num = Random.Range(0, player.room.abstractRoom.creatures.Count))
                                 {
-                                    int num = Random.Range(0, self.room.abstractRoom.creatures.Count);
-                                    creature = self.room.abstractRoom.creatures[num].realizedCreature;
+                                    int num = Random.Range(0, player.room.abstractRoom.creatures.Count);
+                                    creature = player.room.abstractRoom.creatures[num].realizedCreature;
                                     var player1 = creature as Player;
                                     if (player1 == null)
                                     {
@@ -546,26 +492,26 @@ namespace MySlugcat
                 //Vector2 Pvector[] =
                 Vector2 CV0 = creature.bodyChunks[0].pos;
                 Vector2 CV1 = creature.bodyChunks[1].pos;
-                Vector2 PV0 = self.bodyChunks[0].pos;
-                Vector2 PV1 = self.bodyChunks[1].pos;
+                Vector2 PV0 = player.bodyChunks[0].pos;
+                Vector2 PV1 = player.bodyChunks[1].pos;
                 Vector2[] Cvector = new Vector2[] { CV0, CV1 };
                 Vector2[] Pvector = new Vector2[] { PV0, PV1 };
                 //creature.mainBodyChunk.pos
 
-                if (self.tongue != null)
+                if (player.tongue != null)
                 {
-                    self.tongue.resetRopeLength();
-                    self.tongue.mode = Player.Tongue.Mode.Retracted;
-                    self.tongue.rope.Reset();
+                    player.tongue.resetRopeLength();
+                    player.tongue.mode = Player.Tongue.Mode.Retracted;
+                    player.tongue.rope.Reset();
                 }
-                self.room.AddObject(new ExplosionSpikes(self.room, self.mainBodyChunk.pos, 14, 30f, 9f, 7f, 170f, creature.ShortCutColor()));
-                self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 500f, 0.080f, 10, false));
+                player.room.AddObject(new ExplosionSpikes(player.room, player.mainBodyChunk.pos, 14, 30f, 9f, 7f, 170f, creature.ShortCutColor()));
+                player.room.AddObject(new ShockWave(player.mainBodyChunk.pos, 500f, 0.080f, 10, false));
 
                 for (int num12 = 0; num12 < 2; num12++)
                 {
-                    //self.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
-                    self.bodyChunks[num12].pos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
-                    self.bodyChunks[num12].lastPos = (Cvector[num12] + self.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                    //player.bodyChunks[num12].vel = Custom.DegToVec(UnityEngine.Random.value * 360f) * 12f;
+                    player.bodyChunks[num12].pos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
+                    player.bodyChunks[num12].lastPos = (Cvector[num12] + player.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 }
                 for (int num12 = 0; num12 < 2; num12++)
                 {
@@ -574,25 +520,12 @@ namespace MySlugcat
                     creature.bodyChunks[num12].lastPos = (Pvector[num12] + creature.room.game.cameras[0].pos) * (RoomCamera.doubleZoomMode ? 0.5f : 1f);
                 }
 
-                self.room.AddObject(new ExplosionSpikes(self.room, self.mainBodyChunk.pos + new Vector2(0, -10), 14, 30f, 9f, 7f, 170f, self.ShortCutColor()));
-                self.room.AddObject(new ShockWave(self.mainBodyChunk.pos + new Vector2(0, -10), 500f, 0.080f, 10, false));
+                player.room.AddObject(new ExplosionSpikes(player.room, player.mainBodyChunk.pos + new Vector2(0, -10), 14, 30f, 9f, 7f, 170f, player.ShortCutColor()));
+                player.room.AddObject(new ShockWave(player.mainBodyChunk.pos + new Vector2(0, -10), 500f, 0.080f, 10, false));
                 return creature;
             }
             return null;
 
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
         //#nullable disable
 
@@ -625,20 +558,20 @@ namespace MySlugcat
             }
         }
 
-        public static Creature Player_Die(Player self)
+        public static Creature Player_Die(Player player)
         {
-            Creature creature = self;
-            if (((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && !self.dead && SC.FrameSkill)
+            Creature creature = player;
+            if (!player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 Log.Logger(7, "FrameDie", "MySlugcat:Frame​​Skill​​:Player_Die_st", $"");
 
-                Creature? obj = Frame​​Skill.Frame(self, false, self, 12);
+                Creature? obj = Frame​​Skill.Frame(player, false, player, 12);
 
                 Log.Logger(7, "FrameDie", "MySlugcat:Frame​​Skill​​:Player_Die_sh", $"Creature type: ({obj?.GetType()}), BodyChunks: ({obj?.bodyChunks?.Length}), Null ({obj == null})");
                 if (obj != null)
                 {
-                    self.dead = false;
-                    self.stun = 0;
+                    player.dead = false;
+                    player.stun = 0;
                     //obj.Die();
                     var hs = obj.State as HealthState;
                     if (hs != null)
@@ -653,23 +586,23 @@ namespace MySlugcat
 
 /*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            Console.WriteLine($"MySlugcat:Spear_HitSomething,{result.obj == null},{result.obj is not Player},{result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}");
+            Console.WriteLine($"MySlugcat:Spear_HitSomething,{result.obj == null},{result.obj is not Player},{result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}");
             if (result.obj == null)
             {
                 return false;
             }
             //如果被命中的不是玩家
-            if (result.obj is not Player self)
+            if (result.obj is not Player player)
                 return orig.Invoke(spear, result, eu);
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID)
+            if (player.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(spear, result, eu);
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
             Console.WriteLine("MySlugcat:Spear_HitSomething: st");
 
-            Creature obj = Frame(self, false, self);
+            Creature obj = Frame(player, false, player);
 
             Console.WriteLine($"MySlugcat:Spear_HitSomething: sh  Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}, {obj == null}");
 
@@ -696,14 +629,14 @@ namespace MySlugcat
 
         public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player self1 && self1.slugcatStats.name == Plugin.YourSlugID}), ({SC.FrameSkill})");
-            if (result.obj != null && result.obj is Player self && (self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.FrameSkill)
+            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({SC.FrameSkill})");
+            if (result.obj != null && result.obj is Player player && (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
                 Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_st", $"");
                 //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: st |");
 
-                Creature? obj = Frame(self, false, self);
+                Creature? obj = Frame(player, false, player);
 
                 //Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
                 Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_sh", $"Creature type ({obj?.GetType()}), BodyChunks ({obj?.bodyChunks?.Length}), Null ({obj == null})");
@@ -760,17 +693,17 @@ namespace MySlugcat
                 return false;
             }
             //如果被命中的不是玩家
-            if (result.obj is not Player self)
+            if (result.obj is not Player player)
                 return orig.Invoke(spear, result, eu);
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID)
+            if (player.slugcatStats.name != Plugin.YourSlugID)
                 return orig.Invoke(spear, result, eu);
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
             Console.WriteLine("MySlugcat:Spear_HitSomething: st");
 
-            Creature obj = Frame(self, false, self);
+            Creature obj = Frame(player, false, player);
 
             Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
 
@@ -796,17 +729,15 @@ namespace MySlugcat
         private static bool ScavengerBomb_HitSomething(On.ScavengerBomb.orig_HitSomething orig, ScavengerBomb bomb, SharedPhysics.CollisionResult result, bool eu)
         {
             //如果被命中的不是玩家
-            if (result.obj is not Player self)
+            if (result.obj is not Player player)
                 return orig.Invoke(bomb, result, eu);
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+            if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                 return orig.Invoke(bomb, result, eu);
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
                 return orig.Invoke(bomb, result, eu);
-            //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
 
-            Creature? obj = Frame(self, false, self);
+            Creature? obj = Frame(player, false, player);
             //bomb.thrownBy = null;
             //Creature obj = FindNearestCreature(bomb., Frameobj.room, false, null);
             if (obj != null)
@@ -816,14 +747,14 @@ namespace MySlugcat
                 Teleport.SetObjectPosition(bomb, creaturepos);
 
                 result.obj = obj;
-                self.stun = 0;
+                player.stun = 0;
             }
 
             bool resultbool = orig.Invoke(bomb, result, eu);
 
             if (obj != null)
             {
-                self.stun = 0;
+                player.stun = 0;
             }
 
             return resultbool;
@@ -831,34 +762,30 @@ namespace MySlugcat
 
         private static void Creature_Violence(On.Creature.orig_Violence orig, Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             if (hitChunk == null)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
             //如果被伤害的物体不是玩家则运行原程序
-            if (hitChunk.owner is not Player self)
+            if (hitChunk.owner is not Player player)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+            if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
             /*            //如果没有冰盾
                         if (pv.iceShieldList.Count == 0)
                         {
@@ -887,48 +814,35 @@ namespace MySlugcat
                     orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 else
                 {
-                    Creature? newobj2 = Frame(self, false, self);
+                    Creature? newobj2 = Frame(player, false, player);
                     if (newobj2 != null)
                     {
                         hitChunk.owner = newobj2;
                         //eggBug.Stun(10);
-                        self.stun = 0;
+                        player.stun = 0;
                     }
 
-                    //Frame(self, false, self);
+                    //Frame(player, false, player);
                     orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
-                    //self.stun = 0;
+                    //player.stun = 0;
                 }
                 return;
             }
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 hitChunk.owner = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
 
-            //Frame(self, false, self);
+            //Frame(player, false, player);
 
 
             //creature.Stun(10);
-            //Frame(self, false, self);
+            //Frame(player, false, player);
             //防止玩家被咬死
             orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Lizard_Bite(On.Lizard.orig_Bite orig, Lizard lizard, BodyChunk chunk)
@@ -939,45 +853,40 @@ namespace MySlugcat
                 orig.Invoke(lizard, chunk);
                 return;
             }
-            if (chunk.owner is not Player self)
+            if (chunk.owner is not Player player)
             {
                 orig.Invoke(lizard, chunk);
                 return;
             }
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+            if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(lizard, chunk);
                 return;
             }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(lizard, chunk);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 chunk.owner = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
 
             //lizard.Stun(10);
-            //Frame(self, false, self);
+            //Frame(player, false, player);
             orig.Invoke(lizard, chunk);
         }
 
         private static void DaddyLongLegs_Eat(On.DaddyLongLegs.orig_Eat orig, DaddyLongLegs daddyLongLegs, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
-
             if (!SC.FrameSkill)
             {
                 orig.Invoke(daddyLongLegs, eu);
@@ -991,26 +900,26 @@ namespace MySlugcat
                     continue;
                 if (obj.chunk.owner is Player)
                 {
-                    Player? self = obj.chunk.owner as Player;
-                    if (self == null)
+                    Player? player = obj.chunk.owner as Player;
+                    if (player == null)
                         continue;
-                    if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+                    if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                         continue;
-                    if (!SC.FrameSkill)
+                    if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
                         continue;
                     //取玩家变量
-                    GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+                    //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-                    Creature? newobj = Frame(self, false, self);
+                    Creature? newobj = Frame(player, false, player);
                     if (newobj != null)
                     {
                         obj.chunk.owner = newobj;
                         //eggBug.Stun(10);
-                        self.stun = 0;
+                        player.stun = 0;
                     }
 
                     //daddyLongLegs.Stun(10);
-                    //Frame(self, false, self);
+                    //Frame(player, false, player);
                     //removeList.Add(obj);
                 }
             }
@@ -1021,27 +930,10 @@ namespace MySlugcat
                                 p.grabChunk = null;
                         }*/
             orig.Invoke(daddyLongLegs, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Centipede_UpdateGrasp(On.Centipede.orig_UpdateGrasp orig, Centipede centipede, int g)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(centipede, g);
             if (centipede.grasps == null ||
                 centipede.grasps[g] == null)
@@ -1049,59 +941,41 @@ namespace MySlugcat
                 orig.Invoke(centipede, g);
                 return;
             }
-            if (centipede.grasps[g].grabbed is not Player self)
+            if (centipede.grasps[g].grabbed is not Player player)
             {
                 orig.Invoke(centipede, g);
                 return;
             }
             //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
+            if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
             {
                 orig.Invoke(centipede, g);
                 return;
             }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(centipede, g);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 centipede.grasps[g].grabbed = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
 
             orig.Invoke(centipede, g);
 
             //centipede.Stun(10);
-            //Frame(self, false, self);
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
+            //Frame(player, false, player);
         }
 
         private static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel bigEel)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             for (int j = 0; j < bigEel.room.physicalObjects.Length; j++)
             {
                 for (int num = bigEel.room.physicalObjects[j].Count - 1; num >= 0; num--)
@@ -1117,24 +991,24 @@ namespace MySlugcat
 
                             if (bigEel.room.physicalObjects[j][num] is Creature)
                             {
-                                if (bigEel.room.physicalObjects[j][num] is Player self)
+                                if (bigEel.room.physicalObjects[j][num] is Player player)
                                 {
                                     //如果玩家不是MySlugcat则运行原程序
-                                    if (((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && SC.FrameSkill)
+                                    if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
                                     {
                                         //取玩家变量
-                                        GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+                                        //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-                                        Creature? newobj = Frame(self, false, self);
+                                        Creature? newobj = Frame(player, false, player);
                                         if (newobj != null)
                                         {
                                             bigEel.room.physicalObjects[j][num] = newobj;
                                             //eggBug.Stun(10);
-                                            self.stun = 0;
+                                            player.stun = 0;
                                         }
 
                                         //bigEel.Stun(10);
-                                        //Frame(self, false, self);
+                                        //Frame(player, false, player);
                                     }
                                 }
                             }
@@ -1192,16 +1066,16 @@ namespace MySlugcat
 
                             if (bigEel.room.physicalObjects[j][num] is Creature)
                             {
-                                if (bigEel.room.physicalObjects[j][num] is Player self)
+                                if (bigEel.room.physicalObjects[j][num] is Player player)
                                 {
                                     //如果玩家不是MySlugcat则运行原程序
-                                    if (self.slugcatStats.name == Plugin.YourSlugID)
+                                    if (player.slugcatStats.name == Plugin.YourSlugID)
                                     {
                                         //取玩家变量
-                                        GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+                                        GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
                                         bigEel.Stun(10);
-                                        Frame(self, false, self);
+                                        Frame(player, false, player);
                                     }
                                     flag3 = true;
                                 }
@@ -1261,27 +1135,10 @@ namespace MySlugcat
                 bigEel.clampedObjects[l].chunk.owner.ChangeCollisionLayer(0);
                 bigEel.Crush(bigEel.clampedObjects[l].chunk.owner);
             }*/
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void TentaclePlant_Carry(On.TentaclePlant.orig_Carry orig, TentaclePlant tentaclePlant, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(tentaclePlant, eu);
             if (tentaclePlant.grasps == null ||
                 tentaclePlant.grasps[0] == null ||
@@ -1290,54 +1147,31 @@ namespace MySlugcat
                 orig.Invoke(tentaclePlant, eu);
                 return;
             }
-            if (tentaclePlant.grasps[0].grabbedChunk.owner is not Player self)
+            if (tentaclePlant.grasps[0].grabbedChunk.owner is not Player player)
             {
                 orig.Invoke(tentaclePlant, eu);
                 return;
             }
-            //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-            {
-                orig.Invoke(tentaclePlant, eu);
-                return;
-            }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(tentaclePlant, eu);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 tentaclePlant.grasps[0].grabbedChunk.owner = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
             orig.Invoke(tentaclePlant, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void PoleMimic_Carry(On.PoleMimic.orig_Carry orig, PoleMimic poleMimic, bool eu)
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //orig.Invoke(poleMimic, eu);
             if (poleMimic.grasps == null ||
                 poleMimic.grasps[0] == null ||
@@ -1346,33 +1180,27 @@ namespace MySlugcat
                 orig.Invoke(poleMimic, eu);
                 return;
             }
-            if (poleMimic.grasps[0].grabbedChunk.owner is not Player self)
+            if (poleMimic.grasps[0].grabbedChunk.owner is not Player player)
             {
                 {
                     orig.Invoke(poleMimic, eu);
                     return;
                 }
             }
-            //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-            {
-                orig.Invoke(poleMimic, eu);
-                return;
-            }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(poleMimic, eu);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 poleMimic.grasps[0].grabbedChunk.owner = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
                 for (int i = 0; i < poleMimic.stickChunks.Length; i++)
                 {
                     poleMimic.stickChunks[i] = null;
@@ -1380,19 +1208,6 @@ namespace MySlugcat
             }
 
             orig.Invoke(poleMimic, eu);
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void EggBug_CarryObject(On.EggBug.orig_CarryObject orig, EggBug eggBug, bool eu)
@@ -1405,32 +1220,26 @@ namespace MySlugcat
                 return;
             }
 
-            if (obj is not Player self)
+            if (obj is not Player player)
             {
                 orig.Invoke(eggBug, eu);
                 return;
             }
 
-            //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-            {
-                orig.Invoke(eggBug, eu);
-                return;
-            }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(eggBug, eu);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? newobj = Frame(self, false, self);
+            Creature? newobj = Frame(player, false, player);
             if (newobj != null)
             {
                 eggBug.grasps[0].grabbed = newobj;
                 //eggBug.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
             orig.Invoke(eggBug, eu);
         }
@@ -1450,39 +1259,33 @@ namespace MySlugcat
                 return;
             }
             //如果被伤害的物体不是玩家则运行原程序
-            if (vulture.grasps[0].grabbedChunk.owner is not Player self)
+            if (vulture.grasps[0].grabbedChunk.owner is not Player player)
             {
                 orig.Invoke(vulture);
                 return;
             }
-            //如果玩家不是MySlugcat则运行原程序
-            if (self.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
-            {
-                orig.Invoke(vulture);
-                return;
-            }
-            if (!SC.FrameSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(vulture);
                 return;
             }
             //取玩家变量
-            GlobalVar.playerVar.TryGetValue(self, out PlayerVar pv);
+            //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-            Creature? obj = Frame(self, false, self);
+            Creature? obj = Frame(player, false, player);
             if (obj != null)
             {
                 vulture.grasps[0].grabbedChunk.owner = null;
                 vulture.grasps[0].grabbedChunk.owner = obj;
                 vulture.grasps[0].grabbed = obj;
                 //vulture.Stun(10);
-                self.stun = 0;
+                player.stun = 0;
             }
             orig.Invoke(vulture);
 
             if (obj != null)
             {
-                self.stun = 0;
+                player.stun = 0;
             }
         }
 

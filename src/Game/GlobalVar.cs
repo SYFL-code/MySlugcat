@@ -1,4 +1,4 @@
-﻿using ImprovedInput;
+﻿/*using ImprovedInput;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace MySlugcat
         public static bool enableLoadData = false;
         //冰盾技能按键
         //public static readonly PlayerKeybind iceshield_skill = PlayerKeybind.Register("MySlugcat2:iceshield_skill", "theMySlugcat2", "Shield", KeyCode.S, KeyCode.Joystick1Button4);
-/*        public static bool IsPressedIceShield(Player player)
+*//*        public static bool IsPressedIceShield(Player player)
         {
             return CustomInputExt.IsPressed(player, iceshield_skill);
         }*/
@@ -45,7 +45,7 @@ namespace MySlugcat
         {
             //新剧情模式禁用冰盾能力
             MySlugcat2_iceshield_lock = true;
-        }*/
+        }*//*
     }
 }
-
+*/

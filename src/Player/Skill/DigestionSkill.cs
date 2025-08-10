@@ -34,43 +34,25 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             //On.Player.ctor += Player_ctor;
             On.Player.Update += Player_Update;
             On.Player.SwallowObject += Player_SwallowObject;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {
             orig(player, eu);
 
-            /*if (self.slugcatStats.name == Plugin.YourSlugID)
+            /*if (player.slugcatStats.name == Plugin.YourSlugID)
                         {
-                            if (self.objectInStomach.type == AbstractPhysicalObject.AbstractObjectType.Rock)
+                            if (player.objectInStomach.type == AbstractPhysicalObject.AbstractObjectType.Rock)
                             {
-                                if (self.FoodInStomach < self.MaxFoodInStomach - 1 || 
-                                    (self.FoodInStomach == self.MaxFoodInStomach - 1 && self.playerState.quarterFoodPoints <= 2))
+                                if (player.FoodInStomach < player.MaxFoodInStomach - 1 || 
+                                    (player.FoodInStomach == player.MaxFoodInStomach - 1 && player.playerState.quarterFoodPoints <= 2))
                                 {
-                                    self.objectInStomach = null;
-                                    self.AddQuarterFood();
-                                    self.AddQuarterFood();
+                                    player.objectInStomach = null;
+                                    player.AddQuarterFood();
+                                    player.AddQuarterFood();
                                 }
                             }
 
@@ -80,7 +62,7 @@ namespace MySlugcat
             Room room = player.room;
             float LightIntensity = Mathf.Pow(Mathf.Sin(burning[N] * 3.1415927f), 0.4f);
 
-            if (!SC.DigestionSkill)
+            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DigestionSkill)
             {
                 burning[N] = 0f;
             }
@@ -130,8 +112,8 @@ namespace MySlugcat
 
         public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
         {
-            Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
-            if (((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && SC.DigestionSkill)
+            //Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
+            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DigestionSkill)
             {
                 if (grasp < 0 || player.grasps[grasp] == null)
                 {

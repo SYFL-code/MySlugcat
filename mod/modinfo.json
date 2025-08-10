@@ -3,7 +3,7 @@
 	"name": "The accommodator",
 	"version": "0.1.0",
 	"authors": "LH",
-	"description": "An Iterator-modified biological specimen, deemed a failure, abandoned to barely cling to life alone in the wilds...<LINE>Life finds a way...",
+	"description": "Drifting from distant shores, bearing a broken body, wandering to this place.<LINE>Facing a cruel world, Life finds a way...",
 	"requirements": [ "slime-cubed.slugbase", "fisobs", "improved-input-config" ],
 	"requirements_names": [ "SlugBase", "Fisobs", "Improved Input Config: Extended" ],
 	"tags": [ "Custom Slugcat" ]

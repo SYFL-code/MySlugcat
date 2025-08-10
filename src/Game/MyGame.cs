@@ -18,11 +18,19 @@ namespace MySlugcat
         //解锁归乡门
         private static bool RegionGate_customOEGateRequirements(On.RegionGate.orig_customOEGateRequirements orig, RegionGate self)
         {
-            Player firstRealizedPlayer = self.room.game.FirstRealizedPlayer;
-            if (firstRealizedPlayer.slugcatStats.name == Plugin.YourSlugID)
+            if (!ModManager.MSC)
+            {
+                return false;
+            }
+
+            if (self.room.game.StoryCharacter == Plugin.YourSlugID)
+            {
                 return true;
+            }
             else
+            {
                 return orig.Invoke(self);
+            }
         }
     }
 }

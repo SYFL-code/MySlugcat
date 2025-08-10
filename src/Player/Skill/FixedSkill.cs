@@ -40,29 +40,11 @@ namespace MySlugcat
 
         public static void Hook()
         {
-#if MYDEBUG
-            try
-            {
-#endif
             On.Player.Update += Player_Update;
             On.Creature.Update += Creature_Update;
             On.Creature.Die += Creature_Die;
 
             On.RoomCamera.DrawUpdate += RoomCamera_DrawUpdate;
-
-#if MYDEBUG
-            }
-            catch (Exception e)
-            {
-                StackTrace st = new StackTrace(new StackFrame(true));
-                StackFrame sf = st.GetFrame(0);
-                var sr = sf.GetFileName().Split('\\');
-                MyDebug.outStr = sr[sr.Length - 1] + "\n";
-                MyDebug.outStr += sf.GetMethod() + "\n";
-                MyDebug.outStr += e;
-                UnityEngine.Debug.Log(e);
-            }
-#endif
         }
 
         private static void RoomCamera_DrawUpdate(On.RoomCamera.orig_DrawUpdate orig, RoomCamera rCamera, float timeStacker, float timeSpeed)
@@ -87,32 +69,32 @@ namespace MySlugcat
             }
         }
 
-        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {
-            orig(self, eu);
+            orig(player, eu);
 
-            if (((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)) && SC.FixedSkill)
+            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FixedSkill)
             {
-                //if ((self.input[0].pckp || self.input[0].mp) &&
-                //    self.input[0].y > 0 && self.playerState.foodInStomach > 2)
-                Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({self.input[0].pckp}), bool2 ({!self.input[1].pckp}), bool3 ({self.room.abstractRoom.creatures.Count > 0})");
-                if (self.input[0].pckp && !self.input[1].pckp && false)
+                //if ((player.input[0].pckp || player.input[0].mp) &&
+                //    player.input[0].y > 0 && player.playerState.foodInStomach > 2)
+                Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill​​:Player_Update_st", $"bool1 ({player.input[0].pckp}), bool2 ({!player.input[1].pckp}), bool3 ({player.room.abstractRoom.creatures.Count > 0})");
+                if (player.input[0].pckp && !player.input[1].pckp && false)
                 {
-                    //self.playerState.foodInStomach -= 2;
+                    //player.playerState.foodInStomach -= 2;
 
-                    //self.room.PlaySound(freezeCreature, self.mainBodyChunk);
+                    //player.room.PlaySound(freezeCreature, player.mainBodyChunk);
 
-                    Vector2 direction = self.input[0].x != 0 ? new Vector2(self.input[0].x, 0) : Vector2.right;
-                    Vector2 startPos = self.mainBodyChunk.pos;
+                    Vector2 direction = player.input[0].x != 0 ? new Vector2(player.input[0].x, 0) : Vector2.right;
+                    Vector2 startPos = player.mainBodyChunk.pos;
 
-                    if (self.room.abstractRoom.creatures.Count > 0)
+                    if (player.room.abstractRoom.creatures.Count > 0)
                     {
-                        foreach (AbstractCreature abstractCreature in self.room.abstractRoom.creatures)
+                        foreach (AbstractCreature abstractCreature in player.room.abstractRoom.creatures)
                         {
                             Creature c = abstractCreature.realizedCreature;
 
                             if (c == null ||             // 确保生物存在
-                                c == self ||             // 排除自身
+                                c == player ||             // 排除自身
                                 c.dead) // 确保有有效的mainBodyChunk
                             { continue; } // 跳过无效项，继续检查下一个
 
@@ -203,17 +185,17 @@ namespace MySlugcat
             frozenCreature.Remove(creature);
         }
 
-        private static void Creature_Update(On.Creature.orig_Update orig, Creature self, bool eu)
+        private static void Creature_Update(On.Creature.orig_Update orig, Creature creature, bool eu)
         {
-            orig(self, eu);
+            orig(creature, eu);
 
-            //if (self.slugcatStats.name == Plugin.YourSlugID)
-            if (frozenCreature.TryGetValue(self, out var freezeData))
+            //if (creature.slugcatStats.name == Plugin.YourSlugID)
+            if (frozenCreature.TryGetValue(creature, out var freezeData))
             {
                 freezeData.timer--;
                 if (freezeData.timer <= 0)
                 {
-                    UnfreezeCreature(self);
+                    UnfreezeCreature(creature);
                 }
 
                 // 更新粒子位置
@@ -227,7 +209,7 @@ namespace MySlugcat
                             Vector2 offset = Custom.RNV() * UnityEngine.Random.Range(10f, 30f);
 
                             // 设置粒子位置
-                            freezeData.particles[i].HardSetPos(self.mainBodyChunk.pos + offset);
+                            freezeData.particles[i].HardSetPos(creature.mainBodyChunk.pos + offset);
 
                             // 设置粒子半径
                             freezeData.particles[i].HardSetRad(UnityEngine.Random.Range(20f, 40f));
@@ -238,13 +220,13 @@ namespace MySlugcat
             }
         }
 
-        private static void Creature_Die(On.Creature.orig_Die orig, Creature self)
+        private static void Creature_Die(On.Creature.orig_Die orig, Creature creature)
         {
-            if (frozenCreature.ContainsKey(self))
+            if (frozenCreature.ContainsKey(creature))
             {
-                UnfreezeCreature(self);
+                UnfreezeCreature(creature);
             }
-            orig(self);
+            orig(creature);
         }
 
         private class FreezeData

@@ -1,7 +1,6 @@
 ﻿using On;
 using IL;
 using System;
-using System.Threading.Tasks;
 using Mono.Cecil;
 using MoreSlugcats;
 using RWCustom;
@@ -23,280 +22,195 @@ using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
 using System.Reflection;
 using System.Threading;
-//using static MySlugcat.VisionSystem;
+using Expedition;
 
 
 namespace MySlugcat
 {
-    // FSpriteControl 精灵控制中心
-
-    public class Control
+	// Control 控制中心
+	public class Control
     {
-        public static Player[] players = new Player[20];
-        public static int PlayersQuantity = 0;
-        public static int FailurePlayersQuantity = 0;
+		//private static bool StartRunning = true;
 
-        private static bool[] isStart = Enumerable.Repeat(true, 20).ToArray();
-        public static bool[] isRunning = Enumerable.Repeat(true, 20).ToArray();
-        private static float[] lastTime = Enumerable.Repeat(0f, 20).ToArray();
+		//public static List<string> ownedPassages = new List<string>(); // 已拥有的通行证
 
-        public static RainWorldGame? RWG;
-        public static Vector2 camPos = new Vector2(300f, 300f);
+		public static float pixelSize = 15f;          // 像素大小
+		public static float Alpha = 0.9f;             // 像素不透明度
 
+        public static bool AllPlayerSkill = false;
 
-        public static PointerFSprite[] pointer = new PointerFSprite[20];
+        /*public static bool[] PlayerDead = Enumerable.Repeat(false, 100).ToArray();
+        public static int PlayersQuantity = 0;*/
 
-        // 初始化视觉系统
-        /*public static VisionSystem visionSystem = new VisionSystem()
-        {
-            BaseVisionRadius = 120f,
-            BackgroundColor = new Color(0f, 0f, 0f, 0f)
-        };*/
+        /*public static int  MySlugcatStats = 0;        // 蛞蝓猫数据
+		public static bool Exhausted = true;          // 精疲力竭
 
+		public static bool Frame​​Skill = false;        // 嫁祸能力
+		public static bool Deflagration​​Skill = false; // 爆燃能力
+		public static bool KnitmeshSkill = false;     // 缠绕能力
+		public static bool PerceptionSkill = false;   // 感知能力
+		public static bool DigestionSkill = false;    // 暴食能力
+		public static bool FixedSkill = false;        // 定身能力*/
 
         public static void Hook()
+		{
+			//On.RainWorldGame.Update += RainWorldGame_Update;
+			On.Player.ctor += Player_ctor;
+            //On.Player.Update += Player_Update;
+		}
+
+        //private static readonly object lockObject = new object();
+        //private static int lockbool = 0;
+
+        private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
         {
-            On.Player.ctor += Player_ctor;
-            On.Player.Update += Player_Update;
-            On.RoomCamera.SpriteLeaser.Update += SLeaser_Update;
-            On.RainWorldGame.Update += RainWorldGame_Update;
+            orig.Invoke(player, abstractCreature, world);
+
+            if (Options.pixelSize != null && Options.pixelSize.Value != null)
+            {
+                pixelSize = Options.pixelSize.Value;
+            }
         }
 
-        private static readonly object _singletonLock = new object();
-        private static bool _isMainUpdateRunning = false;
-        private static bool Running = false;
-
-        public static void MainUpdate()
+        /*private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {
-            lock (_singletonLock)
+            orig.Invoke(player, eu);
+
+            if (player.dead)
             {
-                // 如果已经在运行，直接返回
-                if (_isMainUpdateRunning)
-                {
-                    Console.WriteLine("MainUpdate 已经在运行！");
-                    return;
-                }
-
-                _isMainUpdateRunning = true; // 标记为已运行
+                PlayerDead[player.playerState.playerNumber] = true;
             }
+        }*/
 
-            try
-            {
-                Console.WriteLine("MainUpdate 已经在运行！1");
-                // 真正的游戏循环
-                //var stopwatch = Stopwatch.StartNew();
-                //double targetFrameTime = 1000.0 / 40.0; // 40 FPS（每帧 = 25ms）
-                //double previousTime = 0;
-
-                while (_isMainUpdateRunning)// 用标志位控制退出
-                {
-                    //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_st1",
-                    //    $"({1})");
-
-                    //visionSystem.Update();
-
-                    int Failure = 0;
-                    for (int i = 0; i < 20; i++)
-                    {
-                        // 检查B是否停止 - 比如超过一定时间没有运行
-                        if (Time.time - lastTime[i] > 0.5f && !isStart[i])
-                        { // 0.5秒阈值
-                            isRunning[i] = false;
-                        }
-                        else
-                        {
-                            isRunning[i] = true;
-                        }
-
-                        if (isRunning[i] == false)
-                        {
-                            Failure += 1;
-                            if (pointer != null && pointer[i] != null && !pointer[i].slatedForDestroy)
-                            {
-                                pointer[i].Destroy();
-                            }
-                        }
-
-
-                        if (pointer != null && pointer[i] != null && !pointer[i].slatedForDestroy)
-                        {
-                            //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:MainUpdate_zh2",
-                            //    $"Null ({pointer[i].owner == null})");
-                            if (pointer[i].owner == null)
-                            {
-                                pointer[i].Destroy();
-                                pointer[i].slatedForDestroy = true;
-                            }
-                            else
-                            {
-                                //pointer[i].Update_(camPos);
-                                pointer[i].Update(i, false);
-                            }
-                        }
-                    }
-                    FailurePlayersQuantity = Failure;
-                    if (PlayersQuantity == FailurePlayersQuantity)
-                    {
-                        PlayersQuantity = 0;
-                        FailurePlayersQuantity = 0;
-
-                        isStart = Enumerable.Repeat(true, 20).ToArray();
-                        isRunning = Enumerable.Repeat(true, 20).ToArray();
-                        lastTime = Enumerable.Repeat(0f, 20).ToArray();
-
-                        /*for (int i = 0; i < visionSystem.VisionSpotsCount; i++)
-                        {
-                            visionSystem.RemoveVisionSpot(0);
-                        }
-                        visionSystem.Hide();*/
-                    }
-
-
-                    //double currentTime = stopwatch.Elapsed.TotalMilliseconds;
-                    //double deltaTime = currentTime - previousTime;
-
-                    //if (deltaTime >= targetFrameTime)
-                    //{
-
-                    //Update(deltaTime / 1000.0); // 传入 deltaTime（秒）
-                    //Render();
-                    //ProcessInput();
-
-                    //previousTime = currentTime;
-                    //}
-                    //else
-                    //{
-                    //    // 如果还没到下一帧，让出 CPU 时间
-                    //    Thread.Sleep(0);
-                    //}
-                }
-            }
-            finally
-            {
-                // 确保退出时释放标志位
-                _isMainUpdateRunning = false;
-            }
-
-        }
-
-        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
-        {
-            orig.Invoke(self, abstractCreature, world);
-
-            if (_isMainUpdateRunning == false)
-            {
-                Running = true;
-                Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
-            }
-
-            /*            if (_isMainUpdateRunning == false)
-                        {
-                            Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
-                        }*/
-        }
-
-        public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+        /*public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
         {
             orig(rainWorldGame);
 
-            RWG = rainWorldGame;
-        }
-
-        public static void SLeaser_Update(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self, float timeStacker, RoomCamera rCam, Vector2 cameraPos)
-        {
-            orig.Invoke(self, timeStacker, rCam, cameraPos);
-
-            camPos = cameraPos;
-
-
-            //Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:SLeaser_Update_1",
-            //    $"Null({update0 == null})");//
-
-
-
-            /*            for (int i = 0; i < 20; i++)
-                        {
-                            if (pointer[i] != null && !pointer[i].slatedForDestroy)
-                            {
-                                if (pointer[i].owner == null)
-                                {
-                                    pointer[i].Destroy();
-                                    pointer[i].slatedForDestroy = true;
-                                }
-                                else
-                                {
-                                    if (!pointer[i].slatedForDestroy)
-                                    {
-                                        pointer[i].Update_(camPos);
-                                        //pointer[i].Update(i, false);
-                                    }
-
-                                }
-                            }
-                        }*/
-
-        }
-
-        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-        {
-            orig(self, eu);
-
-            /*        if (self.slugcatStats.name == Plugin.YourSlugID && 1 == UnityEngine.Random.Range(0, 3000000) && update0 != null)
-                    {
-                        update0.N = 0;
-                        update0.i = UnityEngine.Random.Range(-46666, 30000);
-                    }*/
-
-            int N = self.playerState.playerNumber;
-            Vector2 pos = self.firstChunk.pos;
-
-            if (_isMainUpdateRunning == false && Running == false)
+            if (lockbool > 0)
             {
-                Running = true;
-                Task.Run(() => MainUpdate()); // 异步启动（避免阻塞）
-                //visionSystem.Show();
+                lockbool -= 1;
+            }
+        }*/
+
+
+        /*public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+		{
+			orig(rainWorldGame);
+
+			if (StartRunning)
+			{
+				if (Options.pixelSize != null && Options.pixelSize.Value != null)
+				{
+					pixelSize = Options.pixelSize.Value;
+				}
+
+                AllPlayerSkill = false;
+                MySlugcatStats = 0;
+                Exhausted = true;
+                Frame​​Skill = false;
+                Deflagration​​Skill = false;
+                KnitmeshSkill = false;
+                PerceptionSkill = false;
+                DigestionSkill = false;
+                FixedSkill = false;
+
+                StartRunning = false;
+			}
+		}*/
+
+
+        //private static int frameCounter = 0; // 帧计数器
+        //private const int N = 12000; // 每N帧执行一次（可调整）
+
+        /*private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+		{
+			orig.Invoke(player, eu);
+
+
+			// 每N帧执行一次自定义逻辑
+			if (++frameCounter >= N)
+			{
+				frameCounter = 0;
+                SetSkill(player);
             }
 
-            if ((self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.PerceptionSkill && isStart[N])
+
+			//player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState
+			//player.SessionRecord.
+		}*/
+
+        /*public static void SetSkill(Player player)
+		{
+            MySlugcatStats = 0;
+            Exhausted = true;
+
+            Frame​​Skill = false;
+            Deflagration​​Skill = false;
+            KnitmeshSkill = false;
+            PerceptionSkill = false;
+            DigestionSkill = false;
+            FixedSkill = false;
+
+            if (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)
             {
-                /*if (N == 0)
+                WinState winState = player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState;
+                ownedPassages = new List<string>();
+                bool Survivor = false;
+
+                if (winState != null && winState.endgameTrackers.Count > 0)
                 {
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < winState.endgameTrackers.Count; i++)
                     {
-                        if (pointer[i] != null && !pointer[i].slatedForDestroy)
+                        if (winState.endgameTrackers[i].GoalFullfilled)
                         {
-                            pointer[i].Destroy();
-                            pointer[i].slatedForDestroy = true;
+                            ownedPassages.Add(WinState.PassageDisplayName(winState.endgameTrackers[i].ID));
+                            if (ownedPassages[i] == "The Survivor")
+                            {
+                                PerceptionSkill = true;
+                                Survivor = true;
+                            }
                         }
                     }
-                }*/
-                PlayersQuantity += 1;
-                pointer[N] = new PointerFSprite(self);
-                pointer[N].slatedForDestroy = false;
-                // 添加常规可视点
-                /*visionSystem.AddVisionSpot(pos);
-                visionSystem.Show();*/
+                }
+
+                if (Survivor && ownedPassages != null && ownedPassages.Count > 0)
+                {
+                    for (int i = 0; i < ownedPassages.Count; i++)
+                    {
+                        if (ownedPassages[i] == "The Outlaw")//"暴徒"
+                        {
+							Deflagration​​Skill = true;
+                        }
+
+                    }
+                }
+
+
+
+                //player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState
+                //player.SessionRecord.
             }
+        }*/
 
-            // 动态移动第一个点
-            /*var secondSpot = visionSystem.GetVisionSpot(N);
-            if (secondSpot != null)
-            {
-                secondSpot.TargetPosition = pos; // 向右移动
-            }*/
 
-            players[N] = self;
-            lastTime[N] = Time.time;
-            isStart[N] = false;
-
-            if (pointer != null && pointer[N] != null && !pointer[N].slatedForDestroy && (self.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
-            {
-                //pointer[N].start = true;
-                //pointer[N].i = pointer[N].lasti;
-                //pointer[N].Update(N, false);
-            }
-        }
+        //"The Survivor"        //"求生者"
+        //"The Hunter"          //"猎手"
+        //"The Saint"           //"圣徒"
+        //"The Wanderer"        //"漫游者"
+        //"The Chieftain"       //"酋长"
+        //"The Monk"            //"僧侣"
+        //"The Outlaw"          //"暴徒"
+        //"The Dragon Slayer"   //"屠龙者"
+        //"The Scholar"         //"学者"
+        //"The Friend"          //"朋友"
+        // ModManager.MSC
+        //"The Nomad"           //"流浪者"
+        //"The Martyr"          //"殉道者"
+        //"The Pilgrim"         //"朝圣者"
+        //"The Mother"          //"慈母"
+        //
 
 
     }
 }
+

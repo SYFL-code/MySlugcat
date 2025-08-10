@@ -1,4 +1,4 @@
-﻿using On;
+﻿/*using On;
 using IL;
 using System;
 using System.Threading.Tasks;
@@ -109,14 +109,14 @@ public class PointerFSprite
 			pointerMesh.anchorX = 0.5f;
 			pointerMesh.anchorY = 0.5f; // 中心锚点便于旋转
 
-			/*pointerSprite = new FSprite("pixel")
+			*//*pointerSprite = new FSprite("pixel")
 			{
 				scaleX = PointerWidth,
 				scaleY = PointerLength,
 				color = Color.green,
 				anchorX = 0.5f,
 				anchorY = 0f // 中心锚点
-			};*/
+			};*//*
 
 			// 3. 创建圆环背景
 			circleSprite = new FSprite("Circle20")
@@ -200,7 +200,7 @@ public class PointerFSprite
 		}
 	}
 
-	/*public void Update_(Vector2 camPos)
+	*//*public void Update_(Vector2 camPos)
 	{
 		Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update__st",
 			$"({owner == null})");
@@ -216,7 +216,7 @@ public class PointerFSprite
 
 		camX = camPos.x;
 		camY = camPos.y;
-	}*/
+	}*//*
 
 	public void Update(int N, bool Destroy)
 	{
@@ -242,7 +242,7 @@ public class PointerFSprite
 				return;
 			}
 		}
-		/*if (Control.camPos != null)
+		*//*if (Control.camPos != null)
 		{
 			camX = Control.camPos.x;
 			camY = Control.camPos.y;
@@ -300,7 +300,7 @@ public class PointerFSprite
 						this.Destroy();
 						return;
 					}
-				}*/
+				}*//*
 
 		if (!Control.isRunning[N])
 		{
@@ -383,7 +383,7 @@ public class PointerFSprite
 		Log.Logger(7, "PerceptionSkill", "MySlugcat:CreaturePointer:Update_st",
 			$"渐变状态: fadeState={fadeState}, alpha={currentAlpha}, isActive={isActive}");
 
-		/*        // 淡入淡出控制
+		*//*        // 淡入淡出控制
 				fadeState += (isActive ? FadeSpeed : -FadeSpeed) * timeStacker;
 				fadeState = Mathf.Clamp01(fadeState);
 				pointerContainer.alpha = EaseInOut(fadeState); // 使用缓动函数使过渡更平滑
@@ -391,7 +391,7 @@ public class PointerFSprite
 				//circleSprite.alpha = EaseInOut(fadeState) * (0.9f + EaseInOut(fadeState) * 0.2f);
 
 				// 淡入淡出圆环动画
-				circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);*/
+				circleSprite.scale = (CircleRadius / 20f) * (0.9f + EaseInOut(fadeState) * 0.2f);*//*
 
 		// 如果没有激活或完全透明，跳过更新
 		if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
@@ -431,9 +431,9 @@ public class PointerFSprite
 		Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
 		//Vector2 pointerScreenPos = ownerScreenPos + worldDirection * CircleRadius / 3 * 2;
 
-		/*        // 5. 更新指针位置(公转)
+		*//*        // 5. 更新指针位置(公转)
 				Vector2 pointerScreenPos = ownerScreenPos + orbitOffset;
-				pointerMesh.SetPosition(pointerScreenPos);*/
+				pointerMesh.SetPosition(pointerScreenPos);*//*
 
 		// 更新指针位置和旋转
 		pointerContainer.SetPosition(ownerScreenPos);
@@ -443,8 +443,8 @@ public class PointerFSprite
 		Vector2 pointerOffset = Custom.DegToVec(currentAngle) * 30f;
 		pointerMesh.SetPosition(pointerOffset);
 
-		/*// 保持指针固定朝向(指向目标)
-		pointerMesh.rotation = targetAngle;*/
+		*//*// 保持指针固定朝向(指向目标)
+		pointerMesh.rotation = targetAngle;*//*
 
 		//pointerMesh.rotation = targetAngle;
 
@@ -453,7 +453,7 @@ public class PointerFSprite
 
 
 
-		/*        // 计算指向目标的角度
+		*//*        // 计算指向目标的角度
 				float targetAngle = Custom.VecToDeg(targetPos - ownerPos);
 
 				// 平滑旋转
@@ -468,18 +468,18 @@ public class PointerFSprite
 				// 更新指针旋转时使用pointerMesh代替pointerSprite
 				pointerMesh.rotation = currentAngle;
 				//pointerMesh.SetPosition(pos);//
-				circleSprite.SetPosition(camPos);*/
+				circleSprite.SetPosition(camPos);*//*
 
 
 		// 危险程度指示(根据生物类型)
-		/*if (owner.room != null)
+		*//*if (owner.room != null)
 		{
 			float threatLevel = CalculateThreatLevel(target);
 			pointerSprite.alpha = 0.5f + threatLevel * 0.5f;
 
 			// 危险时增加脉冲强度
 			SetPulseEffect(3f, 0.1f + threatLevel * 0.3f);
-		}*/
+		}*//*
 
 		// 目标接近时震动效果
 		float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
@@ -493,7 +493,7 @@ public class PointerFSprite
 		float Lerp = Mathf.Clamp01(distance / maxDistance);
 		pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
 
-		/*// 更新光效位置
+		*//*// 更新光效位置
 		for (int i = 0; i < glowEffects.Count; i++)
 		{
 			float offsetAngle = radianAngle + i * Mathf.PI * 0.66f;
@@ -505,9 +505,9 @@ public class PointerFSprite
 			glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
 			glowEffects[i].setAlpha = 0.7f;
 			glowEffects[i].color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
-		}*/
+		}*//*
 		// 更新发光效果位置(跟随公转)
-		/*for (int i = 0; i < glowEffects.Count; i++)
+		*//*for (int i = 0; i < glowEffects.Count; i++)
 		{
 			Vector2 lightPos = ownerWorldPos + orbitOffset * 1.2f; // 稍微远离中心
 			glowEffects[i].pos = lightPos;
@@ -515,7 +515,7 @@ public class PointerFSprite
 			glowEffects[i].setRad = 30f + Mathf.Sin(Time.time * 2f + i) * 10f;
 			glowEffects[i].setAlpha = 0.7f;
 			glowEffects[i].color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
-		}*/
+		}*//*
 
 		// 脉冲动画
 		float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
@@ -589,4 +589,4 @@ public class PointerFSprite
 
 
 
-}
+}*/

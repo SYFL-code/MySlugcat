@@ -56,6 +56,7 @@ namespace MySlugcat
             //Exhausted.Hook();
             Control.Hook();
 			VisionSystem.Hook();
+			Key.Hook();
 			//Perception.Hook();
 			//IntelHUD.Hook();
 			//PointerSkillHook.Hook();

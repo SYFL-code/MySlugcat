@@ -12,7 +12,47 @@ namespace MySlugcat
 	public class Health
 	{
 
-		public static void ReviveCreature(PhysicalObject obj)
+        public static void KillCreature(RainWorldGame game, PhysicalObject obj)
+        {
+            if (!(obj is Creature))
+            {
+                return;
+            }
+            // 当使用工具杀死生物时，将杀死标记设置为第一个玩家，这样生物可以传承。\n不通过击杀而销毁生物不会产生传承。
+            /*Configurable<bool> lineageKill = Options.lineageKill;
+            if (lineageKill != null && lineageKill.Value && ((game != null) ? game.FirstAlivePlayer : null) != null)
+            {
+                (obj as Creature).SetKillTag(game.FirstAlivePlayer);
+            }*/
+			if (obj is Creature creature)
+			{
+                creature.Die();
+                AbstractCreature abstractCreature = creature.abstractCreature;
+                if (((abstractCreature != null) ? abstractCreature.state : null) is HealthState healthState)
+                {
+                    healthState.health = 0f;
+                }
+                // 使用此工具击杀精英拾荒者或秃鹫会释放它们的面具。
+                //Configurable<bool> killReleasesMask = Options.killReleasesMask;
+                //if (killReleasesMask != null && killReleasesMask.Value)
+                if (true)
+                {
+                    if (obj is Scavenger scavenger && scavenger.Elite)
+                    {
+                        scavenger.Violence(obj.firstChunk, null, obj.firstChunk, null, Creature.DamageType.Stab, 0f, 0f);
+                    }
+                    Vulture? vulture = obj as Vulture;
+                    if (vulture == null)
+                    {
+                        return;
+                    }
+                    vulture.DropMask(default(Vector2));
+                }
+            }
+
+        }
+
+        public static void ReviveCreature(PhysicalObject obj)
 		{
 			if (!(obj is Creature))
 			{
@@ -40,9 +80,10 @@ namespace MySlugcat
 				creature.Hypothermia = 0f;
 				creature.HypothermiaExposure = 0f;
 				creature.injectedPoison = 0f;
-				//Configurable<bool> healLimbs = Options.healLimbs;//***
-				//if (healLimbs == null || healLimbs.Value)//***
-				if (true)
+                // 使用工具治疗或复活生物也可以治疗它们的四肢/翅膀/触手。
+                //Configurable<bool> healLimbs = Options.healLimbs;//***
+                //if (healLimbs == null || healLimbs.Value)//***
+                if (true)
 				{
 					if (abstractCreature.state is LizardState lizardState)
 					{
@@ -173,9 +214,10 @@ namespace MySlugcat
 				}*/
 				if (obj is Player player)
 				{
-					//Configurable<bool> exitGameOverMode = Options.exitGameOverMode;
-					//if ((exitGameOverMode == null || exitGameOverMode.Value) && !player.isNPC)
-					if (true && !player.isNPC)
+                    // 当复活玩家时尝试退出 "游戏结束模式" 。可能与其他一些模块不兼容。
+                    //Configurable<bool> exitGameOverMode = Options.exitGameOverMode;
+                    //if ((exitGameOverMode == null || exitGameOverMode.Value) && !player.isNPC)
+                    if (true && !player.isNPC)
 					{
 						int num12 = 0;
 						for (; ; )

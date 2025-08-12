@@ -14,57 +14,118 @@ namespace MySlugcat
 {
 	internal class Zname
 	{
-        private static readonly string dnSpy = "In fact, this is open source. 其实这是开源的. Code at https://github.com/SYFL-code/MySlugcat";
-        private static float zname;
+		private static readonly string dnSpy = "In fact, this is open source. 其实这是开源的. Code at https://github.com/SYFL-code/MySlugcat";
+		private static float zname;
 
-        /*//*/
+		/*//*/
 
-        /// <summary>
-        /// 其他
-        /// </summary>
-        private static void 其他()
+		/// <summary>
+		/// 其他
+		/// </summary>
+		private static void 其他()
 		{
-            /*ArtificialIntelligence self = creature.abstractCreature.abstractAI.RealAI;
+			try
+			{
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			/*ArtificialIntelligence self = creature.abstractCreature.abstractAI.RealAI;
 
 Player player;
 foreach (AbstractCreature ac in self.creature.world.game.Players)
 {
-    if (ac.realizedCreature is Player && player.slugcatStats.name == Plugin.YourSlugID)
-    {
-        player = (Player)ac.realizedCreature;
-        if (self is LizardAI ai &&
-            ai.lizard.Template.type == CreatureTemplate.Type.CyanLizard &&
-            player.room == self.creature.Room.realizedRoom)
-        {
-            Lizard cyanLizard = ai.lizard;
-            cyanLizard.abstractCreature.world.game.session.creatureCommunities.
-                SetLikeOfPlayer(cyanLizard.abstractCreature.creatureTemplate.communityID,
-                cyanLizard.abstractCreature.world.RegionNumber,
-                (player.State as PlayerState).playerNumber,
-                -1.0f);
-            //self.tracker.SeeCreature(player.abstractCreature);
-        }
-    }
+	if (ac.realizedCreature is Player && player.slugcatStats.name == Plugin.YourSlugID)
+	{
+		player = (Player)ac.realizedCreature;
+		if (self is LizardAI ai &&
+			ai.lizard.Template.type == CreatureTemplate.Type.CyanLizard &&
+			player.room == self.creature.Room.realizedRoom)
+		{
+			Lizard cyanLizard = ai.lizard;
+			cyanLizard.abstractCreature.world.game.session.creatureCommunities.
+				SetLikeOfPlayer(cyanLizard.abstractCreature.creatureTemplate.communityID,
+				cyanLizard.abstractCreature.world.RegionNumber,
+				(player.State as PlayerState).playerNumber,
+				-1.0f);
+			//self.tracker.SeeCreature(player.abstractCreature);
+		}
+	}
 }
 
 creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
-    (creature.abstractCreature.creatureTemplate.communityID, creature.abstractCreature.world.RegionNumber, (player.State as PlayerState).playerNumber, 1.0f);*/
+	(creature.abstractCreature.creatureTemplate.communityID, creature.abstractCreature.world.RegionNumber, (player.State as PlayerState).playerNumber, 1.0f);*/
 
-            /*if (PlayerModuleManager.playerModules.TryGetValue(self, out var module))
-            {
-                module.Hungry_Update(self);
-            }*/
+			/*if (PlayerModuleManager.playerModules.TryGetValue(self, out var module))
+			{
+				module.Hungry_Update(self);
+			}*/
+		}
+
+		private static void AI_Behavior()
+		{
+			//ScavengerAI.Behavior.Attack;                  // 攻击
+			//ScavengerAI.Behavior.CommunicateWithPlayer;   // 与玩家交流
+			//ScavengerAI.Behavior.EscapeRain;              // 避雨
+			//ScavengerAI.Behavior.FindPackLeader;          // 寻找首领
+			//ScavengerAI.Behavior.Flee;                    // 逃跑
+			//ScavengerAI.Behavior.GuardOutpost;            // 守卫前哨
+			//ScavengerAI.Behavior.Idle;                    // 待机
+			//ScavengerAI.Behavior.Injured;                 // 受伤
+			//ScavengerAI.Behavior.Investigate;             // 调查
+			//ScavengerAI.Behavior.LeaveRoom;               // 离开房间
+			//ScavengerAI.Behavior.Scavange;                // 搜刮
+			//ScavengerAI.Behavior.Travel;                  // 移动
+
+			//LizardAI.Behavior.ActingOutMission;  // 执行使命?
+			//LizardAI.Behavior.EscapeRain;        // 避雨
+			//LizardAI.Behavior.Fighting;          // 战斗
+			//LizardAI.Behavior.Flee;              // 逃离 逃跑
+			//LizardAI.Behavior.FollowFriend;      // 跟随伙伴 跟随朋友
+			//LizardAI.Behavior.Frustrated;        // 受挫 沮丧
+			//LizardAI.Behavior.GoToSpitPos;       // 前往喷射点 吐口水
+			//LizardAI.Behavior.Hunt;              // 狩猎
+			//LizardAI.Behavior.Idle;              // 待机
+			//LizardAI.Behavior.Injured;           // 受伤
+			//LizardAI.Behavior.InvestigateSound;  // 调查声响
+			//LizardAI.Behavior.Lurk;              // 潜伏
+			//LizardAI.Behavior.ReturnPrey;        // 带回猎物 返回猎物 归还猎物
+			//LizardAI.Behavior.Travelling;        // 移动 旅行
+		}
+
+		private static void CreatureTemplate_Relationship_Type()
+		{
+            //CreatureTemplate.Relationship.Type.Afraid;              // 害怕
+            //CreatureTemplate.Relationship.Type.AgressiveRival;      // 敌对竞争者
+            //CreatureTemplate.Relationship.Type.Antagonizes;         // 挑衅
+            //CreatureTemplate.Relationship.Type.Attacks;             // 攻击
+            //CreatureTemplate.Relationship.Type.DoesntTrack;         // 不追踪
+            //CreatureTemplate.Relationship.Type.Eats;                // 捕食
+            //CreatureTemplate.Relationship.Type.Ignores;             // 忽视
+            //CreatureTemplate.Relationship.Type.Pack;                // 群居
+            //CreatureTemplate.Relationship.Type.PlaysWith;           // 与之玩耍
+            //CreatureTemplate.Relationship.Type.SocialDependent;     // 社交依赖
+            //CreatureTemplate.Relationship.Type.StayOutOfWay;        // 避而远之
+            //CreatureTemplate.Relationship.Type.Uncomfortable;       // 感到不适
+
+            //CreatureTemplate.Relationship.Type.valueDictionary;     // 值字典
+            //CreatureTemplate.Relationship.Type.values;              // 值集合
+            //CreatureTemplate.Relationship.Type.valuesVersion;       // 值版本
+
         }
 
-        private static void MOD启用()
+		private static void MOD启用()
 		{
-            //ModManager.ActiveMods             //激活Mods
-            //ModManager.InstalledMods          //已存在的Mods
-            //ModManager.FailedRequirementIds   //需求ID失败的Mods
-            //ModManager.PrePackagedModIDs      //预包装ModsID
+			//ModManager.ActiveMods             //激活Mods
+			//ModManager.InstalledMods          //已存在的Mods
+			//ModManager.FailedRequirementIds   //需求ID失败的Mods
+			//ModManager.PrePackagedModIDs      //预包装ModsID
 
 
-            if (ModManager.GameVersionChangedOnThisLaunch)
+			if (ModManager.GameVersionChangedOnThisLaunch)
 			{
 				//游戏版本在这次发布中发生了变化
 			}
@@ -76,19 +137,19 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			{
 				//初始化屏幕完成
 			}
-            if (ModManager.MSC)
-            {
-                //更多蛞蝓猫?_1
-            }
-            if (ModManager.MMF)
-            {
-                //更多蛞蝓猫?_2
-            }
-            if (ModManager.CoopAvailable)
+			if (ModManager.MSC)
 			{
-                //联机模式是否可用?
-            }
-            if (ModManager.JollyCoop)
+				//更多蛞蝓猫?_1
+			}
+			if (ModManager.MMF)
+			{
+				//更多蛞蝓猫?_2
+			}
+			if (ModManager.CoopAvailable)
+			{
+				//联机模式是否可用?
+			}
+			if (ModManager.JollyCoop)
 			{
 				//联机模式
 			}
@@ -100,7 +161,7 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			{
 				//开发者工具
 			}
-            if (ModManager.Watcher)
+			if (ModManager.Watcher)
 			{
 				//观望者
 			}
@@ -130,6 +191,45 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 
 		private static void 着色器()
 		{
+			//Basic 默认无特效，最普通的纹理绘制
+			//Hologram 全息 / 幽灵：带扫描线、轻微噪点、半透明
+			//LightSource 发光体：把贴图当作光源，周围产生光晕
+			//Water 水流：波纹扭曲、折射
+			//Waterfall 瀑布：比
+			//Water 更剧烈的扭曲和滚动
+			//LensDistortion 镜头畸变：边缘放大、中心收缩的“鱼眼”效果
+			//Blur 高斯模糊
+			//Fog 雾：颜色叠加 + 深度雾
+			//Fire 火焰：滚动噪声、红黄调色
+			//HeatDistortion 热扭曲：透过火焰看背景时的空气抖动
+			//Lightning 闪电：高亮、闪烁
+			//Rain 雨滴：垂直条纹 + 滚动
+			//Sand 沙：细小滚动的颗粒
+			//Scavenger 拾荒者盔甲：金属高光、反射贴图
+			//Slugcat 蛞蝓猫：边缘描边（用于雨眠过场）
+			//SkyAndPressureGradient 天空：日夜颜色渐变
+			//Bloom 泛光：高亮区域向外晕染
+			//Multiply 正片叠底：将贴图与背景颜色相乘
+
+			//Grayscale 去色：变黑白
+			// 把精灵的所有颜色信息强行转成灰度亮度，只保留明暗关系。
+
+			//Palette 调色板映射：把灰度贴图按当前房间调色板重新上色  
+			// 把一张灰度贴图按当前房间的 调色板（palette） 重新上色。
+			// 灰度值 0 → 调色板最暗色
+			// 灰度值 1 → 调色板最亮色
+			// 介于 0~1 之间 → 插值颜色
+
+			//Shadow 阴影：半透明黑色 + 模糊
+			//Ice 冰：高光 + 反射 + 轻微扭曲
+			//Centipede 蜈蚣：节段滚动纹理
+			//Vulture 秃鹫：金属 + 虹彩
+			//JetFish 喷气鱼：带流线滚动
+			//SmallNeedleWorm 针虫：皮肤光泽
+			//TubeWorm 管虫：内部发光
+			//Lantern 灯笼：中心黄白光晕
+			//Overseer 观察者：脉冲扫描线 + 发光
+			//Glow 纯粹发光，可用于 UI 或特效
 
 			//Basic 基础
 
@@ -820,9 +920,9 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			//9cf0a4/363636
 		}
 
-        /*//*/
+		/*//*/
 
 
-        /*//*/
-    }
+		/*//*/
+	}
 }

@@ -141,20 +141,96 @@ internal static class PlayerHooks
 		On.Player.ctor += Player_ctor;
 		On.Player.Update += Player_Update;
 		On.Creature.Update += Creature_Update;
-		On.PlayerGraphics.InitiateSprites += PlayerGraphicsOnInitiateSprites;
+		On.LizardGraphics.DrawSprites += LizardGraphics_DrawSprites;
+		On.ScavengerGraphics.DrawSprites += ScavengerGraphics_DrawSprites;
+		//On.PlayerGraphics.InitiateSprites += PlayerGraphicsOnInitiateSprites;
 	}
 
-	private static void PlayerGraphicsOnInitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+	private static void LizardGraphics_DrawSprites(On.LizardGraphics.orig_DrawSprites orig, LizardGraphics lizardGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
 	{
-		orig(self, sLeaser, rCam);
+		orig(lizardGraphics, sLeaser, rCam, timeStacker, camPos);
 
 		if (!rCam.room.game.DEBUGMODE)
 		{
-			for (int ghostSprite = 0; ghostSprite < 9; ghostSprite++)
+			if (PlayerModuleManager.UndeadCreatures.Count > 0)
 			{
-				sLeaser.sprites[ghostSprite].shader = rCam.game.rainWorld.Shaders["BallToy"];
-				sLeaser.sprites[ghostSprite].alpha = 0.95f;
+				foreach (WeakReference<Creature> weakCreatureRef in PlayerModuleManager.UndeadCreatures)
+				{
+					Creature creature1;
+					if (weakCreatureRef.TryGetTarget(out creature1))
+					{
+						Creature creature = lizardGraphics.lizard;
+						if (creature1 != null && creature1 == creature)
+						{
+
+							if (creature is Lizard || creature is Scavenger)
+							{
+								try
+								{
+									for (int i = 0; i < sLeaser.sprites.Length; i++)
+									{
+										sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders["GhostDistortion"];
+										sLeaser.sprites[i].alpha = 0.8f;
+										//sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders["GhostSkin"];
+										//sLeaser.sprites[i].alpha = 0.95f;
+									}
+								}
+								catch (Exception e)
+								{
+									Debug.LogException(e);
+								}
+							}
+						}
+					}
+				}
 			}
+
+
+
+		}
+	}
+
+	private static void ScavengerGraphics_DrawSprites(On.ScavengerGraphics.orig_DrawSprites orig, ScavengerGraphics scavengerGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+	{
+		orig(scavengerGraphics, sLeaser, rCam, timeStacker, camPos);
+
+		if (!rCam.room.game.DEBUGMODE)
+		{
+			if (PlayerModuleManager.UndeadCreatures.Count > 0)
+			{
+				foreach (WeakReference<Creature> weakCreatureRef in PlayerModuleManager.UndeadCreatures)
+				{
+					Creature creature1;
+					if (weakCreatureRef.TryGetTarget(out creature1))
+					{
+						Creature creature = scavengerGraphics.scavenger;
+						if (creature1 != null && creature1 == creature)
+						{
+
+							if (creature is Lizard || creature is Scavenger)
+							{
+								try
+								{
+									FContainer container = new FContainer();
+									//container.shader
+									for (int i = 0; i < sLeaser.sprites.Length; i++)
+									{
+										//sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders["GhostSkin"];
+										sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders["GhostSkin"];
+										sLeaser.sprites[i].alpha = 0.8f;
+									}
+								}
+								catch (Exception e)
+								{
+									Debug.LogException(e);
+								}
+							}
+						}
+					}
+				}
+			}
+
+
 
 		}
 	}
@@ -181,13 +257,19 @@ internal static class PlayerHooks
 	}
 
 	/// <summary>
-	/// 随机查找当前房间的非亡灵生物
+	/// 查找当前房间中距离自身最近的非亡灵生物
 	/// </summary>
-	public static Creature? RandomlySelectedUnUndeadCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
+	public static Creature? RandomlySelectedUnUndeadCreature(Vector2 selfPos, Room room, bool IncludePlayer, Creature? creature, bool IncludeDeadCreature, int select)
 	{
-		List<Creature> UnUnCreatures = new List<Creature>();
+		Creature? nearest = null;        // 最近非亡灵生物对象
+		float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
+		//List<Creature> UnUnCreatures = new List<Creature>();
 
 		if (!(room.abstractRoom.creatures.Count > 0))
+		{
+			return null;
+		}
+		if (selfPos == null || room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || room.abstractRoom.creatures.Count == null || !(room.abstractRoom.creatures.Count > 0))
 		{
 			return null;
 		}
@@ -212,7 +294,11 @@ internal static class PlayerHooks
 			{
 				continue; // 跳过无效项，继续检查下一个
 			}
-			if (Extension.DisabledCreature(c))// 禁用生物
+			if (Extension.DisabledCreature(c) && select == 1)// 禁用生物
+			{
+				continue; // 跳过无效项，继续检查下一个
+			}
+			if (Extension.HarmlessCreature(c) && select == 2)// 无害生物
 			{
 				continue; // 跳过无效项，继续检查下一个
 			}
@@ -224,117 +310,233 @@ internal static class PlayerHooks
 			{
 				continue; // 跳过无效项，继续检查下一个
 			}
-			UnUnCreatures.Add(c);
+			// 计算位置差（目标位置 - 自身位置）
+			Vector2 offset = c.mainBodyChunk.pos - selfPos;
+			// 计算平方距离（比Vector2.Distance更高效）
+			float sqrDistance = offset.sqrMagnitude;
+
+			// 检查是否为更近的生物
+			if (sqrDistance < minSqrDistance)
+			{
+				// 更新最近生物和最小距离记录
+				minSqrDistance = sqrDistance;
+				nearest = c;
+			}
 		}
 
-		if (UnUnCreatures.Count == 0)
+		if (nearest == null)
 		{
 			Console.WriteLine("RandomlySelectedUnUndeadCreature: No UnUndeadCreatures found");
 			return null;
 		}
-		return UnUnCreatures[UnityEngine.Random.Range(0, UnUnCreatures.Count)];
+		return nearest; // 返回最近生物（可能为null）
 	}
 
 	private static void Creature_Update(On.Creature.orig_Update orig, Creature creature, bool eu)
 	{
+		bool isUndeadCreature = false;
+		if (PlayerModuleManager.UndeadCreatures.Count > 0)
+		{
+			foreach (WeakReference<Creature> weakCreatureRef in PlayerModuleManager.UndeadCreatures)
+			{
+				Creature creature1;
+				if (weakCreatureRef.TryGetTarget(out creature1))
+				{
+					if (creature1 != null && creature1 == creature)
+					{
+
+						if (creature is Lizard || creature is Scavenger)
+						{ 
+							isUndeadCreature = true;
+						}
+
+						break;
+					}
+				}
+			}
+		}
+
+
+		/*if (isUndeadCreature)
+		{
+			if (creature is Lizard lizard && lizard.AI is LizardAI lizardAI && lizardAI.behavior == LizardAI.Behavior.FollowFriend)
+			{
+				
+			}
+		}*/
 		orig.Invoke(creature, eu);
 
-		foreach (WeakReference<Creature> weakPlayerRef in PlayerModuleManager.UndeadCreatures)
+
+		if (isUndeadCreature)
 		{
-			Creature creature1;
-			if (weakPlayerRef.TryGetTarget(out creature1))
+			try
 			{
-				if (creature1 != null && creature1 == creature)
+				if (creature.room.world.rainCycle.TimeUntilRain < 60)
 				{
+					Health.KillCreature(creature.room.game, creature);
+					return;
+				}
 
-					if (creature is Lizard || creature is Scavenger)
+				//Health.ReviveCreature(creature);
+				Tame.TameCreature(creature.room.game, creature);
+				//PlayerModuleManager.UndeadCreatures.Add(new WeakReference<Creature>(creature));
+
+				Creature? target = RandomlySelectedUnUndeadCreature(creature.firstChunk.pos, creature.room, false, creature, false, 0);
+				AbstractCreature? targetAb = target?.abstractCreature;
+
+				if (creature is Lizard lizard)
+				{
+					// 玩家攻击欲望
+					lizard.spawnDataEvil = -1f;
+
+					// 蜥蜴专属好感设置
+					if (lizard.AI is LizardAI lizardAI)
 					{
-						try
+						// 强制设置关系为“忽略”
+						foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
 						{
-							Health.ReviveCreature(creature);
-							Tame.TameCreature(creature.room.game, creature);
-							PlayerModuleManager.UndeadCreatures.Add(new WeakReference<Creature>(creature));
-
-							Creature? target = RandomlySelectedUnUndeadCreature(creature.room, false, creature, false);
-							AbstractCreature? targetAb = target?.abstractCreature;
-
-							if (creature is Lizard lizard)
+							Player player;
+							if (weakPlayerRef.TryGetTarget(out player))
 							{
-								lizard.spawnDataEvil = -1f;
-								// 蜥蜴专属好感设置
-								if (lizard.AI is LizardAI lizardAI)
+								// 获取玩家在当前蜥蜴中的动态关系
+								var rep = lizard.AI.tracker.RepresentationForCreature(player.abstractCreature, false);
+								if (rep != null && rep.dynamicRelationship != null)
 								{
-                                    if (targetAb != null && target != null)
-									{
-                                        lizard.AI.tracker.SeeCreature(targetAb); // 强制让蜥蜴“看到”目标
-                                        Tracker.CreatureRepresentation targetRep = lizardAI.tracker.RepresentationForCreature(targetAb, false);
-                                        if (targetRep != null)
-                                        {
-                                            // 强制设置攻击目标
-                                            lizardAI.focusCreature = targetRep;
-
-                                            // 3. 直接修改动态关系
-                                            targetRep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
-                                                CreatureTemplate.Relationship.Type.Eats, // 设为捕食
-                                                1f                                       // 强度最大
-                                            );
-
-                                            // 触发攻击行为（可选）
-                                            lizardAI.behavior = LizardAI.Behavior.Hunt; // 切换为狩猎模式
-                                            lizardAI.AggressiveBehavior(targetRep, 1f); // 直接调用攻击逻辑
-                                        }
-                                    }
-
-                                }
-							}
-							if (creature is Scavenger scavenger)
-							{
-								// 拾荒者专属好感设置
-								if (scavenger.AI is ScavengerAI scavAI)
+									// 直接覆盖为“无视”
+									rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
+										CreatureTemplate.Relationship.Type.Ignores,
+										0f
+									);
+								}
+								CreatureState state = lizard.abstractCreature.state;
+								SocialMemory.Relationship? relationship = null;
+								if (state != null)
 								{
-									if (targetAb != null && target != null)
-									{
-										// 获取关系状态
-										Tracker.CreatureRepresentation targetRep = scavAI.tracker.RepresentationForObject(target, false);
-										if (targetRep != null && targetRep.dynamicRelationship != null)
-										{
-											// 设置攻击关系
-											targetRep.dynamicRelationship.currentRelationship.type = CreatureTemplate.Relationship.Type.Attacks;
-											targetRep.dynamicRelationship.currentRelationship.intensity = 1f;
-
-											// 设置暴力类型为致命攻击
-											var trackState = targetRep.dynamicRelationship.state as ScavengerAI.ScavengerTrackState;
-											if (trackState != null)
-											{
-												trackState.taggedViolenceType = ScavengerAI.ViolenceType.Lethal;
-											}
-
-											// 强制进入攻击行为
-											scavAI.behavior = ScavengerAI.Behavior.Attack;
-											scavAI.focusCreature = targetRep;
-
-                                            // 触发攻击行为（可选）
-                                            if (scavAI.CheckHandsForSpear())
-											{
-												scavenger.TryThrow(target.bodyChunks[0], ScavengerAI.ViolenceType.Lethal);
-											}
-										}
-
-									}
-
+									SocialMemory socialMemory = state.socialMemory;
+									relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
+								}
+								if (relationship != null)
+								{
+									relationship.InfluenceTempLike(2f);
+									relationship.InfluenceLike(2f);
+									relationship.InfluenceKnow(0.9f);
 								}
 							}
-
-							creature.Template.shortcutColor = new Color(84f / 255f, 84f / 255f, 84f / 255f, 1f);
 						}
-						catch (Exception e)
+
+						if (targetAb != null && target != null)
 						{
-							Debug.LogException(e);
-						}
-					}
+							lizard.AI.tracker.SeeCreature(targetAb); // 强制让蜥蜴“看到”目标
+							Tracker.CreatureRepresentation targetRep = lizardAI.tracker.RepresentationForCreature(targetAb, false);
+							if (targetRep != null)
+							{
+								// 强制设置攻击目标
+								lizardAI.focusCreature = targetRep;
 
-					break;
+								// 3. 直接修改动态关系
+								targetRep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
+									CreatureTemplate.Relationship.Type.Eats, // 设为捕食
+									1f                                       // 强度最大
+								);
+
+								// 触发攻击行为（可选）
+								lizardAI.behavior = LizardAI.Behavior.Hunt; // 切换为狩猎模式
+								lizardAI.AggressiveBehavior(targetRep, 1f); // 直接调用攻击逻辑
+							}
+						}
+						else
+						{
+							lizardAI.behavior = LizardAI.Behavior.FollowFriend;
+							lizardAI.focusCreature = null;
+							Tracker.CreatureRepresentation playerRep = lizardAI.tracker.RepresentationForCreature(targetAb, false);
+							lizard.abstractCreature.abstractAI.SetDestination(playerRep.BestGuessForPosition());
+						}
+
+					}
 				}
+				if (creature is Scavenger scavenger)
+				{
+					// 拾荒者专属好感设置
+					if (scavenger.AI is ScavengerAI scavAI)
+					{
+						// 强制设置关系为“忽略”
+						foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+						{
+							Player player;
+							if (weakPlayerRef.TryGetTarget(out player))
+							{
+								// 获取玩家在当前拾荒者中的动态关系
+								if (scavenger.abstractCreature.abstractAI.RealAI is ScavengerAI scavAI_)
+								{
+									var rep = scavAI_.tracker.RepresentationForCreature(player.abstractCreature, false);
+									if (rep != null && rep.dynamicRelationship != null)
+									{
+										rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
+											CreatureTemplate.Relationship.Type.Ignores,
+											0f
+										);
+									}
+								}
+								CreatureState state = scavenger.abstractCreature.state;
+								SocialMemory.Relationship? relationship = null;
+								if (state != null)
+								{
+									SocialMemory socialMemory = state.socialMemory;
+									relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
+								}
+								if (relationship != null)
+								{
+									relationship.InfluenceTempLike(2f);
+									relationship.InfluenceLike(2f);
+									relationship.InfluenceKnow(0.9f);
+								}
+							}
+						}
+
+						if (targetAb != null && target != null)
+						{
+							// 获取关系状态
+							Tracker.CreatureRepresentation targetRep = scavAI.tracker.RepresentationForObject(target, false);
+							if (targetRep != null && targetRep.dynamicRelationship != null)
+							{
+								// 设置攻击关系
+								targetRep.dynamicRelationship.currentRelationship.type = CreatureTemplate.Relationship.Type.Attacks;
+								targetRep.dynamicRelationship.currentRelationship.intensity = 1f;
+
+								// 设置暴力类型为致命攻击
+								var trackState = targetRep.dynamicRelationship.state as ScavengerAI.ScavengerTrackState;
+								if (trackState != null)
+								{
+									trackState.taggedViolenceType = ScavengerAI.ViolenceType.Lethal;
+								}
+
+								// 强制进入攻击行为
+								scavAI.behavior = ScavengerAI.Behavior.Attack;
+								scavAI.focusCreature = targetRep;
+
+								// 触发攻击行为（可选）
+								if (scavAI.CheckHandsForSpear())
+								{
+									scavenger.TryThrow(target.bodyChunks[0], ScavengerAI.ViolenceType.Lethal);
+								}
+							}
+						}
+						else
+						{
+							scavAI.behavior = ScavengerAI.Behavior.FindPackLeader;
+							scavAI.focusCreature = null;
+							Tracker.CreatureRepresentation playerRep = scavAI.tracker.RepresentationForCreature(targetAb, false);
+							scavenger.abstractCreature.abstractAI.SetDestination(playerRep.BestGuessForPosition());
+						}
+
+					}
+				}
+
+				creature.Template.shortcutColor = new Color(84f / 255f, 84f / 255f, 84f / 255f, 1f);
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
 			}
 		}
 
@@ -375,8 +577,8 @@ internal static class PlayerHooks
 								{
 									Health.ReviveCreature(creature);
 									Tame.TameCreature(player.room.game, creature);
-									PlayerModuleManager.UndeadCreatures.Add(new WeakReference<Creature>(creature));
 									room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, creature.mainBodyChunk);
+									PlayerModuleManager.UndeadCreatures.Add(new WeakReference<Creature>(creature));
 
 									if (creature is Lizard lizard)
 									{

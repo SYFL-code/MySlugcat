@@ -233,10 +233,66 @@ namespace MySlugcat
             return nearest; // 返回最近生物（可能为null）
         }
 
-        /// <summary>
-        /// 随机查找当前房间的生物
-        /// </summary>
-        public static Creature? RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
+		/// <summary>
+		/// 查找当前房间中距离自身最近的玩家
+		/// </summary>
+		public static Player? FindNearestPlayer(Vector2 selfPos, Room room, Player? player, bool IncludeDeadPlayer)
+		{
+			// 初始化变量
+			Player? nearest = null;        // 最近生物对象
+			float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
+													//List<Creature> creatures = new List<Creature>();
+
+			if (selfPos == null || room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || room.abstractRoom.creatures.Count == null || !(room.abstractRoom.creatures.Count > 0))
+			{
+				return null;
+			}
+
+			// 遍历当前房间所有生物
+			foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)
+			{
+
+				Creature c = abstractCreature.realizedCreature;
+				var p = c as Player;
+				if (p == null)
+				{
+					continue; // 跳过无效项，继续检查下一个
+				}
+				// 排除检查：玩家、无效引用、自身、或没有身体部位的对象
+				if (p == null ||             // 确保生物存在
+					(player != null && p == player) ||             // 排除自身
+					p.mainBodyChunk == null ||      // 确保有有效的mainBodyChunk
+					p.mainBodyChunk.pos == null)
+				{
+					continue; // 跳过无效项，继续检查下一个
+				}
+				if (p.dead == true && !IncludeDeadPlayer)// 死亡的生物
+				{
+					continue; // 跳过无效项，继续检查下一个
+				}
+				// 计算位置差（目标位置 - 自身位置）
+				Vector2 offset = p.mainBodyChunk.pos - selfPos;
+				// 计算平方距离（比Vector2.Distance更高效）
+				float sqrDistance = offset.sqrMagnitude;
+
+				//creatures.Add(c);
+
+				// 检查是否为更近的生物
+				if (sqrDistance < minSqrDistance)
+				{
+					// 更新最近生物和最小距离记录
+					minSqrDistance = sqrDistance;
+					nearest = p;
+				}
+			}
+			//return creatures[UnityEngine.Random.Range(0, creatures.Count)];
+			return nearest; // 返回最近生物（可能为null）
+		}
+
+		/// <summary>
+		/// 随机查找当前房间的生物
+		/// </summary>
+		public static Creature? RandomlySelectedCreature(Room room, bool IncludePlayer, Creature creature, bool IncludeDeadCreature)
         {
             // 初始化变量
             //Creature? nearest = null;        // 最近生物对象

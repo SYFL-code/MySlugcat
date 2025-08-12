@@ -13,6 +13,14 @@
     </ItemGroup>
     
     <ItemGroup>
+      <None Remove="Shaders\MyGrayscale.shader" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <EmbeddedResource Include="Shaders\MyGrayscale.shader" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <Reference Include="..\lib\Mono.Cecil.dll">
           <Private>false</Private>
         </Reference>

@@ -83,7 +83,7 @@ namespace MySlugcat
                 }
                 if (relationship2 != null)
                 {
-
+                    // 使用这个工具驯服生物也增加世界声望。
                     /*Configurable<bool> tameIncreasesRep = Options.tameIncreasesRep;//***
                     if (tameIncreasesRep != null && tameIncreasesRep.Value)
                     {
@@ -97,6 +97,7 @@ namespace MySlugcat
                             }
                         }
                     }*/
+                    // 输出日志
                     /*Configurable<bool> logDebug = Options.logDebug;
                     if (logDebug == null || logDebug.Value)
                     {
@@ -118,6 +119,7 @@ namespace MySlugcat
                     {
                         artificialIntelligence.friendTracker.friendRel = relationship2;
                     }
+                    // 输出日志
                     /*Configurable<bool> logDebug2 = Options.logDebug;
                     if (logDebug2 == null || logDebug2.Value)
                     {
@@ -130,6 +132,7 @@ namespace MySlugcat
 
         public static void TameCreatures(RainWorldGame game, Room room)
         {
+            // 输出日志
             /*Configurable<bool> logDebug = Options.logDebug;
             if (logDebug == null || logDebug.Value)
             {
@@ -226,6 +229,7 @@ namespace MySlugcat
                         }
                     }
                 }
+                // 输出日志
                 /*Configurable<bool> logDebug = Options.logDebug;
                 if (logDebug == null || logDebug.Value)
                 {
@@ -235,6 +239,7 @@ namespace MySlugcat
                 {
                     artificialIntelligence2.friendTracker.friend = null;
                     artificialIntelligence2.friendTracker.friendRel = null;
+                    // 输出日志
                     /*Configurable<bool> logDebug2 = Options.logDebug;
                     if (logDebug2 == null || logDebug2.Value)
                     {
@@ -247,6 +252,7 @@ namespace MySlugcat
 
         public static void ClearRelationships(Room room)
         {
+            // 输出日志
             /*Configurable<bool> logDebug = Options.logDebug;
             if (logDebug == null || logDebug.Value)
             {
@@ -285,6 +291,7 @@ namespace MySlugcat
                     {
                         goto IL_6F;
                     }
+                    // 如果勾选此项，当暂停/毁灭/杀死所有生物时，不要暂停/毁灭/杀死蛞蝓猫崽。
                     /*Configurable<bool> exceptSlugNPC = Options.exceptSlugNPC;//t
                     if (exceptSlugNPC != null && !exceptSlugNPC.Value && (room.physicalObjects[num][num5] as Player).isNPC)
                     {

@@ -14,726 +14,815 @@ namespace MySlugcat
 {
 	internal class Zname
 	{
+        private static readonly string dnSpy = "In fact, this is open source. 其实这是开源的. Code at https://github.com/SYFL-code/MySlugcat";
+        private static float zname;
 
+        /*//*/
+
+        /// <summary>
+        /// 其他
+        /// </summary>
         private static void 其他()
 		{
+            /*ArtificialIntelligence self = creature.abstractCreature.abstractAI.RealAI;
+
+Player player;
+foreach (AbstractCreature ac in self.creature.world.game.Players)
+{
+    if (ac.realizedCreature is Player && player.slugcatStats.name == Plugin.YourSlugID)
+    {
+        player = (Player)ac.realizedCreature;
+        if (self is LizardAI ai &&
+            ai.lizard.Template.type == CreatureTemplate.Type.CyanLizard &&
+            player.room == self.creature.Room.realizedRoom)
+        {
+            Lizard cyanLizard = ai.lizard;
+            cyanLizard.abstractCreature.world.game.session.creatureCommunities.
+                SetLikeOfPlayer(cyanLizard.abstractCreature.creatureTemplate.communityID,
+                cyanLizard.abstractCreature.world.RegionNumber,
+                (player.State as PlayerState).playerNumber,
+                -1.0f);
+            //self.tracker.SeeCreature(player.abstractCreature);
+        }
+    }
+}
+
+creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
+    (creature.abstractCreature.creatureTemplate.communityID, creature.abstractCreature.world.RegionNumber, (player.State as PlayerState).playerNumber, 1.0f);*/
+
+            /*if (PlayerModuleManager.playerModules.TryGetValue(self, out var module))
+            {
+                module.Hungry_Update(self);
+            }*/
+        }
+
+        private static void MOD启用()
+		{
+            //ModManager.ActiveMods             //激活Mods
+            //ModManager.InstalledMods          //已存在的Mods
+            //ModManager.FailedRequirementIds   //需求ID失败的Mods
+            //ModManager.PrePackagedModIDs      //预包装ModsID
+
+
+            if (ModManager.GameVersionChangedOnThisLaunch)
+			{
+				//游戏版本在这次发布中发生了变化
+			}
+			if (ModManager.NonPrepackagedModsInstalled)
+			{
+				//安装了非预打包的Mods
+			}
+			if (ModManager.InitializationScreenFinished)
+			{
+				//初始化屏幕完成
+			}
+            if (ModManager.MSC)
+            {
+                //更多蛞蝓猫?_1
+            }
+            if (ModManager.MMF)
+            {
+                //更多蛞蝓猫?_2
+            }
+            if (ModManager.CoopAvailable)
+			{
+                //联机模式是否可用?
+            }
+            if (ModManager.JollyCoop)
+			{
+				//联机模式
+			}
+			if (ModManager.Expedition)
+			{
+				//远征模式
+			}
+			if (ModManager.DevTools)
+			{
+				//开发者工具
+			}
+            if (ModManager.Watcher)
+			{
+				//观望者
+			}
+		}
+
+		private static void 通行证()
+		{
+
+			//"The Survivor"        //"求生者"
+			//"The Hunter"          //"猎手"
+			//"The Saint"           //"圣徒"
+			//"The Wanderer"        //"漫游者"
+			//"The Chieftain"       //"酋长"
+			//"The Monk"            //"僧侣"
+			//"The Outlaw"          //"暴徒"
+			//"The Dragon Slayer"   //"屠龙者"
+			//"The Scholar"         //"学者"
+			//"The Friend"          //"朋友"
+			// ModManager.MSC
+			//"The Nomad"           //"流浪者"
+			//"The Martyr"          //"殉道者"
+			//"The Pilgrim"         //"朝圣者"
+			//"The Mother"          //"慈母"
+			//
 
 		}
 
-        private static void 通行证()
-        {
+		private static void 着色器()
+		{
 
-            //"The Survivor"        //"求生者"
-            //"The Hunter"          //"猎手"
-            //"The Saint"           //"圣徒"
-            //"The Wanderer"        //"漫游者"
-            //"The Chieftain"       //"酋长"
-            //"The Monk"            //"僧侣"
-            //"The Outlaw"          //"暴徒"
-            //"The Dragon Slayer"   //"屠龙者"
-            //"The Scholar"         //"学者"
-            //"The Friend"          //"朋友"
-            // ModManager.MSC
-            //"The Nomad"           //"流浪者"
-            //"The Martyr"          //"殉道者"
-            //"The Pilgrim"         //"朝圣者"
-            //"The Mother"          //"慈母"
-            //
+			//Basic 基础
 
-        }
+			//LevelColor 关卡颜色
 
-        private static void 着色器()
-        {
+			//Background 背景
 
-            //Basic 基础
+			//WaterSurface 水面
 
-            //LevelColor 关卡颜色
+			//DeepWater 深水区
 
-            //Background 背景
+			//Shortcuts 捷径
 
-            //WaterSurface 水面
+			//DeathRain 死亡之雨
 
-            //DeepWater 深水区
+			//LizardLaser 蜥蜴激光
 
-            //Shortcuts 捷径
+			//WaterLight 水光
 
-            //DeathRain 死亡之雨
+			//WaterFall 瀑布
 
-            //LizardLaser 蜥蜴激光
+			//ShockWave 冲击波
 
-            //WaterLight 水光
+			//Smoke 烟雾
 
-            //WaterFall 瀑布
+			//Spores 孢子
 
-            //ShockWave 冲击波
+			//Steam 蒸汽
 
-            //Smoke 烟雾
+			//ColoredSprite 彩色精灵
 
-            //Spores 孢子
+			//ColoredSprite2 彩色精灵2
 
-            //Steam 蒸汽
+			//LightSource 光源
 
-            //ColoredSprite 彩色精灵
+			//LightSourceBothSides 双面光源
 
-            //ColoredSprite2 彩色精灵2
+			//LightSourceRippleSide 波纹面光源
 
-            //LightSource 光源
+			//LightBloom 光晕
 
-            //LightSourceBothSides 双面光源
+			//SkyBloom 天光晕染
 
-            //LightSourceRippleSide 波纹面光源
+			//Adrenaline 肾上腺素
 
-            //LightBloom 光晕
+			//AdrenalineBothSides 双面肾上腺素
 
-            //SkyBloom 天光晕染
+			//CicadaWing 蝉翼
 
-            //Adrenaline 肾上腺素
+			//BulletRain 弹雨
 
-            //AdrenalineBothSides 双面肾上腺素
+			//CustomDepth 自定义深度
 
-            //CicadaWing 蝉翼
+			//CustomDepthBothSides 双面自定义深度
 
-            //BulletRain 弹雨
+			//UnderWaterLight 水下光源
 
-            //CustomDepth 自定义深度
+			//FlatLight 平面光
 
-            //CustomDepthBothSides 双面自定义深度
+			//FlatLightRippleSide 波纹面平面光
 
-            //UnderWaterLight 水下光源
+			//FlatLightBothSides 双面平面光
 
-            //FlatLight 平面光
+			//FlatLightBehindTerrain 地形后平面光
 
-            //FlatLightRippleSide 波纹面平面光
+			//VectorCircle 矢量圆环
 
-            //FlatLightBothSides 双面平面光
+			//VectorCircleBothSides 双面矢量圆环
 
-            //FlatLightBehindTerrain 地形后平面光
+			//VectorCircleRippleSide 波纹面矢量圆环
 
-            //VectorCircle 矢量圆环
+			//VectorCircleFadable 可渐隐矢量圆环
 
-            //VectorCircleBothSides 双面矢量圆环
+			//FlareBomb 闪光弹
 
-            //VectorCircleRippleSide 波纹面矢量圆环
+			//FlareBombBothSides 双面闪光弹
 
-            //VectorCircleFadable 可渐隐矢量圆环
+			//Fog 雾气
 
-            //FlareBomb 闪光弹
+			//WaterSplash 水花
 
-            //FlareBombBothSides 双面闪光弹
+			//EelFin 鳗鱼鳍
 
-            //Fog 雾气
+			//EelBody 鳗鱼身体
 
-            //WaterSplash 水花
+			//JaggedCircle 锯齿圆环
 
-            //EelFin 鳗鱼鳍
+			//JaggedCircleBothSides 双面锯齿圆环
 
-            //EelBody 鳗鱼身体
+			//JaggedCircleRippleSide 波纹面锯齿圆环
 
-            //JaggedCircle 锯齿圆环
+			//JaggedSquare 锯齿方块
 
-            //JaggedCircleBothSides 双面锯齿圆环
+			//TubeWorm 管虫
 
-            //JaggedCircleRippleSide 波纹面锯齿圆环
+			//LizardAntenna 蜥蜴触须
 
-            //JaggedSquare 锯齿方块
+			//TentaclePlant 触手植物
 
-            //TubeWorm 管虫
+			//TentaclePlantBothSides 双面触手植物
 
-            //LizardAntenna 蜥蜴触须
+			//TentaclePlantRippleSide 波纹面触手植物
 
-            //TentaclePlant 触手植物
+			//LevelMelt 关卡溶解
 
-            //TentaclePlantBothSides 双面触手植物
+			//LevelMelt2 关卡溶解2
 
-            //TentaclePlantRippleSide 波纹面触手植物
+			//CoralCircuit 珊瑚电路
 
-            //LevelMelt 关卡溶解
+			//CoralCircuitBothSides 双面珊瑚电路
 
-            //LevelMelt2 关卡溶解2
+			//DeadCoralCircuit 死珊瑚电路
 
-            //CoralCircuit 珊瑚电路
+			//DeadCoralCircuitBothSides 双面死珊瑚电路
 
-            //CoralCircuitBothSides 双面珊瑚电路
+			//CoralNeuron 珊瑚神经元
 
-            //DeadCoralCircuit 死珊瑚电路
+			//CoralNeuronBothSides 双面珊瑚神经元
 
-            //DeadCoralCircuitBothSides 双面死珊瑚电路
+			//Bloom 泛光
 
-            //CoralNeuron 珊瑚神经元
+			//GravityDisruptor 重力干扰器
 
-            //CoralNeuronBothSides 双面珊瑚神经元
+			//GlyphProjection 符文投影
 
-            //Bloom 泛光
+			//BlackGoo 黑色粘液
 
-            //GravityDisruptor 重力干扰器
+			//BlackGooBothSides 双面黑色粘液
 
-            //GlyphProjection 符文投影
+			//Map 地图
 
-            //BlackGoo 黑色粘液
+			//MapAerial 航拍地图
 
-            //BlackGooBothSides 双面黑色粘液
+			//MapShortcut 捷径地图
 
-            //Map 地图
+			//LightAndSkyBloom 光与天光晕染
 
-            //MapAerial 航拍地图
+			//SceneBlur 场景模糊
 
-            //MapShortcut 捷径地图
+			//EdgeFade 边缘褪色
 
-            //LightAndSkyBloom 光与天光晕染
+			//HeatDistortion 热浪扭曲
 
-            //SceneBlur 场景模糊
+			//Projection 投影
 
-            //EdgeFade 边缘褪色
+			//SingleGlyph 单体符文
 
-            //HeatDistortion 热浪扭曲
+			//DeepProcessing 深度处理
 
-            //Projection 投影
+			//Cloud 云层
 
-            //SingleGlyph 单体符文
+			//CloudDistant 远景云层
 
-            //DeepProcessing 深度处理
+			//DistantBkgObject 远景背景物体
 
-            //Cloud 云层
+			//BkgFloor 背景地板
 
-            //CloudDistant 远景云层
+			//House 房屋
 
-            //DistantBkgObject 远景背景物体
+			//DistantBkgObjectRepeatHorizontal 水平重复远景物体
 
-            //BkgFloor 背景地板
+			//Dust 尘埃
 
-            //House 房屋
+			//RoomTransition 房间过渡
 
-            //DistantBkgObjectRepeatHorizontal 水平重复远景物体
+			//VoidCeiling 虚空天花板
 
-            //Dust 尘埃
+			//FlatLightNoisy 噪点平面光
 
-            //RoomTransition 房间过渡
+			//VoidWormBody 虚空蠕虫身体
 
-            //VoidCeiling 虚空天花板
+			//VoidWormFin 虚空蠕虫鳍
 
-            //FlatLightNoisy 噪点平面光
+			//VoidWormPincher 虚空蠕虫钳
 
-            //VoidWormBody 虚空蠕虫身体
+			//FlatWaterLight 平面水光
 
-            //VoidWormFin 虚空蠕虫鳍
+			//FlatWaterLightBothSides 双面平面水光
 
-            //VoidWormPincher 虚空蠕虫钳
+			//FlatWaterLightRippleSpawn 波纹生成平面水光
 
-            //FlatWaterLight 平面水光
+			//FlatWaterLightRippleSpawnRippleSide 波纹面生成平面水光
 
-            //FlatWaterLightBothSides 双面平面水光
+			//WormLayerFade 蠕虫层渐隐
 
-            //FlatWaterLightRippleSpawn 波纹生成平面水光
+			//OverseerZip 监视者瞬移
 
-            //FlatWaterLightRippleSpawnRippleSide 波纹面生成平面水光
+			//GhostSkin 幽灵表皮
 
-            //WormLayerFade 蠕虫层渐隐
+			//GhostBall 幽灵球体
 
-            //OverseerZip 监视者瞬移
+			//GhostDistortion 幽灵扭曲
 
-            //GhostSkin 幽灵表皮
+			//GhostSkinRipple 波纹幽灵表皮
 
-            //GhostBall 幽灵球体
+			//GhostBallRipple 波纹幽灵球体
 
-            //GhostDistortion 幽灵扭曲
+			//GhostDistortionRipple 波纹幽灵扭曲
 
-            //GhostSkinRipple 波纹幽灵表皮
+			//GateHologram 门全息投影
 
-            //GhostBallRipple 波纹幽灵球体
+			//OutPostAntler 前哨鹿角
 
-            //GhostDistortionRipple 波纹幽灵扭曲
+			//WaterNut 水坚果
 
-            //GateHologram 门全息投影
+			//Hologram 全息投影
 
-            //OutPostAntler 前哨鹿角
+			//HologramBothSides 双面全息投影
 
-            //WaterNut 水坚果
+			//FireSmoke 火焰烟雾
 
-            //Hologram 全息投影
+			//HoldButtonCircle 按钮保持圆环
 
-            //HologramBothSides 双面全息投影
+			//GoldenGlow 金色辉光
 
-            //FireSmoke 火焰烟雾
+			//ElectricDeath 电击死亡
 
-            //HoldButtonCircle 按钮保持圆环
+			//VoidSpawnBody 虚空孵化体
 
-            //GoldenGlow 金色辉光
+			//SceneLighten 场景增亮
 
-            //ElectricDeath 电击死亡
+			//SceneBlurLightEdges 场景光边模糊
 
-            //VoidSpawnBody 虚空孵化体
+			//SceneRain 场景雨
 
-            //SceneLighten 场景增亮
+			//SceneOverlay 场景叠加
 
-            //SceneBlurLightEdges 场景光边模糊
+			//SceneSoftLight 场景柔光
 
-            //SceneRain 场景雨
+			//SceneMultiply 场景相乘
 
-            //SceneOverlay 场景叠加
+			//HologramImage 全息图像
 
-            //SceneSoftLight 场景柔光
+			//HologramBehindTerrain 地形后全息
 
-            //SceneMultiply 场景相乘
+			//Decal 贴花
 
-            //HologramImage 全息图像
+			//SpecificDepth 特定深度
 
-            //HologramBehindTerrain 地形后全息
+			//LocalBloom 局部泛光
 
-            //Decal 贴花
+			//MenuText 菜单文字
 
-            //SpecificDepth 特定深度
+			//DeathFall 坠落死亡
 
-            //LocalBloom 局部泛光
+			//DeathFallHeavy 重型坠落死亡
 
-            //MenuText 菜单文字
+			//KingTusk 帝王獠牙
 
-            //DeathFall 坠落死亡
+			//HoloGrid 全息网格
 
-            //DeathFallHeavy 重型坠落死亡
+			//SootMark 煤烟痕迹
 
-            //KingTusk 帝王獠牙
+			//NewVultureSmoke 新秃鹫烟雾
 
-            //HoloGrid 全息网格
+			//SmokeTrail 烟雾轨迹
 
-            //SootMark 煤烟痕迹
+			//RedsIllness 红色病态
 
-            //NewVultureSmoke 新秃鹫烟雾
+			//HazerHaze 薄雾朦胧
 
-            //SmokeTrail 烟雾轨迹
+			//Rainbow 彩虹
 
-            //RedsIllness 红色病态
+			//LightBeam 光束
 
-            //HazerHaze 薄雾朦胧
+			//SlopedTerrainSurface 斜坡地形表面
 
-            //Rainbow 彩虹
+			//SlopedTerrainStain 斜坡地形污渍
 
-            //LightBeam 光束
+			//Rubble 碎石
 
-            //SlopedTerrainSurface 斜坡地形表面
+			//Whirlpool 漩涡
 
-            //SlopedTerrainStain 斜坡地形污渍
+			//GeyserWater 间歇泉水
 
-            //Rubble 碎石
+			//BackgroundAdditive 附加背景
 
-            //Whirlpool 漩涡
+			//BackgroundJaggedCircle 背景锯齿圆环
 
-            //GeyserWater 间歇泉水
+			//BackgroundNoHoles 无孔背景
 
-            //BackgroundAdditive 附加背景
+			//WaterCurrent 水流
 
-            //BackgroundJaggedCircle 背景锯齿圆环
+			//BlackSpot 黑斑
 
-            //BackgroundNoHoles 无孔背景
+			//SkyWhaleBody 天鲸身体
 
-            //WaterCurrent 水流
+			//SkyWhaleCuticle 天鲸角质层
 
-            //BlackSpot 黑斑
+			//KarmicShield 业力护盾
 
-            //SkyWhaleBody 天鲸身体
+			//TemplarCircle 圣堂圆环
 
-            //SkyWhaleCuticle 天鲸角质层
+			//TemplarCloak 圣堂斗篷
 
-            //KarmicShield 业力护盾
+			//Sandstorm 沙暴
 
-            //TemplarCircle 圣堂圆环
+			//SlopedTerrainMask 斜坡地形遮罩
 
-            //TemplarCloak 圣堂斗篷
+			//SlopedTerrainMaskGrab 斜坡地形遮罩抓取
 
-            //Sandstorm 沙暴
+			//DistantBkgObjectAlpha 远景物体透明度
 
-            //SlopedTerrainMask 斜坡地形遮罩
+			//WaterSlush 雪泥水
 
-            //SlopedTerrainMaskGrab 斜坡地形遮罩抓取
+			//SporesSnow 孢子雪
 
-            //DistantBkgObjectAlpha 远景物体透明度
+			//SnowFall 落雪
 
-            //WaterSlush 雪泥水
+			//OESphereTop 奥术球顶部
 
-            //SporesSnow 孢子雪
+			//OESphereLight 奥术球光源
 
-            //SnowFall 落雪
+			//OESphereBase 奥术球基底
 
-            //OESphereTop 奥术球顶部
+			//MoonProjection 月亮投影
 
-            //OESphereLight 奥术球光源
+			//LocalBlizzard 局部暴风雪
 
-            //OESphereBase 奥术球基底
+			//LightningBolt 闪电束
 
-            //MoonProjection 月亮投影
+			//LevelHeat 关卡热度
 
-            //LocalBlizzard 局部暴风雪
+			//FastSnowFall 快速落雪
 
-            //LightningBolt 闪电束
+			//FastLocalBlizzard 快速局部暴风雪
 
-            //LevelHeat 关卡热度
+			//FastBlizzard 快速暴风雪
 
-            //FastSnowFall 快速落雪
+			//EnergySwirl 能量漩涡
 
-            //FastLocalBlizzard 快速局部暴风雪
+			//EnergyCell 能量细胞
 
-            //FastBlizzard 快速暴风雪
+			//DisplaySnowShader 显示雪着色器
 
-            //EnergySwirl 能量漩涡
+			//BlizzardMapPrerender 暴风雪地图预渲染
 
-            //EnergyCell 能量细胞
+			//Blizzard 暴风雪
 
-            //DisplaySnowShader 显示雪着色器
+			//LevelSnowShader 关卡雪着色器
 
-            //BlizzardMapPrerender 暴风雪地图预渲染
+			//InterpolateWindMap 插值风图
 
-            //Blizzard 暴风雪
+			//DustWaveLow 低强度尘埃波
 
-            //LevelSnowShader 关卡雪着色器
+			//DustFlowRenderer 尘埃流渲染器
 
-            //InterpolateWindMap 插值风图
+			//DustWave 尘埃波
 
-            //DustWaveLow 低强度尘埃波
+			//DustWaveLevel 关卡尘埃波
 
-            //DustFlowRenderer 尘埃流渲染器
+			//DustWaveLevelLow 低强度关卡尘埃波
 
-            //DustWave 尘埃波
+			//BlizzardReduction 暴风雪减弱
 
-            //DustWaveLevel 关卡尘埃波
+			//BlizzardMap 暴风雪地图
 
-            //DustWaveLevelLow 低强度关卡尘埃波
+			//CellDist 细胞距离
 
-            //BlizzardReduction 暴风雪减弱
+			//DisplayWind 显示风
 
-            //BlizzardMap 暴风雪地图
+			//SingleGlyphHologram 单体符文全息
 
-            //CellDist 细胞距离
+			//WaterFallInverted 反向瀑布
 
-            //DisplayWind 显示风
+			//AquapedeBody 水蜈蚣身体
 
-            //SingleGlyphHologram 单体符文全息
+			//MenuTextGold 金色菜单文字
 
-            //WaterFallInverted 反向瀑布
+			//MenuTextCustom 自定义菜单文字
 
-            //AquapedeBody 水蜈蚣身体
+			//WarpPointHoldFrame 跃迁点保持帧
 
-            //MenuTextGold 金色菜单文字
+			//Warp 跃迁
 
-            //MenuTextCustom 自定义菜单文字
+			//WarpNoRing 无环跃迁
 
-            //WarpPointHoldFrame 跃迁点保持帧
+			//WarpCircleBasic 基础跃迁圆环
 
-            //Warp 跃迁
+			//WarpCircleRipple 波纹跃迁圆环
 
-            //WarpNoRing 无环跃迁
+			//WarpPlayerDistortion 玩家跃迁扭曲
 
-            //WarpCircleBasic 基础跃迁圆环
+			//HugeTurbine 巨型涡轮
 
-            //WarpCircleRipple 波纹跃迁圆环
+			//RotWormBody 腐烂蠕虫身体
 
-            //WarpPlayerDistortion 玩家跃迁扭曲
+			//RotWormFin 腐烂蠕虫鳍
 
-            //HugeTurbine 巨型涡轮
+			//DynamicLevelElementGrab 动态关卡元素抓取
 
-            //RotWormBody 腐烂蠕虫身体
+			//DynamicLevelElement 动态关卡元素
 
-            //RotWormFin 腐烂蠕虫鳍
+			//DevUI_TwinArrowVertical 开发UI垂直双箭头
 
-            //DynamicLevelElementGrab 动态关卡元素抓取
+			//DevUI_TwinArrowHorizontal 开发UI水平双箭头
 
-            //DynamicLevelElement 动态关卡元素
+			//DevUIDepthPreview 开发UI深度预览
 
-            //DevUI_TwinArrowVertical 开发UI垂直双箭头
+			//DynamicLevelRock 动态关卡岩石
 
-            //DevUI_TwinArrowHorizontal 开发UI水平双箭头
+			//DynamicLevelRock_NoMovement 静态动态关卡岩石
 
-            //DevUIDepthPreview 开发UI深度预览
+			//DynamicLevelBlob 动态关卡斑点
 
-            //DynamicLevelRock 动态关卡岩石
+			//DynamicLevelTubeSegment 动态关卡管段
 
-            //DynamicLevelRock_NoMovement 静态动态关卡岩石
+			//DynamicLevelWire 动态关卡线缆
 
-            //DynamicLevelBlob 动态关卡斑点
+			//DynamicLevelUrbanCandle 动态关卡都市烛台
 
-            //DynamicLevelTubeSegment 动态关卡管段
+			//DynamicLevelBowl 动态关卡碗
 
-            //DynamicLevelWire 动态关卡线缆
+			//DynamicLevelPole 动态关卡杆
 
-            //DynamicLevelUrbanCandle 动态关卡都市烛台
+			//Aurora 极光
 
-            //DynamicLevelBowl 动态关卡碗
+			//AuroraForeground 前景极光
 
-            //DynamicLevelPole 动态关卡杆
+			//AuroraRipple 波纹极光
 
-            //Aurora 极光
+			//AuroraForegroundRipple 前景波纹极光
 
-            //AuroraForeground 前景极光
+			//RippleSpawnBody 波纹生成体
 
-            //AuroraRipple 波纹极光
+			//RippleSpawnBodyRippleSide 波纹面生成体
 
-            //AuroraForegroundRipple 前景波纹极光
+			//RippleGlow 波纹辉光
 
-            //RippleSpawnBody 波纹生成体
+			//RippleGlowRippleSide 波纹面辉光
 
-            //RippleSpawnBodyRippleSide 波纹面生成体
+			//RippleDeath 波纹死亡
 
-            //RippleGlow 波纹辉光
+			//BrainBall 脑球
 
-            //RippleGlowRippleSide 波纹面辉光
+			//BrainStem 脑干
 
-            //RippleDeath 波纹死亡
+			//BrainMold 脑霉菌
 
-            //BrainBall 脑球
+			//BrainBallDark 暗黑脑球
 
-            //BrainStem 脑干
+			//BrainStemDark 暗黑脑干
 
-            //BrainMold 脑霉菌
+			//LocustCluster 蝗虫群
 
-            //BrainBallDark 暗黑脑球
+			//LocustClusterShadow 蝗虫群阴影
 
-            //BrainStemDark 暗黑脑干
+			//AncientUrbanBuilding 远古都市建筑
 
-            //LocustCluster 蝗虫群
+			//DustGradient 尘埃渐变
 
-            //LocustClusterShadow 蝗虫群阴影
+			//BoxWormBody 箱虫身体
 
-            //AncientUrbanBuilding 远古都市建筑
+			//BoxWormLarvaHolder 箱虫幼虫容器
 
-            //DustGradient 尘埃渐变
+			//BoxWormBox 箱虫箱体
 
-            //BoxWormBody 箱虫身体
+			//BoxWormOpenBox 箱虫开箱
 
-            //BoxWormLarvaHolder 箱虫幼虫容器
+			//BoxWormFakeLarva 箱虫假幼虫
 
-            //BoxWormBox 箱虫箱体
+			//BoxWormLarvaFood 箱虫幼虫食物
 
-            //BoxWormOpenBox 箱虫开箱
+			//FireSpriteWing 火精灵翅膀
 
-            //BoxWormFakeLarva 箱虫假幼虫
+			//FireSpriteBody 火精灵身体
 
-            //BoxWormLarvaFood 箱虫幼虫食物
+			//RippleHybrid 混合波纹
 
-            //FireSpriteWing 火精灵翅膀
+			//RippleHybridRipple 混合波纹涟漪
 
-            //FireSpriteBody 火精灵身体
+			//RippleHybridBoth 双面混合波纹
 
-            //RippleHybrid 混合波纹
+			//FlameJet 火焰喷射
 
-            //RippleHybridRipple 混合波纹涟漪
+			//FlameJetGlow 火焰喷射辉光
 
-            //RippleHybridBoth 双面混合波纹
+			//SaltFlake 盐片
 
-            //FlameJet 火焰喷射
+			//SaltFlakeShadow 盐片阴影
 
-            //FlameJetGlow 火焰喷射辉光
+			//AetherRainbow 以太彩虹
 
-            //SaltFlake 盐片
+			//GildedWind 镀金之风
 
-            //SaltFlakeShadow 盐片阴影
+			//Stardust 星尘
 
-            //AetherRainbow 以太彩虹
+			//BackgroundDune 背景沙丘
 
-            //GildedWind 镀金之风
+			//OuterRimBackgroundBuilding 外环背景建筑
 
-            //Stardust 星尘
+			//OuterRimDustGradient 外环尘埃渐变
 
-            //BackgroundDune 背景沙丘
+			//FallingStar 流星
 
-            //OuterRimBackgroundBuilding 外环背景建筑
+			//WallLight 墙光
 
-            //OuterRimDustGradient 外环尘埃渐变
+			//WallLightSoftEdge 柔边墙光
 
-            //FallingStar 流星
+			//WallLightStaticNoise 静态噪点墙光
 
-            //WallLight 墙光
+			//WallLightHardShadow 硬阴影墙光
 
-            //WallLightSoftEdge 柔边墙光
+			//WallLightFlat 平面墙光
 
-            //WallLightStaticNoise 静态噪点墙光
+			//WarpTearMask 跃迁撕裂遮罩
 
-            //WallLightHardShadow 硬阴影墙光
+			//WarpTearBlocker 跃迁撕裂阻挡器
 
-            //WallLightFlat 平面墙光
+			//WarpTear 跃迁撕裂
 
-            //WarpTearMask 跃迁撕裂遮罩
+			//WarpTearBad 不良跃迁撕裂
 
-            //WarpTearBlocker 跃迁撕裂阻挡器
+			//WarpTearOuter 外部跃迁撕裂
 
-            //WarpTear 跃迁撕裂
+			//WarpTearRippleSide 波纹面跃迁撕裂
 
-            //WarpTearBad 不良跃迁撕裂
+			//WarpTearGrab 跃迁撕裂抓取
 
-            //WarpTearOuter 外部跃迁撕裂
+			//SKLightning 天空闪电
 
-            //WarpTearRippleSide 波纹面跃迁撕裂
+			//SKLightningForeground 前景天空闪电
 
-            //WarpTearGrab 跃迁撕裂抓取
+			//SKLightningBGFlash 背景天空闪电闪光
 
-            //SKLightning 天空闪电
+			//Darken 暗化
 
-            //SKLightningForeground 前景天空闪电
+			//SKLightningFlash 天空闪电闪光
 
-            //SKLightningBGFlash 背景天空闪电闪光
+			//PrinceStem 王子茎干
 
-            //Darken 暗化
+			//SkinkStripes 石龙子条纹
 
-            //SKLightningFlash 天空闪电闪光
+			//MothWing 蛾翼
 
-            //PrinceStem 王子茎干
+			//MudDecal 泥浆贴花
 
-            //SkinkStripes 石龙子条纹
+			//MudPit 泥潭
 
-            //MothWing 蛾翼
+			//MudOverlay 泥浆覆盖
 
-            //MudDecal 泥浆贴花
+			//UrbanLife 都市生命
 
-            //MudPit 泥潭
+			//UrbanLifeShadow 都市生命阴影
 
-            //MudOverlay 泥浆覆盖
+			//UrbanLifeFirstLayer 都市生命首层
 
-            //UrbanLife 都市生命
+			//UrbanShadowsGrab 都市阴影抓取
 
-            //UrbanLifeShadow 都市生命阴影
+			//UrbanShadowsBlur 都市阴影模糊
 
-            //UrbanLifeFirstLayer 都市生命首层
+			//UrbanShadowsBlurGrab 都市阴影模糊抓取
 
-            //UrbanShadowsGrab 都市阴影抓取
+			//UrbanShadowGradient 都市阴影渐变
 
-            //UrbanShadowsBlur 都市阴影模糊
+			//SpinToy 旋转玩具
 
-            //UrbanShadowsBlurGrab 都市阴影模糊抓取
+			//SpinToyGlyph 旋转玩具符文
 
-            //UrbanShadowGradient 都市阴影渐变
+			//BallToy 球玩具
 
-            //SpinToy 旋转玩具
+			//SoftToyBody 软玩具身体
 
-            //SpinToyGlyph 旋转玩具符文
+			//SoftToyEye 软玩具眼睛
 
-            //BallToy 球玩具
+			//GreebleGrid 细节网格
 
-            //SoftToyBody 软玩具身体
+			//PlaceholderBackgroundElement 占位背景元素
 
-            //SoftToyEye 软玩具眼睛
+			//FirmamentCloud 苍穹云
 
-            //GreebleGrid 细节网格
+			//DustDunes 尘埃沙丘
 
-            //PlaceholderBackgroundElement 占位背景元素
+			//CamoMeter 伪装计量器
 
-            //FirmamentCloud 苍穹云
+			//UrbanCandleSSS 都市烛台次表面散射
 
-            //DustDunes 尘埃沙丘
+			//UrbanCandleFlame 都市烛台火焰
 
-            //CamoMeter 伪装计量器
+			//DeepLightSource 深层光源
 
-            //UrbanCandleSSS 都市烛台次表面散射
+			//PoisonSpearTip 毒矛尖
 
-            //UrbanCandleFlame 都市烛台火焰
+			//ARZapper AR电击器
 
-            //DeepLightSource 深层光源
+			//ARZapperOmni AR全向电击器
 
-            //PoisonSpearTip 毒矛尖
+			//ARZapperOneSide AR单面电击器
 
-            //ARZapper AR电击器
+			//ARZapperGlow AR电击器辉光
 
-            //ARZapperOmni AR全向电击器
+			//ShiftMask 位移遮罩
 
-            //ARZapperOneSide AR单面电击器
+			//WavesShiftMask 波浪位移遮罩
 
-            //ARZapperGlow AR电击器辉光
+			//RippleTearMask 波纹撕裂遮罩
 
-            //ShiftMask 位移遮罩
+			//RippleRingMask 波纹环遮罩
 
-            //WavesShiftMask 波浪位移遮罩
+			//RippleBubbleMask 波纹气泡遮罩
 
-            //RippleTearMask 波纹撕裂遮罩
+			//TransitionRippleMask 过渡波纹遮罩
 
-            //RippleRingMask 波纹环遮罩
+			//RippleFlow 波纹流
 
-            //RippleBubbleMask 波纹气泡遮罩
+			//RippleGrab 波纹抓取
 
-            //TransitionRippleMask 过渡波纹遮罩
+			//GameplayRippleGrab 游戏波纹抓取
 
-            //RippleFlow 波纹流
+			//RippleBasic 基础波纹
 
-            //RippleGrab 波纹抓取
+			//RippleBasicRippleSide 基础波纹面
 
-            //GameplayRippleGrab 游戏波纹抓取
+			//RippleBasicRippleSideAlt 基础波纹面替代
 
-            //RippleBasic 基础波纹
+			//RippleBasicBothSides 双面基础波纹
 
-            //RippleBasicRippleSide 基础波纹面
+			//RippleBasicClipDistortion 基础波纹裁剪扭曲
 
-            //RippleBasicRippleSideAlt 基础波纹面替代
+			//PlayerCamoMask 玩家伪装遮罩
 
-            //RippleBasicBothSides 双面基础波纹
+			//PlayerCamoMaskBeforePlayer 玩家前伪装遮罩
 
-            //RippleBasicClipDistortion 基础波纹裁剪扭曲
+			//PlayerRippleTrail 玩家波纹轨迹
 
-            //PlayerCamoMask 玩家伪装遮罩
+		}
 
-            //PlayerCamoMaskBeforePlayer 玩家前伪装遮罩
+		private static void MagicCat(Player player)
+		{
+			int N = player.playerState.playerNumber;
+			Vector2 pos = player.mainBodyChunk.pos;
+			Room room = player.room;
+			var color = player.ShortCutColor();
 
-            //PlayerRippleTrail 玩家波纹轨迹
+			//
 
-        }
+			/*                    for (int j = 0; j < room.abstractRoom.creatures.Count; j++)
+					{
+						Vector2 pos3 = room.abstractRoom.creatures[j].realizedCreature.mainBodyChunk.pos;
+					}*/
 
-        private static void MagicCat(Player player)
-        {
-            int N = player.playerState.playerNumber;
-            Vector2 pos = player.mainBodyChunk.pos;
-            Room room = player.room;
-            var color = player.ShortCutColor();
+			//
+			Vector2 vel = Custom.RNV() * 4f * (1f + UnityEngine.Random.value);
+			for (int i = 0; i < UnityEngine.Random.Range(5, 8); i++)
+			{
+				room.AddObject(new Spark(pos, vel, color, null, 20, 40));
+			}
+			room.PlaySound(SoundID.Bomb_Explode, pos, 0.75f, 1.25f);
+			room.AddObject(new Explosion.ExplosionSmoke(pos, vel, 1.1f));
+			room.AddObject(new Explosion.ExplosionLight(pos, 400f, 1f, 7, color));
+			room.AddObject(new ExplosionSpikes(room, pos, 14, 30f, 9f, 7f, 170f, color));
+			room.AddObject(new ShockWave(pos, 4000f, 0.05f, 20, true));
 
-            //
+			/*                    float num = UnityEngine.Random.Range(-0.1f, 0.1f);
+								room.AddObject(new Explosion.ExplosionLight(pos, 100f, 1f, 5, new Color(1f, 0.9f, 0f)));
+								room.AddObject(new ExplosionSpikes(room, pos, 14, 2f, 5f, 7f, 100f, new Color(1f, 0.9f, 0f)));
+								room.AddObject(new ShockWave(pos, 100f, 0.05f, 5, false));
+								room.PlaySound(SoundID.Spear_Bounce_Off_Wall, pos, 2f, 0.6f + num);
+								room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, pos, 2f, 1.5f + num);*/
 
-            /*                    for (int j = 0; j < room.abstractRoom.creatures.Count; j++)
-                    {
-                        Vector2 pos3 = room.abstractRoom.creatures[j].realizedCreature.mainBodyChunk.pos;
-                    }*/
+			//
 
-            //
-            Vector2 vel = Custom.RNV() * 4f * (1f + UnityEngine.Random.value);
-            for (int i = 0; i < UnityEngine.Random.Range(5, 8); i++)
-            {
-                room.AddObject(new Spark(pos, vel, color, null, 20, 40));
-            }
-            room.PlaySound(SoundID.Bomb_Explode, pos, 0.75f, 1.25f);
-            room.AddObject(new Explosion.ExplosionSmoke(pos, vel, 1.1f));
-            room.AddObject(new Explosion.ExplosionLight(pos, 400f, 1f, 7, color));
-            room.AddObject(new ExplosionSpikes(room, pos, 14, 30f, 9f, 7f, 170f, color));
-            room.AddObject(new ShockWave(pos, 4000f, 0.05f, 20, true));
+			foreach (var item in room.updateList)
+			{
+				var creature = item as Creature;
+				if (creature != null)
+				{
+					var player1 = creature as Player;
+					if (player1 == null)
+					{
+						creature.Stun(200);
+					}
+				}
+			}
 
-            /*                    float num = UnityEngine.Random.Range(-0.1f, 0.1f);
-                                room.AddObject(new Explosion.ExplosionLight(pos, 100f, 1f, 5, new Color(1f, 0.9f, 0f)));
-                                room.AddObject(new ExplosionSpikes(room, pos, 14, 2f, 5f, 7f, 100f, new Color(1f, 0.9f, 0f)));
-                                room.AddObject(new ShockWave(pos, 100f, 0.05f, 5, false));
-                                room.PlaySound(SoundID.Spear_Bounce_Off_Wall, pos, 2f, 0.6f + num);
-                                room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, pos, 2f, 1.5f + num);*/
+			for (int j = 0; j < room.abstractRoom.creatures.Count; j++)
+			{
+				Creature creature = room.abstractRoom.creatures[j].realizedCreature;
+				var player1 = creature as Player;
+				if (player1 == null)
+				{
+					creature.Stun(200);
+				}
+			}
 
-            //
+			Debug.Log("1");
 
-            foreach (var item in room.updateList)
-            {
-                var creature = item as Creature;
-                if (creature != null)
-                {
-                    var player1 = creature as Player;
-                    if (player1 == null)
-                    {
-                        creature.Stun(200);
-                    }
-                }
-            }
+			//9cf0a4/363636
+		}
 
-            for (int j = 0; j < room.abstractRoom.creatures.Count; j++)
-            {
-                Creature creature = room.abstractRoom.creatures[j].realizedCreature;
-                var player1 = creature as Player;
-                if (player1 == null)
-                {
-                    creature.Stun(200);
-                }
-            }
+        /*//*/
 
-            Debug.Log("1");
 
-            //9cf0a4/363636
-        }
-
-
+        /*//*/
     }
 }

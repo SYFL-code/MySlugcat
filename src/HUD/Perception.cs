@@ -120,7 +120,7 @@ namespace MySlugcat
 						Creature? creature = null;
 						if (owner.room != null)
 						{
-							creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
+							creature = Extension.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
 							if (creature == null)
 							{
 								return;
@@ -213,7 +213,7 @@ namespace MySlugcat
 				}
 				if (owner.room != null)
 				{
-					creature = MyPlayer.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
+					creature = Extension.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
 					if (creature == null)
 					{
 						shouldBeActive = false;

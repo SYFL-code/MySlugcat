@@ -41,7 +41,7 @@ namespace MySlugcat
             //Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
             if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
             {
-                List<Creature>? creatures = MyPlayer.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, player, false, true);
+                List<Creature>? creatures = Extension.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, player, false, true);
 
                 Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_zh", $"creatures_Null ({creatures == null})");
 

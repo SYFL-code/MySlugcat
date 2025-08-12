@@ -250,7 +250,7 @@ namespace MySlugcat
 
         public static Creature? Frame(Player player, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
         {
-            Creature? creature = MyPlayer.RandomlySelectedCreature(player.room, true, player, false);
+            Creature? creature = Extension.RandomlySelectedCreature(player.room, true, player, false);
             int percentage = 40;
             if (probability == -1)
             {

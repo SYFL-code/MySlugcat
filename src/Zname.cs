@@ -23,7 +23,7 @@ namespace MySlugcat
 		/// 其他
 		/// </summary>
 		private static void 其他()
-		{
+		{//shioldcotClass.Lockodtarget
 			try
 			{
 

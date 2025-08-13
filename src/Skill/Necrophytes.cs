@@ -69,6 +69,10 @@ namespace MySlugcat
 				{
 					if (scavenger is Lizard || scavenger is Scavenger)
 					{
+						for (int i = 0; i < sLeaser.sprites.Length; i++)
+						{
+							sLeaser.sprites[i]._color = Extension.ToGrayscale(sLeaser.sprites[i]._color, 0.8f);
+						}
 						scavGraphics.bodyColor = Extension.ToGrayscale(scavGraphics.bodyColor, 0.8f);
 						scavGraphics.headColor = Extension.ToGrayscale(scavGraphics.headColor, 0.8f);
 						scavGraphics.decorationColor = Extension.ToGrayscale(scavGraphics.decorationColor, 0.8f);

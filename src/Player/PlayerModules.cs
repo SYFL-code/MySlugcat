@@ -68,22 +68,34 @@ internal static class PlayerModuleManager
 
 		public List<string> Passages = new List<string>(); // 已拥有的通行证
 
-		public int  MySlugcatStats = 0;        // 蛞蝓猫数据
-		public bool Exhausted = false;         // 精疲力竭
-		public bool VisionSystem = false;      // 视觉系统
+		#region 能力字段
+		/// <summary> 蛞蝓猫数据 </summary>
+		public int  MySlugcatStats = 0;
+		/// <summary> 精疲力竭 </summary>
+		public bool Exhausted = false;
+		/// <summary> 视觉系统 </summary>
+		public bool VisionSystem = false;
 
-		public bool FrameSkill = false;        // 嫁祸能力
-		public bool DeflagrationSkill = false; // 爆燃能力
-		public bool KnitmeshSkill = false;     // 缠绕能力
-		public bool PerceptionSkill = false;   // 感知能力
-		public bool DigestionSkill = false;    // 暴食能力
-		public bool SpawnNecrophytes = false;  // 死灵能力 死灵法师
-		public bool FixedSkill = false;        // 定身能力
+		/// <summary> 嫁祸能力 </summary>
+		public bool FrameSkill = false;
+		/// <summary> 爆燃能力 </summary>
+		public bool DeflagrationSkill = false;
+		/// <summary> 缠绕能力 </summary>
+		public bool KnitmeshSkill = false;
+		/// <summary> 感知能力 </summary>
+		public bool PerceptionSkill = false;
+		/// <summary> 暴食能力 </summary>
+		public bool DigestionSkill = false;
+		/// <summary> 死灵能力 死灵法师 </summary>
+		public bool SpawnNecrophytes = false;
+		/// <summary> 定身能力 </summary>
+		public bool FixedSkill = false;
 
 		//public int HungryCoolDown = 12000;//冷却计时器
+		#endregion
 
 
-        public PlayerModule(Player player)
+		public PlayerModule(Player player)
 		{
 			playerRef = new WeakReference<Player>(player);
 			Console.WriteLine($"{Exhausted}_1");

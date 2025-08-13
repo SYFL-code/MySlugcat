@@ -54,28 +54,28 @@ namespace MySlugcat
 
         public static void Hook()
         {
-            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:Hook", $"sst");
+            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:Hook", $"sst");
             On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
         }
 
         private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
         {
-            ///Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSleepHud", $"st");
+            ///Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:HUD_InitSleepHud", $"st");
             orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
             self.AddPart(new IntelHUD(self));
         }
 
         private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
-            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSinglePlayerHud", $"st");
+            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:HUD_InitSinglePlayerHud", $"st");
             orig.Invoke(self, cam);
             self.AddPart(new IntelHUD(self));
         }
 
         public IntelHUD(HUD.HUD hud) : base(hud)
         {
-            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:IntelHUD_", $"st_");
+            //Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:IntelHUD_", $"st_");
             // 在构造函数中初始化指针线
             scavPointerLines = new FSprite[9]; // 创建9个精灵用于组成3D指针
             for (int i = 0; i < 9; i++)
@@ -95,7 +95,7 @@ namespace MySlugcat
 
         public int ScoreOfPointScav(Player player, Creature scav)
         {
-            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:ScoreOfPointScav", $"st");
+            Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:ScoreOfPointScav", $"st");
             int score = Custom.ManhattanDistance(player.abstractCreature.pos, scav.abstractCreature.pos);
 
             if (scav.room == null) return score;
@@ -108,7 +108,7 @@ namespace MySlugcat
 
         public override void Update()
         {
-            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"st");
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:Update", $"st");
             // 在Update()方法中更新指针逻辑
             showPointer = false; // 默认不显示指针
 
@@ -125,10 +125,10 @@ namespace MySlugcat
 
             if (hud.owner is Player player && SC.PerceptionSkill)
             {
-                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"player ({hud.owner is Player})");
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:Update", $"player ({hud.owner is Player})");
                 // 获取玩家当前房间
                 Room room = player.abstractCreature.world.game.cameras[0].room;
-                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Update", $"Room_Null ({room == null})");
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:Update", $"Room_Null ({room == null})");
                 if (room != null)
                 {
                     //Scavenger? pointCreature = null;
@@ -199,11 +199,11 @@ namespace MySlugcat
 
         public override void Draw(float timeStacker)
         {
-            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"player ({hud.owner is Player})");
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:Draw", $"player ({hud.owner is Player})");
             if (hud.owner is Player player && (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill))
             {
                 Room room = player.abstractCreature.world.game.cameras[0].room;
-                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:Draw", $"Room_Null ({room == null})");
+                Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:Draw", $"Room_Null ({room == null})");
                 if (room != null)
                 {
                     // 计算插值后的旋转因子
@@ -285,7 +285,7 @@ namespace MySlugcat
         // 清除指针精灵
         public override void ClearSprites()
         {
-            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:ClearSprites", $"st");
+            Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:ClearSprites", $"st");
             for (int i = 0; i < 9; i++)
             {
                 scavPointerLines[i].RemoveFromContainer();

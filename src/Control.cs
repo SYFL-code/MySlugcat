@@ -45,8 +45,8 @@ namespace MySlugcat
         /*public static int  MySlugcatStats = 0;        // 蛞蝓猫数据
 		public static bool Exhausted = true;          // 精疲力竭
 
-		public static bool Frame​​Skill = false;        // 嫁祸能力
-		public static bool Deflagration​​Skill = false; // 爆燃能力
+		public static bool FrameSkill = false;        // 嫁祸能力
+		public static bool DeflagrationSkill = false; // 爆燃能力
 		public static bool KnitmeshSkill = false;     // 缠绕能力
 		public static bool PerceptionSkill = false;   // 感知能力
 		public static bool DigestionSkill = false;    // 暴食能力
@@ -107,8 +107,8 @@ namespace MySlugcat
                 AllPlayerSkill = false;
                 MySlugcatStats = 0;
                 Exhausted = true;
-                Frame​​Skill = false;
-                Deflagration​​Skill = false;
+                FrameSkill = false;
+                DeflagrationSkill = false;
                 KnitmeshSkill = false;
                 PerceptionSkill = false;
                 DigestionSkill = false;
@@ -144,8 +144,8 @@ namespace MySlugcat
             MySlugcatStats = 0;
             Exhausted = true;
 
-            Frame​​Skill = false;
-            Deflagration​​Skill = false;
+            FrameSkill = false;
+            DeflagrationSkill = false;
             KnitmeshSkill = false;
             PerceptionSkill = false;
             DigestionSkill = false;
@@ -179,7 +179,7 @@ namespace MySlugcat
                     {
                         if (ownedPassages[i] == "The Outlaw")//"暴徒"
                         {
-							Deflagration​​Skill = true;
+							DeflagrationSkill = true;
                         }
 
                     }

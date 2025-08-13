@@ -26,7 +26,7 @@ using System.Reflection;
 namespace MySlugcat
 {
     //嫁祸能力
-    public class Frame​​Skill
+    public class FrameSkill
     {
         public static void Hook()
         {
@@ -263,12 +263,12 @@ namespace MySlugcat
             StackTrace stackTrace = new StackTrace();
             StackFrame stackFrame = stackTrace.GetFrame(2);
             MethodBase methodBase = stackFrame.GetMethod();
-            //Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
+            //Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
             if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 if (Vector2.Distance(player.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(player.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(player.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
                 {
-                    Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Frame", $"pos_Distance < 10");
+                    Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Frame", $"pos_Distance < 10");
                     return null;
                 }
 
@@ -336,11 +336,11 @@ namespace MySlugcat
                 Vector2 playerpos = player.mainBodyChunk.pos;
                 Vector2 creaturepos = creature.mainBodyChunk.pos;
 
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_st", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_st", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
                 Teleport.SetObjectPosition(creature, playerpos);
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_zh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_zh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
                 Teleport.SetObjectPosition(player, creaturepos);
-                Log.Logger(7, "Frame", "MySlugcat:Frame​​Skill​​:Frame_Teleport_sh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
+                Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_sh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
 
                 if (creature is Lizard lizard)
                 {
@@ -533,7 +533,7 @@ namespace MySlugcat
         {
             if (((player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)) && !player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
-                Creature? obj = Frame​​Skill.Frame(player, false, player, 20);
+                Creature? obj = FrameSkill.Frame(player, false, player, 20);
 
                 if (obj != null)
                 {
@@ -563,11 +563,11 @@ namespace MySlugcat
             Creature creature = player;
             if (!player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
-                Log.Logger(7, "FrameDie", "MySlugcat:Frame​​Skill​​:Player_Die_st", $"");
+                Log.Logger(7, "FrameDie", "MySlugcat:FrameSkill:Player_Die_st", $"");
 
-                Creature? obj = Frame​​Skill.Frame(player, false, player, 12);
+                Creature? obj = FrameSkill.Frame(player, false, player, 12);
 
-                Log.Logger(7, "FrameDie", "MySlugcat:Frame​​Skill​​:Player_Die_sh", $"Creature type: ({obj?.GetType()}), BodyChunks: ({obj?.bodyChunks?.Length}), Null ({obj == null})");
+                Log.Logger(7, "FrameDie", "MySlugcat:FrameSkill:Player_Die_sh", $"Creature type: ({obj?.GetType()}), BodyChunks: ({obj?.bodyChunks?.Length}), Null ({obj == null})");
                 if (obj != null)
                 {
                     player.dead = false;
@@ -629,17 +629,17 @@ namespace MySlugcat
 
         public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
-            //Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({Control.FrameSkill})");
+            //Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({Control.FrameSkill})");
             if (result.obj != null && result.obj is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
-                Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_st", $"");
+                Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething_st", $"");
                 //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: st |");
 
                 Creature? obj = Frame(player, false, player);
 
                 //Console.WriteLine($"MySlugcat:Spear_HitSomething: sh \n Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}");
-                Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething_sh", $"Creature type ({obj?.GetType()}), BodyChunks ({obj?.bodyChunks?.Length}), Null ({obj == null})");
+                Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething_sh", $"Creature type ({obj?.GetType()}), BodyChunks ({obj?.bodyChunks?.Length}), Null ({obj == null})");
                 //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: sh |{obj?.GetType()}, {obj?.bodyChunks?.Length}, {obj != null}");
 
 /*                if (obj != null)
@@ -665,7 +665,7 @@ namespace MySlugcat
                     hs.health -= spear.spearDamageBonus;
                     if (hs != null && hs.health != null)
                     {
-                        Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"hs_Null ({hs == null}), hs ({hs?.health}) _ ({spear.spearDamageBonus})");
+                        Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"hs_Null ({hs == null}), hs ({hs?.health}) _ ({spear.spearDamageBonus})");
                         //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: hs {hs != null}, {hs?.health} _ {spear.spearDamageBonus}");
                     }
                 }
@@ -675,16 +675,16 @@ namespace MySlugcat
                     hs2.health -= spear.spearDamageBonus;
                     if (hs2 != null && hs2.health != null)
                     {
-                        Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"hs2_Null ({hs2 == null}), hs ({hs2?.health}) _ ({spear.spearDamageBonus})");
+                        Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"hs2_Null ({hs2 == null}), hs ({hs2?.health}) _ ({spear.spearDamageBonus})");
                         //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: hs {hs != null}, {hs?.health} _ {spear.spearDamageBonus}");
                     }
                 }
 
-                Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"Creature type ({obj?.GetType()})");
+                Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"Creature type ({obj?.GetType()})");
                 //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: obj {obj?.GetType()}");
                 return obj;
             }
-            Log.Logger(8, "Frame", "MySlugcat:Frame​​Skill​​:Spear_HitSomething", $"Creature type ({result.obj?.GetType()})");
+            Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"Creature type ({result.obj?.GetType()})");
             //Console.WriteLine($"MySlugcat:Frame:Spear_HitSomething: obj {result.obj?.GetType()}");
             return result.obj;
 

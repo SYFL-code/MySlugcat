@@ -21,6 +21,8 @@ namespace MySlugcat
 		private readonly FContainer pointerContainer;
 		private readonly TriangleMesh pointerMesh; // 使用网格创建自定义形状
 
+		private readonly int N;
+
 		private const float PointerLength = 25f; // 缩短指针长度
 		private const float PointerWidth = 10f;  // 增加指针宽度
 		private const float CircleRadius = 60f;
@@ -49,9 +51,9 @@ namespace MySlugcat
 		private List<LightSource> glowEffects = new List<LightSource>();
 
 
-		public Perception(HUD.HUD hud) : base(hud)
+		public Perception(HUD.HUD hud, int N) : base(hud)
 		{
-
+			this.N = N;
 			try
 			{
 				// 1. 创建显示容器
@@ -169,7 +171,7 @@ namespace MySlugcat
 		{
 			if (hud.owner is Player owner)
 			{
-                /*foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+				/*foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
                 {
                     //Player? GetPlayer = null;
                     if (weakPlayerRef.TryGetTarget(out var GetPlayer))
@@ -178,162 +180,181 @@ namespace MySlugcat
                     }
                 }*/
 
-                if (PlayerModuleManager.playerModules.TryGetValue(owner, out var module) && module.PerceptionSkill)
-                {
+				//int N = owner.playerState.playerNumber;
 
-                }
-                else
-                {
-                    fadeState = 0f;
-                }
-
-                int N = owner.playerState.playerNumber;
-
-				if (owner.abstractCreature.world.game.GamePaused)
+				Player? player = null;
+				bool isShow = false;
+				foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
 				{
-					//pointerMesh.color = Color.black;
-					return;
-				}
-
-				bool shouldBeActive = true;
-				Creature? creature = null;
-				float timeStacker = Time.deltaTime;//1秒60帧，那增量时间就是 1/60 秒  (Time.deltaTime)
-
-				if (owner.room == null && owner.inShortcut)
-				{
-					shouldBeActive = false;
-				}
-				if (owner is Player player && player.Sleeping)
-				{
-					shouldBeActive = false;
-				}
-				if (owner is Player player1 && player1.dead)
-				{
-					shouldBeActive = false;
-				}
-				if (owner.room != null)
-				{
-					creature = Extension.FindNearestCreature(owner.firstChunk.pos, owner.room, false, owner, false, 2);
-					if (creature == null)
+					Player player_;
+					if (weakPlayerRef.TryGetTarget(out player_))
 					{
-						shouldBeActive = false;
-					}
-					if (creature != null)
-					{
-						Vector2? vector = creature.firstChunk.pos;
-						if (vector == null)
+						if (player_.playerState.playerNumber == N && player_.room == owner.room && !player_.dead)
 						{
-							shouldBeActive = false;
+							if (PlayerModuleManager.playerModules.TryGetValue(player_, out var module) && module.PerceptionSkill)
+							{
+								isShow = true;
+								player = player_;
+								break;
+							}
 						}
 					}
 				}
-
-				if (shouldBeActive != isActive)
+				if (isShow && player != null)
 				{
-					isActive = shouldBeActive;
-					fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
-				}
+					if (player.abstractCreature.world.game.GamePaused)
+					{
+						//pointerMesh.color = Color.black;
+						return;
+					}
 
-				// 改进的淡入淡出控制
-				float targetAlpha = isActive ? 1f : 0f;
-				float fadeDelta = (isActive ? FadeSpeed : -FadeSpeed) * Time.deltaTime;
+					bool shouldBeActive = true;
+					Creature? creature = null;
+					float timeStacker = Time.deltaTime;//1秒60帧，那增量时间就是 1/60 秒  (Time.deltaTime)
 
-				// 更平滑的渐变过渡
-				fadeState = Mathf.Clamp01(fadeState + fadeDelta * 0.5f); // 降低变化速度
+					if (player.room == null && player.inShortcut)
+					{
+						shouldBeActive = false;
+					}
+					if (player is Player player01 && player01.Sleeping)
+					{
+						shouldBeActive = false;
+					}
+					if (player is Player player02 && player02.dead)
+					{
+						shouldBeActive = false;
+					}
+					if (player.room != null)
+					{
+						creature = Extension.FindNearestCreature(player.firstChunk.pos, player.room, false, player, false, 2);
+						if (creature == null)
+						{
+							shouldBeActive = false;
+						}
+						if (creature != null)
+						{
+							Vector2? vector = creature.firstChunk.pos;
+							if (vector == null)
+							{
+								shouldBeActive = false;
+							}
+						}
+					}
 
-				// 使用更明显的缓动函数
-				float currentAlpha = EnhancedEaseInOut(fadeState);
+					if (shouldBeActive != isActive)
+					{
+						isActive = shouldBeActive;
+						fadeState = Mathf.Clamp01(fadeState); // 确保在0-1范围内
+					}
 
-				// 应用透明度到所有元素
-				pointerContainer.alpha = currentAlpha;
-				pointerMesh.alpha = currentAlpha;
+					// 改进的淡入淡出控制
+					float targetAlpha = isActive ? 1f : 0f;
+					float fadeDelta = (isActive ? FadeSpeed : -FadeSpeed) * Time.deltaTime;
 
-				// 更新光效透明度
-				foreach (var light in glowEffects)
-				{
-					light.setAlpha = currentAlpha * 0.7f;
-				}
+					// 更平滑的渐变过渡
+					fadeState = Mathf.Clamp01(fadeState + fadeDelta * 0.5f); // 降低变化速度
 
-				// 确保当完全透明时停止更新
-				if (fadeState <= 0f)
-				{
-					pointerContainer.isVisible = false; // 直接隐藏整个容器
-					return;
+					// 使用更明显的缓动函数
+					float currentAlpha = EnhancedEaseInOut(fadeState);
+
+					// 应用透明度到所有元素
+					pointerContainer.alpha = currentAlpha;
+					pointerMesh.alpha = currentAlpha;
+
+					// 更新光效透明度
+					foreach (var light in glowEffects)
+					{
+						light.setAlpha = currentAlpha * 0.7f;
+					}
+
+					// 确保当完全透明时停止更新
+					if (fadeState <= 0f)
+					{
+						pointerContainer.isVisible = false; // 直接隐藏整个容器
+						return;
+					}
+					else
+					{
+						pointerContainer.isVisible = true;
+					}
+
+					// 如果没有激活或完全透明，跳过更新
+					//if (fadeState <= 0f || !shouldBeActive || player.inShortcut) return;
+					if (creature == null) return;
+
+					// 摄像机坐标
+					float camX = 300f;
+					float camY = 300f;
+					if (player.room != null)
+					{
+						camX = player.room.game.cameras[0].pos.x;
+						camY = player.room.game.cameras[0].pos.y;
+					}
+
+					// 1. 获取世界坐标
+					Vector2 targetWorldPos = creature.mainBodyChunk.pos;
+					Vector2 playerWorldPos = player.firstChunk.pos;
+
+					// 2. 计算方向向量(从玩家指向目标)
+					Vector2 direction = (targetWorldPos - playerWorldPos).normalized;
+					targetAngle = Custom.VecToDeg(direction);
+					//targetAngle = Custom.VecToDeg(targetWorldPos - playerWorldPos);
+
+					// 平滑旋转
+					float currentVelocity = 0f;
+					float smoothTime = 0.5f; // 调整这个值（越大越慢）
+					float currentAngle2 = Mathf.SmoothDampAngle(pointerMesh.rotation, targetAngle, ref currentVelocity, smoothTime);
+
+					float degreesPerSecond = 60f; // 每秒旋转 60 度
+					float maxStep = degreesPerSecond * Time.deltaTime; // 每帧最大步长
+					float currentAngle = Mathf.MoveTowardsAngle(pointerMesh.rotation, targetAngle, maxStep);
+
+					float currentAngle1 = Mathf.LerpAngle(
+						pointerMesh.rotation,
+						targetAngle,
+						timeStacker * RotationSpeed * 0.01f);
+
+
+					// 3. 计算屏幕空间位置
+					Vector2 playerScreenPos = new Vector2(playerWorldPos.x - camX, playerWorldPos.y - camY);
+
+					// 更新指针位置和旋转
+					pointerContainer.SetPosition(playerScreenPos);
+					pointerMesh.rotation = currentAngle;
+
+					// 调整指针位置(尖端指向目标)
+					Vector2 pointerOffset = Custom.DegToVec(currentAngle) * 30f;
+					pointerMesh.SetPosition(pointerOffset);
+
+
+					// 目标接近时震动效果
+					float distance = Vector2.Distance(playerWorldPos, targetWorldPos);
+					distance = distance * 1.5f;
+					float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
+					Vector2 exactPos = pointerOffset + Custom.RNV() * shakeIntensity * 3f;
+					pointerMesh.SetPosition(exactPos);
+
+					// 动态颜色变化
+					float Lerp = Mathf.Clamp01(distance / maxDistance);
+					pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
+
+					// 脉冲动画
+					float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
+					float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
+					if (distance >= 1100)
+					{
+						pulseIntensity_ = 0f;
+					}
+					pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.075f;
+					pointerMesh.scaleY = baseWidth * (1f + pulse * pulseIntensity_) * 0.075f;
 				}
 				else
 				{
-					pointerContainer.isVisible = true;
+					pointerContainer.isVisible = false;
+					return;
 				}
 
-				// 如果没有激活或完全透明，跳过更新
-				//if (fadeState <= 0f || !shouldBeActive || owner.inShortcut) return;
-				if (creature == null) return;
 
-				// 摄像机坐标
-				float camX = 300f;
-				float camY = 300f;
-				if (owner.room != null)
-				{
-					camX = owner.room.game.cameras[0].pos.x;
-					camY = owner.room.game.cameras[0].pos.y;
-				}
-
-				// 1. 获取世界坐标
-				Vector2 targetWorldPos = creature.mainBodyChunk.pos;
-				Vector2 ownerWorldPos = owner.firstChunk.pos;
-
-				// 2. 计算方向向量(从玩家指向目标)
-				Vector2 direction = (targetWorldPos - ownerWorldPos).normalized;
-				targetAngle = Custom.VecToDeg(direction);
-				//targetAngle = Custom.VecToDeg(targetWorldPos - ownerWorldPos);
-
-				// 平滑旋转
-				float currentVelocity = 0f;
-				float smoothTime = 0.5f; // 调整这个值（越大越慢）
-				float currentAngle2 = Mathf.SmoothDampAngle(pointerMesh.rotation, targetAngle, ref currentVelocity, smoothTime);
-
-				float degreesPerSecond = 60f; // 每秒旋转 60 度
-				float maxStep = degreesPerSecond * Time.deltaTime; // 每帧最大步长
-				float currentAngle = Mathf.MoveTowardsAngle(pointerMesh.rotation, targetAngle, maxStep);
-
-				float currentAngle1 = Mathf.LerpAngle(
-					pointerMesh.rotation,
-					targetAngle,
-					timeStacker * RotationSpeed * 0.01f);
-
-
-				// 3. 计算屏幕空间位置
-				Vector2 ownerScreenPos = new Vector2(ownerWorldPos.x - camX, ownerWorldPos.y - camY);
-
-				// 更新指针位置和旋转
-				pointerContainer.SetPosition(ownerScreenPos);
-				pointerMesh.rotation = currentAngle;
-
-				// 调整指针位置(尖端指向目标)
-				Vector2 pointerOffset = Custom.DegToVec(currentAngle) * 30f;
-				pointerMesh.SetPosition(pointerOffset);
-
-
-				// 目标接近时震动效果
-				float distance = Vector2.Distance(ownerWorldPos, targetWorldPos);
-				distance = distance * 1.5f;
-				float shakeIntensity = Mathf.Clamp01(1f - distance / 300f) * fadeState;
-				Vector2 exactPos = pointerOffset + Custom.RNV() * shakeIntensity * 3f;
-				pointerMesh.SetPosition(exactPos);
-
-				// 动态颜色变化
-				float Lerp = Mathf.Clamp01(distance / maxDistance);
-				pointerMesh.color = Color.Lerp(endColor, startColor, Lerp / 1.5f);
-
-				// 脉冲动画
-				float pulse = 0.5f + Mathf.Sin(Time.time * pulseSpeed) * 0.5f;
-				float pulseIntensity_ = Mathf.Clamp01(maxDistance / distance / 5) / 3;
-				if (distance >= 1100)
-				{
-					pulseIntensity_ = 0f;
-				}
-				pointerMesh.scaleX = baseLength * (1f + pulse * pulseIntensity_) * 0.075f;
-				pointerMesh.scaleY = baseWidth * (1f + pulse * pulseIntensity_) * 0.075f;
 
 
 			}

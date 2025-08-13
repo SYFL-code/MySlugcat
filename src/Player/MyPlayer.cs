@@ -282,7 +282,7 @@ namespace MySlugcat
             Log.Logger(-7, "", "", "");
             Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sst", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
             //Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
-            PhysicalObject? obje = Frame​​Skill.Spear_HitSomething(spear, result, eu);
+            PhysicalObject? obje = FrameSkill.Spear_HitSomething(spear, result, eu);
             Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_st", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
             //Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
             if (obje != null)
@@ -295,7 +295,7 @@ namespace MySlugcat
 
             Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_zh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
             //Console.WriteLine($"MySlugcat MyPlayer:zh Spear_HitSomething: zh , GetType {result.obj?.GetType()}, result.obj {result.obj == null}");
-            Deflagration​​Skill.Spear_HitSomething(spear, result, eu, obj, mode);
+            DeflagrationSkill.Spear_HitSomething(spear, result, eu, obj, mode);
             Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
             //Console.WriteLine($"MySlugcat MyPlayer:sh Spear_HitSomething: sh {result.obj?.GetType()}, {result.obj == null}");
 

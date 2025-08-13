@@ -31,44 +31,60 @@ namespace MySlugcat
 			//On.HUD.HUD.InitTeleportHud += HUD_InitTeleportHud;
 		}
 
-		/*private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
+		/*private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD HUD, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
 		{
-			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSleepHud", $"st");
+			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:HUD_InitSleepHud", $"st");
 			if (charStats.name == Plugin.YourSlugID)
 			{
-				self.AddPart(new Perception(self));
+				SpawnHUD(HUD);
 			}
-			orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
+			orig.Invoke(HUD, sleepAndDeathScreen, mapData, charStats);
 		}*/
 
-		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD HUD, RoomCamera cam)
 		{
 			if (cam.room.game.StoryCharacter == Plugin.YourSlugID)
 			{
-				self.AddPart(new Perception(self));
-				self.AddPart(new VisionSystem(self));
+				SpawnHUD(HUD);
 			}
-			orig.Invoke(self, cam);
+			orig.Invoke(HUD, cam);
 		}
 
-		private static void HUD_InitMultiplayerHud(On.HUD.HUD.orig_InitMultiplayerHud orig, HUD.HUD self, ArenaGameSession session)
+		private static void HUD_InitMultiplayerHud(On.HUD.HUD.orig_InitMultiplayerHud orig, HUD.HUD HUD, ArenaGameSession session)
 		{
 			if (session.room.game.StoryCharacter == Plugin.YourSlugID)
 			{
-				self.AddPart(new Perception(self));
-				self.AddPart(new VisionSystem(self));
+				SpawnHUD(HUD);
 			}
-			orig.Invoke(self, session);
+			orig.Invoke(HUD, session);
 		}
 
-		private static void HUD_InitSafariHud(On.HUD.HUD.orig_InitSafariHud orig, HUD.HUD self, RoomCamera cam)
+		private static void HUD_InitSafariHud(On.HUD.HUD.orig_InitSafariHud orig, HUD.HUD HUD, RoomCamera cam)
 		{
 			if (cam.room.game.StoryCharacter == Plugin.YourSlugID)
 			{
-				self.AddPart(new Perception(self));
-				self.AddPart(new VisionSystem(self));
+				SpawnHUD(HUD);
 			}
-			orig.Invoke(self, cam);
+			orig.Invoke(HUD, cam);
+		}
+
+		private static void SpawnHUD(HUD.HUD HUD)
+		{
+			HUD.AddPart(new VisionSystem(HUD));
+			if (PlayerModuleManager.players.Count > 0)
+			{
+				for (int i = 0; i < PlayerModuleManager.players.Count; i++)
+				{
+					HUD.AddPart(new Perception(HUD, i));
+				}
+			}
+			else
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					HUD.AddPart(new Perception(HUD, i));
+				}
+			}
 		}
 
 
@@ -153,6 +169,60 @@ namespace MySlugcat
 		{
 			//base.Update();
 
+			bool allPlayerDead = true;
+			bool NotVisionSystem = true;
+
+			/*for (int i = 0; i < Control.PlayersQuantity; i++)
+			{
+				if (!Control.PlayerDead[i])
+				{
+					allPlayerDead = false;
+				}
+			}*/
+			foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+			{
+				Player player;
+				if (weakPlayerRef.TryGetTarget(out player))
+				{
+					if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.VisionSystem)
+					{
+						NotVisionSystem = false;
+					}
+					if (!player.dead)
+					{
+						allPlayerDead = false;
+					}
+				}
+			}
+
+			if (NotVisionSystem)
+			{
+				ClearSprites();
+				return;
+			}
+
+			if (allPlayerDead == true && Clear == 0)
+			{
+				Clear = 0.025f;
+				HOLE_COLOR = new Color(1f, 1f, 1f);
+			}
+
+			if (Clear != 0)
+			{
+				holeCenters[99] = new Vector2(gridX, gridY);
+				holeRadii[99] = (gridX + 50) * Clear; // 默认半径
+				holeEdge[99] = (gridX + 50) + 40;
+				holeColor[99] = new Color(1f, 1f, 1f);
+				holeActive[99] = true; // 标记有效洞
+				Clear += 0.025f;
+			}
+
+			if (Clear >= 1.01f)
+			{
+				ClearSprites();
+				return;
+			}
+
 			// 更新洞的位置 (这里简化处理，实际应根据游戏逻辑更新)
 			// 重置所有洞状态
 			for (int i = 0; i < 100; i++)
@@ -191,51 +261,6 @@ namespace MySlugcat
 					}
 				}
 			}
-
-			bool allPlayerDead = true;
-
-			/*for (int i = 0; i < Control.PlayersQuantity; i++)
-			{
-				if (!Control.PlayerDead[i])
-				{
-					allPlayerDead = false;
-				}
-			}*/
-
-			foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
-			{
-				Player player;
-				if (weakPlayerRef.TryGetTarget(out player))
-				{
-					if (!player.dead)
-					{
-						allPlayerDead = false;
-					}
-				}
-			}
-
-			if (allPlayerDead == true && Clear == 0)
-			{
-				Clear = 0.025f;
-				HOLE_COLOR = new Color(1f, 1f, 1f);
-			}
-
-			if (Clear != 0)
-			{
-				holeCenters[99] = new Vector2(gridX, gridY);
-				holeRadii[99] = (gridX + 50) * Clear; // 默认半径
-				holeEdge[99] = (gridX + 50) + 40;
-				holeColor[99] = new Color(1f, 1f, 1f);
-				holeActive[99] = true; // 标记有效洞
-				Clear += 0.025f;
-			}
-
-			if (Clear >= 1.01f)
-			{
-				ClearSprites();
-				return;
-			}
-
 
 			// 更新像素透明度
 			UpdatePixelTransparency();
@@ -364,21 +389,21 @@ namespace MySlugcat
 
 		public static void Hook()
 		{
-			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:Hook", $"sst");
+			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:Hook", $"sst");
 			On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
 			On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
 		}
 
 		private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD self, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
 		{
-			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSleepHud", $"st");
+			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:HUD_InitSleepHud", $"st");
 			orig.Invoke(self, sleepAndDeathScreen, mapData, charStats);
 			self.AddPart(new VisionSystem(self));
 		}
 
 		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
 		{
-			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD​​:HUD_InitSinglePlayerHud", $"st");
+			//Log.Logger(7, "IntelHUD", "MySlugcat:IntelHUD:HUD_InitSinglePlayerHud", $"st");
 			orig.Invoke(self, cam);
 			self.AddPart(new VisionSystem(self));
 		}
@@ -626,7 +651,7 @@ public override void Draw(float timeStacker)
 
 public override void ClearSprites()
 {
-	//Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD​​:ClearSprites", $"st");
+	//Log.Logger(9, "IntelHUD", "MySlugcat:IntelHUD:ClearSprites", $"st");
 	container.isVisible = false;
 	container.RemoveFromContainer();
 	rect.RemoveFromContainer();

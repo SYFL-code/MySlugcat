@@ -38,12 +38,12 @@ namespace MySlugcat
 
         private static void Knitmesh(Player player, Room room, Vector2 pos)
         {
-            //Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
+            //Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
             if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
             {
                 List<Creature>? creatures = Extension.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, player, false, true);
 
-                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh_zh", $"creatures_Null ({creatures == null})");
+                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh_zh", $"creatures_Null ({creatures == null})");
 
                 if (creatures != null && creatures.Count > 0)
                 {
@@ -59,7 +59,7 @@ namespace MySlugcat
                                                     Vector2 V3 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));
                                                     Vector2 V4 = new Vector2(UnityEngine.Random.Range(-60, 61), UnityEngine.Random.Range(-60, 61));*/
 
-                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh", $"st");
 
                             for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
                             {
@@ -81,7 +81,7 @@ namespace MySlugcat
                             }
                             creature.room.PlaySound(SoundID.Spore_Bees_Emerge, creature.firstChunk);
 
-                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"zh");
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh", $"zh");
 
                             float j = UnityEngine.Random.Range(0.01f, 8.00f);
                             for (int i = 0; i < 160000 / (Distance * Distance) * 1.5 * j; i++)
@@ -102,7 +102,7 @@ namespace MySlugcat
                                 bee2.forceAngry = true;
                                 creature.room.AddObject(bee2);
                             }
-                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"sh");
+                            Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh", $"sh");
 
                         }
 
@@ -110,7 +110,7 @@ namespace MySlugcat
                 }
                 else
                 {
-                    Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Knitmesh", $"st");
+                    Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh", $"st");
 
                     for (int i = 0; i < UnityEngine.Random.Range(8, 38); i++)
                     {
@@ -140,10 +140,10 @@ namespace MySlugcat
             orig(player, eu);
 
             int N = player.playerState.playerNumber;
-            //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
+            //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
             if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
             {
-                //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
+                //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;
                 //if (KnitmeshSkill != null&& KnitmeshSkill.Value)
                 float timeStacker = Time.deltaTime;
@@ -217,7 +217,7 @@ namespace MySlugcat
             {
                 if (bee.blackColor.a <= 1f)
                 {
-                    Log.Logger(7, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Bee_Update", $"({bee.blackColor.a <= 1f}), ({bee.blackColor.a})");
+                    Log.Logger(7, "Knitmesh", "MySlugcat:KnitmeshSkill:Bee_Update", $"({bee.blackColor.a <= 1f}), ({bee.blackColor.a})");
                     bee.blackColor.a += 0.01f;
                 }
             }
@@ -230,7 +230,7 @@ namespace MySlugcat
             //if (bee.blackColor != new Color(0.066f, 0.030f, 0.001f, 1.000f))
             if (bee.blackColor.r != 0.066f || bee.blackColor.g != 0.030f || bee.blackColor.b != 0.001f)
             {
-                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill​​:Bee_ApplyPalette", $"({palette.blackColor.ToString()})");
+                Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Bee_ApplyPalette", $"({palette.blackColor.ToString()})");
                 bee.blackColor = palette.blackColor;
             }
             

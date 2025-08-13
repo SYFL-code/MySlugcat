@@ -32,23 +32,23 @@ namespace MySlugcat
 
         //按下按键的时长(40次 = 1秒)
         //jump 跳跃键
-        public static int[] JmpCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] JmpCounter = Enumerable.Repeat(0, 100).ToArray();
         //pckp 拾取键
-        public static int[] pckpCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] pckpCounter = Enumerable.Repeat(0, 100).ToArray();
         //throw 投掷键
-        public static int[] thrwCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] thrwCounter = Enumerable.Repeat(0, 100).ToArray();
         //map 地图键
-        public static int[] mpCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] mpCounter = Enumerable.Repeat(0, 100).ToArray();
         //special 特殊键
-        public static int[] specCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] specCounter = Enumerable.Repeat(0, 100).ToArray();
         //y Y键  输入为正（上）、零（无输入）、负（下）
-        public static int[] yHCounter = Enumerable.Repeat(0, 20).ToArray();
-        public static int[] yNCounter = Enumerable.Repeat(0, 20).ToArray();
-        public static int[] yLCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] yHCounter = Enumerable.Repeat(0, 100).ToArray();
+        public static int[] yNCounter = Enumerable.Repeat(0, 100).ToArray();
+        public static int[] yLCounter = Enumerable.Repeat(0, 100).ToArray();
         //x X键  输入为正（右）、零（无输入）、负（左）
-        public static int[] xHCounter = Enumerable.Repeat(0, 20).ToArray();
-        public static int[] xNCounter = Enumerable.Repeat(0, 20).ToArray();
-        public static int[] xLCounter = Enumerable.Repeat(0, 20).ToArray();
+        public static int[] xHCounter = Enumerable.Repeat(0, 100).ToArray();
+        public static int[] xNCounter = Enumerable.Repeat(0, 100).ToArray();
+        public static int[] xLCounter = Enumerable.Repeat(0, 100).ToArray();
 
 
         public static void Hook()

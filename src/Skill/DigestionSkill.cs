@@ -112,7 +112,7 @@ namespace MySlugcat
 
         public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
         {
-            //Log.Logger(6, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
+            //Log.Logger(6, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
             if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DigestionSkill)
             {
                 if (grasp < 0 || player.grasps[grasp] == null)
@@ -120,7 +120,7 @@ namespace MySlugcat
                     return;
                 }
                 AbstractPhysicalObject? abstractPhysicalObject = player.grasps[grasp].grabbed.abstractPhysicalObject;
-                Log.Logger(7, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_st", $"Type ({abstractPhysicalObject.type.ToString()})");
+                Log.Logger(7, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_st", $"Type ({abstractPhysicalObject.type.ToString()})");
                 if (abstractPhysicalObject is AbstractSpear abstractSpear)
                 {
                     abstractSpear.stuckInWallCycles = 0;
@@ -135,7 +135,7 @@ namespace MySlugcat
                 player.objectInStomach.Abstractize(player.abstractCreature.pos);
                 player.objectInStomach.Room.RemoveEntity(player.objectInStomach);
 
-                Log.Logger(7, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_zh", $"Type ({abstractPhysicalObject.type.ToString()})");
+                Log.Logger(7, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_zh", $"Type ({abstractPhysicalObject.type.ToString()})");
                 //
                 if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Rock && true &&
                     (player.FoodInStomach < player.MaxFoodInStomach - 1 ||
@@ -312,7 +312,7 @@ namespace MySlugcat
                     player.AddFood(1);
                 }
                 //
-                Log.Logger(7, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_sh", $"Type ({abstractPhysicalObject?.type.ToString()}), Null({abstractPhysicalObject == null})");
+                Log.Logger(7, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_sh", $"Type ({abstractPhysicalObject?.type.ToString()}), Null({abstractPhysicalObject == null})");
 
                 /*else if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb && true &&
                         (player.FoodInStomach < player.MaxFoodInStomach - 1 ||
@@ -348,7 +348,7 @@ namespace MySlugcat
                 BodyChunk mainBodyChunk = player.mainBodyChunk;
                 mainBodyChunk.vel.y = mainBodyChunk.vel.y + 2f;
                 player.room.PlaySound(SoundID.Slugcat_Swallow_Item, player.mainBodyChunk);
-                Log.Logger(7, "Digestion", "MySlugcat:Digestion​​:Player_SwallowObject_ssh", $"Type ({player.objectInStomach?.type.ToString()}), Null({player.objectInStomach == null})");
+                Log.Logger(7, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_ssh", $"Type ({player.objectInStomach?.type.ToString()}), Null({player.objectInStomach == null})");
             }
             else
             {

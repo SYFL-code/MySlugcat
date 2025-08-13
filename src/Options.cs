@@ -13,8 +13,8 @@ namespace MySlugcat
     {
         public int curTab;
 
-        /*public static Configurable<bool>? Frame​​Skill;
-        public static Configurable<bool>? Deflagration​​Skill;
+        /*public static Configurable<bool>? FrameSkill;
+        public static Configurable<bool>? DeflagrationSkill;
         public static Configurable<bool>? KnitmeshSkill;*/
 
         public static Configurable<float>? pixelSize;
@@ -38,7 +38,7 @@ namespace MySlugcat
             {
                 "FrameSkill"
             }));
-            Options.DeflagrationSkill = this.config.Bind<bool>("DeflagrationSkill", false, new ConfigurableInfo("Enable Deflagration​​ Skill (default: false)", null, "", new object[]
+            Options.DeflagrationSkill = this.config.Bind<bool>("DeflagrationSkill", false, new ConfigurableInfo("Enable Deflagration Skill (default: false)", null, "", new object[]
             {
                 "DeflagrationSkill"
             }));
@@ -103,10 +103,10 @@ namespace MySlugcat
                 this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
             }
 
-/*            if (logDebug != null && copyID != null && Frame​​Skill != null && Deflagration​​Skill != null && KnitmeshSkill != null)
+/*            if (logDebug != null && copyID != null && FrameSkill != null && DeflagrationSkill != null && KnitmeshSkill != null)
             {
-                this.AddCheckBox(Options.Frame​​Skill, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.Deflagration​​Skill, new Vector2(num, num2 -= num3), null);
+                this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
+                this.AddCheckBox(Options.DeflagrationSkill, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
                 this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);

@@ -23,41 +23,106 @@ using Watcher;
 
 namespace MySlugcat
 {
-
-    public class Extension
+	/// <summary>
+	/// 扩展插件
+	/// </summary>
+	public static class Extension
     {
-
-
-        /// <summary>
-        /// 减去四分之一的食物
-        /// </summary>
-        static public void SubtractQuarterFood(int a, Player player)
-        {
-            for (int i = 0; i < a; i++)
+		/// <summary>
+		/// 玩家胃里的食物格数
+		/// </summary>
+		public static float? PlayerStomachFood(Player player)
+		{
+			if (player == null || player.playerState == null) return null;
+            int FoodInt = 0;
+			FoodInt = player.FoodInStomach;
+            float FoodFloat = player.playerState.quarterFoodPoints * 0.25f;
+			return FoodInt + FoodFloat;
+			/*if (player.FoodInStomach == player.playerState.foodInStomach)
             {
-                if (player.playerState.quarterFoodPoints > 0)
-                {
-                    player.playerState.quarterFoodPoints--;
-                    player.room.game.cameras[0].hud.PlaySound(SoundID.HUD_Food_Meter_Deplete_Plop_A);
-                    player.room.game.cameras[0].hud.foodMeter.quarterPipShower.Reset();
-                }
-                else
-                {
-                    player.SubtractFood(1);
-                    player.room.game.cameras[0].hud.PlaySound(SoundID.HUD_Food_Meter_Deplete_Plop_A);
-                    player.room.game.cameras[0].hud.foodMeter.Update();
-                    player.AddQuarterFood();
-                    player.AddQuarterFood();
-                    player.AddQuarterFood();
-                    player.room.game.cameras[0].hud.foodMeter.quarterPipShower.Reset();
-                }
-            }
+                FoodInt = player.FoodInStomach;
+			}*/
+		}
+
+		/// <summary>
+		/// 从玩家胃里扣除指定数量的 ¼ 格食物
+		/// </summary>
+		/// <param name="player">目标玩家</param>
+		/// <param name="quartersToRemove">要扣掉的 ¼ 格总数</param>
+		public static void SubtractQuarterFood(Player player, int quartersToRemove)
+        {
+			if (quartersToRemove <= 0) return;          // 健壮性
+			if (player == null || player.room == null) return;
+
+			var hud = player.room.game.cameras[0]?.hud;
+			var meter = hud?.foodMeter;
+			var sound = SoundID.HUD_Food_Meter_Deplete_Plop_A;
+
+			for (int i = 0; i < quartersToRemove; i++)
+			{
+				if (player.playerState.quarterFoodPoints > 0)
+				{
+					// 扣 ¼ 格
+					player.playerState.quarterFoodPoints--;
+				}
+				else if (player.FoodInStomach > 0)
+				{
+					// 官方整格扣除
+					player.SubtractFood(1);
+					player.playerState.quarterFoodPoints = 3;   // 直接补 3 个 ¼ 格
+				}
+				else
+				{
+					break;  // 已经空了
+				}
+
+				// 每扣一次都刷新 UI
+				hud?.PlaySound(sound);
+				meter?.Update();
+				meter?.quarterPipShower?.Reset();
+			}
         }
 
-        /// <summary>
-        /// 无害的生物
-        /// </summary>
-        public static bool HarmlessCreature(Creature creature)
+		/// <summary>
+		/// 把任意 Color 按指定强度转成黑白灰
+		/// </summary>
+		/// <param name="c">原始 Color</param>
+		/// <param name="strength">0~1，0 保持原色，1 完全灰度</param>
+		public static Color ToGrayscale(this Color c, float strength = 1f)
+		{
+			float g = 0.299f * c.r + 0.587f * c.g + 0.114f * c.b;
+			strength = Mathf.Clamp01(strength);          // 保险
+			float r = Mathf.Lerp(c.r, g, strength);
+			float g2 = Mathf.Lerp(c.g, g, strength);
+			float b2 = Mathf.Lerp(c.b, g, strength);
+			return new Color(r, g2, b2, c.a);            // 保留 alpha
+		}
+
+		/// <summary>
+		/// 把任意 HSLColor 按指定强度转成黑白灰
+		/// </summary>
+		/// <param name="hsl">原始 HSLColor</param>
+		/// <param name="strength">0~1，0 保持原色，1 完全灰度</param>
+		public static HSLColor ToGrayscale(this HSLColor hsl, float strength = 1f)
+		{
+			strength = Mathf.Clamp01(strength);
+
+			//float grayLightness =
+			//	0.299f * hsl.RgbR + 0.587f * hsl.RgbG + 0.114f * hsl.RgbB; // 如果你 HSLColor 有 RgbR/G/B
+																		   // 如果没有，就先转 Color 再算：
+			float grayLightness = 0.299f * hsl.rgb.r + 0.587f * hsl.rgb.g + 0.114f * hsl.rgb.b;
+
+			return new HSLColor(
+				hue: hsl.hue,                           // 色相不变
+				saturation: Mathf.Lerp(hsl.saturation, 0f, strength),
+				lightness: Mathf.Lerp(hsl.lightness, grayLightness, strength)
+			);
+		}
+
+		/// <summary>
+		/// 无害的生物
+		/// </summary>
+		public static bool HarmlessCreature(Creature creature)
         {
             // 玩家 监视者 蝉乌贼 垃圾虫 波动龟 光鼠 蛙鱼 管虫 蝠蝇 蛋虫 雨鹿 幼年面条蝇 幼年蜈蚣 射线虫 墨鱼 水母 跃客
             // 监察者 天空鲸 藤壶 水熊虫 火精灵 箱虫 
@@ -66,28 +131,27 @@ namespace MySlugcat
                 creature is JetFish || creature is TubeWorm || creature is Fly || creature is EggBug ||
                 creature is Deer || creature is SmallNeedleWorm || (creature is Centipede centipede && centipede.Small) ||
                 creature is VultureGrub || creature is Hazer || creature is JellyFish || creature is Yeek ||
-                (creature is Inspector inspector && inspector.Consious == true) ||
+                (creature is Inspector inspector && inspector.Consious == false) ||
                 creature is SkyWhale || creature is Barnacle || creature is FireSprite || creature is Tardigrade ||
-                (creature is BoxWorm boxWorm && boxWorm.Consious == true))
+                (creature is BoxWorm boxWorm && boxWorm.Consious == false))
             {
                 return true;// creature is Leech || 
             }
             return false;
         }
 
-
         /// <summary>
-        /// 有害的生物
+        /// 有害的生物(不完全)
         /// </summary>
         public static bool HarmfulCreature(Creature creature)
         {
             if (creature == null || creature is SandGrub || creature is TentaclePlant || creature is Lizard ||
-                creature is BigEel || creature is DaddyLongLegs || creature is Vulture ||
-                creature is EggBug || creature is Centipede || creature is Spider || creature is MirosBird ||
+                creature is BigEel || creature is DaddyLongLegs || creature is Vulture || creature is MirosBird ||
+				(creature is Centipede centipede && !centipede.Small) || creature is Spider || 
                 creature is Scavenger || creature is BigNeedleWorm || creature is DropBug || creature is BigMoth ||
-                (creature is Inspector inspector && inspector.Consious == false) || creature is PoleMimic ||
+                (creature is Inspector inspector && inspector.Consious == true) || creature is PoleMimic ||
                 creature is BigJellyFish || creature is StowawayBug || creature is Loach || creature is Frog ||
-                (creature is BoxWorm boxWorm && boxWorm.Consious == false) || creature is DrillCrab)
+                (creature is BoxWorm boxWorm && boxWorm.Consious == true) || creature is DrillCrab)
             {
                 return true;// creature is Leech || 
             }
@@ -176,7 +240,7 @@ namespace MySlugcat
             float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
             //List<Creature> creatures = new List<Creature>();
 
-            if (selfPos == null || room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || room.abstractRoom.creatures.Count == null || !(room.abstractRoom.creatures.Count > 0))
+            if (room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || !(room.abstractRoom.creatures.Count > 0))
             {
                 return null;
             }
@@ -243,7 +307,7 @@ namespace MySlugcat
 			float minSqrDistance = float.MaxValue;  // 最小平方距离（初始设为最大浮点数）
 													//List<Creature> creatures = new List<Creature>();
 
-			if (selfPos == null || room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || room.abstractRoom.creatures.Count == null || !(room.abstractRoom.creatures.Count > 0))
+			if (room == null || room.abstractRoom == null || room.abstractRoom.creatures == null || !(room.abstractRoom.creatures.Count > 0))
 			{
 				return null;
 			}
@@ -310,21 +374,21 @@ namespace MySlugcat
 
                 Creature c = abstractCreature.realizedCreature;
                 // 排除检查：玩家、无效引用、自身、或没有身体部位的对象
-                if (!IncludePlayer)
-                {
-                    var player1 = c as Player;
-                    if (player1 != null)
-                    {
-                        continue; // 跳过无效项，继续检查下一个
-                    }
-                }
                 if (c == null ||             // 确保生物存在
                     c == creature ||             // 排除自身
                     c.mainBodyChunk == null) // 确保有有效的mainBodyChunk
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }
-                if (DisabledCreature(c))// 禁用生物
+				if (!IncludePlayer)
+				{
+					var player1 = c as Player;
+					if (player1 != null)
+					{
+						continue; // 跳过无效项，继续检查下一个
+					}
+				}
+				if (DisabledCreature(c))// 禁用生物
                 {
                     continue; // 跳过无效项，继续检查下一个
                 }

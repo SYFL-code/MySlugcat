@@ -48,41 +48,30 @@ namespace MySlugcat
             //if ((slugcat == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats = -1)
             orig(slugcatStats, slugcat, malnourished);
 
-            Player? player = null;
-            foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
-            {
-                Player player1;
-                if (weakPlayerRef.TryGetTarget(out player1))
-                {
-                    if (player1.slugcatStats == slugcatStats)
-                    {
-                        player = player1;
-                        break;
-                    }
-                }
-            }
-
-            if (player != null)
-            {
-                if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
-                {
-                    slugcatStats.runspeedFac = 0.74f;
-                    slugcatStats.bodyWeightFac = 0.68f;
-                    slugcatStats.generalVisibilityBonus = 3f;
-                    slugcatStats.visualStealthInSneakMode = -0.5f;
-                    slugcatStats.loudnessFac = 2f;
-                    slugcatStats.lungsFac = 1.4f;
-                    slugcatStats.throwingSkill = 0;
-                }
-            }
-
+			var Players = PlayerModuleManager.GetActivePlayers();
+			foreach (var player in Players)
+			{
+				if (player.slugcatStats == slugcatStats)
+				{
+					if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
+					{
+						slugcatStats.runspeedFac = 0.74f;
+						slugcatStats.bodyWeightFac = 0.68f;
+						slugcatStats.generalVisibilityBonus = 3f;
+						slugcatStats.visualStealthInSneakMode = -0.5f;
+						slugcatStats.loudnessFac = 2f;
+						slugcatStats.lungsFac = 1.4f;
+						slugcatStats.throwingSkill = 0;
+					}
+				}
+			}
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {
             orig(player, eu);
 
-            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.Exhausted)
+            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.Exhausted)
             {
                 // 精疲力竭
                 player.gourmandAttackNegateTime--;
@@ -110,7 +99,7 @@ namespace MySlugcat
 
         private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
         {
-            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
+            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
             {
                 spear.throwModeFrames = 18;
                 spear.spearDamageBonus = 0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
@@ -173,7 +162,7 @@ namespace MySlugcat
 
         private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player player, bool eu)
         {
-            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.MySlugcatStats == 1)
+            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == 1)
             {
                 int num2 = 0;
                 for (int i = 0; i < 4; i++)

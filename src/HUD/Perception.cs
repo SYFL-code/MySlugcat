@@ -184,22 +184,21 @@ namespace MySlugcat
 
 				Player? player = null;
 				bool isShow = false;
-				foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+
+				var Players = PlayerModuleManager.GetActivePlayers();
+				foreach (var player_ in Players)
 				{
-					Player player_;
-					if (weakPlayerRef.TryGetTarget(out player_))
+					if (player_.playerState.playerNumber == N && player_.room == owner.room && !player_.dead)
 					{
-						if (player_.playerState.playerNumber == N && player_.room == owner.room && !player_.dead)
+						if (PlayerModuleManager.PlayerModules.TryGetValue(player_, out var module) && module.PerceptionSkill)
 						{
-							if (PlayerModuleManager.playerModules.TryGetValue(player_, out var module) && module.PerceptionSkill)
-							{
-								isShow = true;
-								player = player_;
-								break;
-							}
+							isShow = true;
+							player = player_;
+							break;
 						}
 					}
 				}
+
 				if (isShow && player != null)
 				{
 					if (player.abstractCreature.world.game.GamePaused)

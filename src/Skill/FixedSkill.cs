@@ -73,7 +73,7 @@ namespace MySlugcat
         {
             orig(player, eu);
 
-            if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FixedSkill)
+            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FixedSkill)
             {
                 //if ((player.input[0].pckp || player.input[0].mp) &&
                 //    player.input[0].y > 0 && player.playerState.foodInStomach > 2)

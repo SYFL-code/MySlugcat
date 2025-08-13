@@ -59,7 +59,7 @@ foreach (AbstractCreature ac in self.creature.world.game.Players)
 creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 	(creature.abstractCreature.creatureTemplate.communityID, creature.abstractCreature.world.RegionNumber, (player.State as PlayerState).playerNumber, 1.0f);*/
 
-			/*if (PlayerModuleManager.playerModules.TryGetValue(self, out var module))
+			/*if (PlayerModuleManager.PlayerModules.TryGetValue(self, out var module))
 			{
 				module.Hungry_Update(self);
 			}*/

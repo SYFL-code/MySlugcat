@@ -264,7 +264,7 @@ namespace MySlugcat
             StackFrame stackFrame = stackTrace.GetFrame(2);
             MethodBase methodBase = stackFrame.GetMethod();
             //Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
-            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 if (Vector2.Distance(player.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(player.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(player.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
                 {
@@ -531,7 +531,7 @@ namespace MySlugcat
 
         private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
         {
-            if (((player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)) && !player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (((player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)) && !player.dead && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 Creature? obj = FrameSkill.Frame(player, false, player, 20);
 
@@ -561,7 +561,7 @@ namespace MySlugcat
         public static Creature Player_Die(Player player)
         {
             Creature creature = player;
-            if (!player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!player.dead && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 Log.Logger(7, "FrameDie", "MySlugcat:FrameSkill:Player_Die_st", $"");
 
@@ -630,7 +630,7 @@ namespace MySlugcat
         public static PhysicalObject? Spear_HitSomething(Spear spear, SharedPhysics.CollisionResult result, bool eu)
         {
             //Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"({result.obj != null}), ({result.obj is Player}), ({result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}), ({Control.FrameSkill})");
-            if (result.obj != null && result.obj is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (result.obj != null && result.obj is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 //Console.WriteLine("MySlugcat:Spear_HitSomething: st");
                 Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething_st", $"");
@@ -732,7 +732,7 @@ namespace MySlugcat
             if (result.obj is not Player player)
                 return orig.Invoke(bomb, result, eu);
 
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
                 return orig.Invoke(bomb, result, eu);
 
             Creature? obj = Frame(player, false, player);
@@ -777,7 +777,7 @@ namespace MySlugcat
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
             }*/
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
                 return;
@@ -862,7 +862,7 @@ namespace MySlugcat
                 orig.Invoke(lizard, chunk);
                 return;
             }*/
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(lizard, chunk);
                 return;
@@ -903,7 +903,7 @@ namespace MySlugcat
                         continue;
                     /*if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
                         continue;*/
-                    if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+                    if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
                         continue;
                     //取玩家变量
                     //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
@@ -950,7 +950,7 @@ namespace MySlugcat
                 orig.Invoke(centipede, g);
                 return;
             }*/
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(centipede, g);
                 return;
@@ -992,7 +992,7 @@ namespace MySlugcat
                                 if (bigEel.room.physicalObjects[j][num] is Player player)
                                 {
                                     //如果玩家不是MySlugcat则运行原程序
-                                    if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+                                    if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
                                     {
                                         //取玩家变量
                                         //GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
@@ -1150,7 +1150,7 @@ namespace MySlugcat
                 orig.Invoke(tentaclePlant, eu);
                 return;
             }
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(tentaclePlant, eu);
                 return;
@@ -1185,7 +1185,7 @@ namespace MySlugcat
                     return;
                 }
             }
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(poleMimic, eu);
                 return;
@@ -1224,7 +1224,7 @@ namespace MySlugcat
                 return;
             }
 
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(eggBug, eu);
                 return;
@@ -1262,7 +1262,7 @@ namespace MySlugcat
                 orig.Invoke(vulture);
                 return;
             }
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.FrameSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.FrameSkill)
             {
                 orig.Invoke(vulture);
                 return;

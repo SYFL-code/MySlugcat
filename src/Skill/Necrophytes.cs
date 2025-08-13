@@ -115,35 +115,32 @@ namespace MySlugcat
 						// 蜥蜴专属好感设置
 						if (lizard.AI is LizardAI lizardAI)
 						{
+							var Players = PlayerModuleManager.GetActivePlayers();
 							// 强制设置关系为“忽略”
-							foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+							foreach (var player in Players)
 							{
-								Player player;
-								if (weakPlayerRef.TryGetTarget(out player))
+								// 获取玩家在当前蜥蜴中的动态关系
+								var rep = lizard.AI.tracker.RepresentationForCreature(player.abstractCreature, false);
+								if (rep != null && rep.dynamicRelationship != null)
 								{
-									// 获取玩家在当前蜥蜴中的动态关系
-									var rep = lizard.AI.tracker.RepresentationForCreature(player.abstractCreature, false);
-									if (rep != null && rep.dynamicRelationship != null)
-									{
-										// 直接覆盖为“无视”
-										rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
-											CreatureTemplate.Relationship.Type.Ignores,
-											0f
-										);
-									}
-									CreatureState state = lizard.abstractCreature.state;
-									SocialMemory.Relationship? relationship = null;
-									if (state != null)
-									{
-										SocialMemory socialMemory = state.socialMemory;
-										relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
-									}
-									if (relationship != null)
-									{
-										relationship.InfluenceTempLike(2f);
-										relationship.InfluenceLike(2f);
-										relationship.InfluenceKnow(0.9f);
-									}
+									// 直接覆盖为“无视”
+									rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
+										CreatureTemplate.Relationship.Type.Ignores,
+										0f
+									);
+								}
+								CreatureState state = lizard.abstractCreature.state;
+								SocialMemory.Relationship? relationship = null;
+								if (state != null)
+								{
+									SocialMemory socialMemory = state.socialMemory;
+									relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
+								}
+								if (relationship != null)
+								{
+									relationship.InfluenceTempLike(2f);
+									relationship.InfluenceLike(2f);
+									relationship.InfluenceKnow(0.9f);
 								}
 							}
 
@@ -182,37 +179,34 @@ namespace MySlugcat
 						// 拾荒者专属好感设置
 						if (scavenger.AI is ScavengerAI scavAI)
 						{
+							var Players = PlayerModuleManager.GetActivePlayers();
 							// 强制设置关系为“忽略”
-							foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
+							foreach (var player in Players)
 							{
-								Player player;
-								if (weakPlayerRef.TryGetTarget(out player))
+								// 获取玩家在当前拾荒者中的动态关系
+								if (scavenger.abstractCreature.abstractAI.RealAI is ScavengerAI scavAI_)
 								{
-									// 获取玩家在当前拾荒者中的动态关系
-									if (scavenger.abstractCreature.abstractAI.RealAI is ScavengerAI scavAI_)
+									var rep = scavAI_.tracker.RepresentationForCreature(player.abstractCreature, false);
+									if (rep != null && rep.dynamicRelationship != null)
 									{
-										var rep = scavAI_.tracker.RepresentationForCreature(player.abstractCreature, false);
-										if (rep != null && rep.dynamicRelationship != null)
-										{
-											rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
-												CreatureTemplate.Relationship.Type.Ignores,
-												0f
-											);
-										}
+										rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(
+											CreatureTemplate.Relationship.Type.Ignores,
+											0f
+										);
 									}
-									CreatureState state = scavenger.abstractCreature.state;
-									SocialMemory.Relationship? relationship = null;
-									if (state != null)
-									{
-										SocialMemory socialMemory = state.socialMemory;
-										relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
-									}
-									if (relationship != null)
-									{
-										relationship.InfluenceTempLike(2f);
-										relationship.InfluenceLike(2f);
-										relationship.InfluenceKnow(0.9f);
-									}
+								}
+								CreatureState state = scavenger.abstractCreature.state;
+								SocialMemory.Relationship? relationship = null;
+								if (state != null)
+								{
+									SocialMemory socialMemory = state.socialMemory;
+									relationship = ((socialMemory != null) ? socialMemory.GetOrInitiateRelationship(player.abstractCreature.ID) : null);
+								}
+								if (relationship != null)
+								{
+									relationship.InfluenceTempLike(2f);
+									relationship.InfluenceLike(2f);
+									relationship.InfluenceKnow(0.9f);
 								}
 							}
 
@@ -272,7 +266,7 @@ namespace MySlugcat
 			//creature.Template.shortcutColor = new Color(0.2f, 0.2f, 0.2f, 1f);
 
 			int N = player.playerState.playerNumber;
-			if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.SpawnNecrophytes)
+			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.SpawnNecrophytes)
 			{
 				if (Key.JmpCounter[N] >= 60 && !player.input[0].jmp && player.input[1].jmp)
 				{

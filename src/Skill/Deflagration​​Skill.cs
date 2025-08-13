@@ -208,7 +208,7 @@ namespace MySlugcat
         {
             //Log.Logger(4, "Spear", "MySlugcat:Deflagration:Spear_HitSomething", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({Control.DeflagrationSkill})");
             //Console.WriteLine($"MySlugcat:Deflagration:Spear_HitSomething: {spear.thrownBy != null}, {spear.thrownBy is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}, {spear.thrownBy is Player}");
-            if (spear.thrownBy != null && spear.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (spear.thrownBy != null && spear.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             {
                 Log.Logger(4, "Spear", "MySlugcat:Deflagration:Spear_HitSomething", $"obj ({obj}), mode ({mode}), spear.mode ({spear.mode})");
                 //Console.WriteLine($"MySlugcat:Deflagration:Spear_HitSomething: obj {obj}, mode {mode}, spear.mode {spear.mode}");
@@ -249,7 +249,7 @@ namespace MySlugcat
             orig(spear);
 
             //Log.Logger(7, "Spear", "MySlugcat:Deflagration:Spear_SetRandomSpin", $"({spear.thrownBy != null}), ({spear.thrownBy is Player}), ({spear.thrownBy is Player && ((Player)spear.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
-            if (spear.thrownBy != null && spear.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (spear.thrownBy != null && spear.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             {
                 if (15 > UnityEngine.Random.Range(0, 300))
                 {
@@ -268,7 +268,7 @@ namespace MySlugcat
             if (weapon is Rock rock)
             {
                 //Log.Logger(7, "Rock", "MySlugcat:Deflagration:Rock_SetRandomSpin", $"({weapon is Rock}), ({rock.thrownBy != null}), ({rock.thrownBy is Player}), ({rock.thrownBy is Player && ((Player)rock.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
-                if (rock.thrownBy != null && rock.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+                if (rock.thrownBy != null && rock.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
                 {
                     if (8 > UnityEngine.Random.Range(0, 300))
                     {
@@ -292,7 +292,7 @@ namespace MySlugcat
             if (rock.thrownBy is not Player player)
                 return orig.Invoke(rock, result, eu);
 
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
                 return orig.Invoke(rock, result, eu);
 
             Weapon.Mode mode = rock.mode;
@@ -320,7 +320,7 @@ namespace MySlugcat
             if (lillyPuck.thrownBy is not Player player)
                 return orig.Invoke(lillyPuck, result, eu);
 
-            if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
                 return orig.Invoke(lillyPuck, result, eu);
 
             Weapon.Mode mode = lillyPuck.mode;
@@ -343,7 +343,7 @@ namespace MySlugcat
             orig(lillyPuck);
 
             //Log.Logger(7, "LillyPuck", "MySlugcat:Deflagration:LillyPuck_SetRandomSpin", $"({lillyPuck.thrownBy != null}), ({lillyPuck.thrownBy is Player}), ({lillyPuck.thrownBy is Player && ((Player)lillyPuck.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
-            if (lillyPuck.thrownBy != null && lillyPuck.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (lillyPuck.thrownBy != null && lillyPuck.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             {
                 if (20 > UnityEngine.Random.Range(0, 300))
                 {
@@ -364,7 +364,7 @@ namespace MySlugcat
         //如果被命中的不是玩家
         if (puffBall.thrownBy is not Player player)
             return orig.Invoke(puffBall, result, eu);
-        if (!PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+        if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             return orig.Invoke(puffBall, result, eu);
 
             bool obj = orig.Invoke(puffBall, result, eu);
@@ -384,7 +384,7 @@ namespace MySlugcat
 
             if (10 > UnityEngine.Random.Range(0, 100))
             {
-                if (puffBall.thrownBy != null && puffBall.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+                if (puffBall.thrownBy != null && puffBall.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
                 {
                     Explode(puffBall, null, puffBall.thrownBy);
                 }
@@ -426,7 +426,7 @@ namespace MySlugcat
         {
             orig(flareBomb);
 
-            if (flareBomb.thrownBy != null && flareBomb.thrownBy is Player player && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (flareBomb.thrownBy != null && flareBomb.thrownBy is Player player && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             {
                 if (18 > UnityEngine.Random.Range(0, 100) && (flareBomb.color != new Color(0.3f, 0f, 0.9f) || flareBomb.color == new Color(0.2f, 0f, 1f)))
                 {
@@ -442,7 +442,7 @@ namespace MySlugcat
 
         public static void Player_Die(Creature self, bool orig)
         {
-            if (self is Player player && !orig && player.dead && PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
+            if (self is Player player && !orig && player.dead && PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DeflagrationSkill)
             {
                 if (100 > UnityEngine.Random.Range(0, 100))
                 {

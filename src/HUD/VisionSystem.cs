@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
 using UnityEngine.Rendering;
+using static MySlugcat.PlayerModuleManager;
 
 
 namespace MySlugcat
@@ -71,9 +72,9 @@ namespace MySlugcat
 		private static void SpawnHUD(HUD.HUD HUD)
 		{
 			HUD.AddPart(new VisionSystem(HUD));
-			if (PlayerModuleManager.players.Count > 0)
+			if (ActivePlayerCount > 0)
 			{
-				for (int i = 0; i < PlayerModuleManager.players.Count; i++)
+				for (int i = 0; i < ActivePlayerCount; i++)
 				{
 					HUD.AddPart(new Perception(HUD, i));
 				}
@@ -172,28 +173,19 @@ namespace MySlugcat
 			bool allPlayerDead = true;
 			bool NotVisionSystem = true;
 
-			/*for (int i = 0; i < Control.PlayersQuantity; i++)
+			var Players = PlayerModuleManager.GetActivePlayers();
+			foreach (var player in Players)
 			{
-				if (!Control.PlayerDead[i])
+				if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.VisionSystem)
+				{
+					NotVisionSystem = false;
+				}
+				if (!player.dead)
 				{
 					allPlayerDead = false;
 				}
-			}*/
-			foreach (WeakReference<Player> weakPlayerRef in PlayerModuleManager.players)
-			{
-				Player player;
-				if (weakPlayerRef.TryGetTarget(out player))
-				{
-					if (PlayerModuleManager.playerModules.TryGetValue(player, out var module) && module.VisionSystem)
-					{
-						NotVisionSystem = false;
-					}
-					if (!player.dead)
-					{
-						allPlayerDead = false;
-					}
-				}
 			}
+
 
 			if (NotVisionSystem)
 			{

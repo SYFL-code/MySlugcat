@@ -7,14 +7,59 @@ using RWCustom;
 using System.Linq;
 using Noise;
 using System.Globalization;
+using System.Threading;
 using Watcher;
 
 
 namespace MySlugcat;
 internal static class PlayerModuleManager
 {
-	public static List<WeakReference<Player>> players = new List<WeakReference<Player>>();
-	public static ConditionalWeakTable<Player, PlayerModule> playerModules = new ConditionalWeakTable<Player, PlayerModule>();
+	private static readonly ReaderWriterLockSlim _rwLock = new();
+	private static readonly HashSet<Player> _activePlayers = new();
+	public static readonly ConditionalWeakTable<Player, PlayerModule> PlayerModules = new();
+
+	public static int ActivePlayerCount
+	{
+		get
+		{
+			_rwLock.EnterReadLock();
+			try { return _activePlayers.Count; }
+			finally { _rwLock.ExitReadLock(); }
+		}
+	}
+
+	public static void RegisterPlayer(Player player)
+	{
+		if (player == null) return;
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			_activePlayers.Add(player);
+			PlayerModules.Add(player, new PlayerModule(player));
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
+	public static void UnregisterPlayer(Player player)
+	{
+		if (player == null) return;
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			_activePlayers.Remove(player);
+			PlayerModules.Remove(player);
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
+	public static IEnumerable<Player> GetActivePlayers()
+	{
+		_rwLock.EnterReadLock();
+		try { return new List<Player>(_activePlayers); }
+		finally { _rwLock.ExitReadLock(); }
+	}
 
 
 	internal class PlayerModule
@@ -75,9 +120,10 @@ internal static class PlayerModuleManager
 				SpawnNecrophytes = true;//
 				FixedSkill = false;
 
-				//WinState winState = player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState;
 				var session = player?.room?.game?.GetStorySession;
-				var dpsd = session?.saveState?.deathPersistentSaveData;
+				if (session == null) return;
+				var dpsd = session.saveState?.deathPersistentSaveData;
+				if (dpsd == null) return;
 				var winState = dpsd?.winState;
 				if (winState == null) return;
 
@@ -112,36 +158,8 @@ internal static class PlayerModuleManager
 						SpawnNecrophytes = true;
 					}
 				}
-
-
-
-				//player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState
-				//player.SessionRecord.
 			}
 		}
-
-
-		/*public void Hungry_Update(Player player)
-		{
-			if ((player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill) && (SC.MySlugcatStats == 0 && SC.Exhausted))
-			{
-				if (player.FoodInStomach > 0 || player.playerState.quarterFoodPoints > 0)
-				{
-					if (HungryCoolDown > 0)
-					{
-						HungryCoolDown--;
-
-					}
-					else
-					{
-						HungryCoolDown = 12000;
-						MyPlayer.SubtractQuarterFood(1, player);
-
-					}
-				}
-			}
-		}*/
-
 	}
 }
 
@@ -154,23 +172,18 @@ internal static class PlayerHooks
 		On.Player.Destroy += Player_Destroy;
 	}
 
-	private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
+	private static void Player_ctor(On.Player.orig_ctor orig, Player player,
+		AbstractCreature ac, World world)
 	{
-		orig.Invoke(player, abstractCreature, world);
-
-		PlayerModuleManager.players.Add(new WeakReference<Player>(player));
-		PlayerModuleManager.playerModules.Add(player, new PlayerModuleManager.PlayerModule(player));
+		orig(player, ac, world);
+		PlayerModuleManager.RegisterPlayer(player);        // ① 注册
 	}
 
-	private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
+	private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
 	{
-		orig(self);
-		if (self.dead || self.slatedForDeletetion)
-		{
-			PlayerModuleManager.players.RemoveAll(r => !r.TryGetTarget(out var p) || p == self);
-			PlayerModuleManager.playerModules.Remove(self);
-		}
-
+		orig(player);
+		if (player.dead || player.slatedForDeletetion)
+			PlayerModuleManager.UnregisterPlayer(player);  // ② 注销
 	}
 
 

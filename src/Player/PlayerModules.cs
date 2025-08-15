@@ -14,9 +14,12 @@ using Watcher;
 namespace MySlugcat;
 internal static class PlayerModuleManager
 {
-	private static readonly ReaderWriterLockSlim _rwLock = new();
+	private static readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.SupportsRecursion);
 	private static readonly HashSet<Player> _activePlayers = new();
 	public static readonly ConditionalWeakTable<Player, PlayerModule> PlayerModules = new();
+
+	private static readonly List<Player> _snapshot = new(4);
+	private static volatile bool _dirty = true;
 
 	public static int ActivePlayerCount
 	{
@@ -37,6 +40,7 @@ internal static class PlayerModuleManager
 		{
 			_activePlayers.Add(player);
 			PlayerModules.Add(player, new PlayerModule(player));
+			_dirty = true;
 		}
 		finally { _rwLock.ExitWriteLock(); }
 	}
@@ -50,21 +54,37 @@ internal static class PlayerModuleManager
 		{
 			_activePlayers.Remove(player);
 			PlayerModules.Remove(player);
+			_dirty = true;
 		}
 		finally { _rwLock.ExitWriteLock(); }
 	}
 
-	public static IEnumerable<Player> GetActivePlayers()
+	//public static IEnumerable<Player> GetActivePlayers()
+	public static IReadOnlyList<Player> GetActivePlayers()
 	{
-		_rwLock.EnterReadLock();
+		if (_dirty)
+		{
+			_rwLock.EnterReadLock();   // 写锁即可，读锁已够用
+			try
+			{
+				_snapshot.Clear();
+				_snapshot.AddRange(_activePlayers);
+				_dirty = false;
+			}
+			finally { _rwLock.ExitReadLock(); }
+		}
+		return _snapshot;
+
+		/*_rwLock.EnterReadLock();
 		try { return new List<Player>(_activePlayers); }
-		finally { _rwLock.ExitReadLock(); }
+		finally { _rwLock.ExitReadLock(); }*/
 	}
 
 
 	internal class PlayerModule
 	{
-		WeakReference<Player> playerRef;
+		//WeakReference<Player> playerRef;
+		public readonly Player player;
 
 		public List<string> Passages = new List<string>(); // 已拥有的通行证
 
@@ -90,18 +110,65 @@ internal static class PlayerModuleManager
 		public bool SpawnNecrophytes = false;
 		/// <summary> 定身能力 </summary>
 		public bool FixedSkill = false;
+		/// <summary> 杀戮光环 </summary>
+		public bool KillingAuraSkill = false;
 
 		//public int HungryCoolDown = 12000;//冷却计时器
+		#endregion
+
+		#region 通行证字段
+		// Vanilla
+		/// <summary> "求生者" </summary>
+		private const string TheSurvivorPassage = "The Survivor";
+		/// <summary> "猎手" </summary>
+		private const string TheHunterPassage = "The Hunter";
+		/// <summary> "圣徒" </summary>
+		private const string TheSaintPassage = "The Saint";
+		/// <summary> "漫游者" </summary>
+		private const string TheWandererPassage = "The Wanderer";
+		/// <summary> "酋长" </summary>
+		private const string TheChieftainPassage = "The Chieftain";
+		/// <summary> "僧侣" </summary>
+		private const string TheMonkPassage = "The Monk";
+		/// <summary> "暴徒" </summary>
+		private const string TheOutlawPassage = "The Outlaw";
+		/// <summary> "屠龙者" </summary>
+		private const string TheDragonSlayerPassage = "The Dragon Slayer";
+		/// <summary> "学者" </summary>
+		private const string TheScholarPassage = "The Scholar";
+		/// <summary> "朋友" </summary>
+		private const string TheFriendPassage = "The Friend";
+
+		// ModManager.MSC
+		/// <summary> "流浪者" </summary>
+		private const string TheNomadPassage = "The Nomad";
+		/// <summary> "殉道者" </summary>
+		private const string TheMartyrPassage = "The Martyr";
+		/// <summary> "朝圣者" </summary>
+		private const string ThePilgrimPassage = "The Pilgrim";
+		/// <summary> "慈母" </summary>
+		private const string TheMotherPassage = "The Mother";
+
+		// The Vanguard
+		/// <summary> "龙王" </summary>
+		private const string TheDragonlordPassage = "The Dragonlord";
+		// Rotund World
+		/// <summary> "贪食者" </summary>
+		private const string TheGluttonPassage = "The Glutton";
+		#endregion
+
+		#region 其他字段
 		#endregion
 
 
 		public PlayerModule(Player player)
 		{
-			playerRef = new WeakReference<Player>(player);
-			Console.WriteLine($"{Exhausted}_1");
+			//playerRef = new WeakReference<Player>(player);
+			this.player = player;
+			Console.WriteLine("Passages_1: " + string.Join(", ", Passages));
 			SetSkill(player);
-			Console.WriteLine($"{Exhausted}_2");
-			Console.WriteLine($"{player.slugcatStats.name == Plugin.YourSlugID}_2{Control.AllPlayerSkill}_{player.slugcatStats.name}");
+			//Log.Logger();
+			Console.WriteLine("Passages_2: " + string.Join(", ", Passages));
 		}
 
 		public void SetSkill(Player player)
@@ -117,6 +184,7 @@ internal static class PlayerModuleManager
 			DigestionSkill = false;
 			SpawnNecrophytes = false;
 			FixedSkill = false;
+			KillingAuraSkill = false;
 
 			if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
 			{
@@ -131,6 +199,7 @@ internal static class PlayerModuleManager
 				DigestionSkill = true;//
 				SpawnNecrophytes = true;//
 				FixedSkill = false;
+				KillingAuraSkill = true;//
 
 				var session = player?.room?.game?.GetStorySession;
 				if (session == null) return;
@@ -150,7 +219,7 @@ internal static class PlayerModuleManager
 						{
 							string name = WinState.PassageDisplayName(winState.endgameTrackers[i].ID);
 							Passages.Add(name);
-							if (name == "The Survivor")//"求生者"
+							if (name == TheSurvivorPassage)//"求生者"
 							{
 								PerceptionSkill = true;
 								Survivor = true;
@@ -159,15 +228,24 @@ internal static class PlayerModuleManager
 					}
 				}
 
-				if (Survivor && Passages != null && Passages.Count > 0)
+				var passSet = new HashSet<string>(Passages);
+				if (Survivor && passSet != null && passSet.Count > 0)
 				{
-					if (Passages.Contains("The Outlaw"))//"暴徒"
+					if (passSet.Contains(TheOutlawPassage))//"暴徒"
 					{
 						DeflagrationSkill = true;
 					}
-					if (Passages.Contains("The Chieftain") && Passages.Contains("The Friend"))//"酋长"&"朋友"
+					if (passSet.Contains(TheHunterPassage))//"猎手"
+					{
+						KillingAuraSkill = true;
+					}
+					if (passSet.Contains(TheChieftainPassage) && passSet.Contains(TheFriendPassage))//"酋长"&"朋友"
 					{
 						SpawnNecrophytes = true;
+					}
+					if (passSet.Contains(TheGluttonPassage))//"贪食者"
+					{
+						DigestionSkill = true;
 					}
 				}
 			}

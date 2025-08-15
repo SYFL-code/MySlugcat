@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,7 +37,7 @@ public class MyModdedEnums // 自定义枚举
         private void PlayerGraphicsOnInitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
-            /*if (self.player is PlayerGhost && !rCam.room.game.DEBUGMODE)
+            *//*if (self.player is PlayerGhost && !rCam.room.game.DEBUGMODE)
             {
                 for (int ghostSprite = 0; ghostSprite < 9; ghostSprite++)
                 {
@@ -45,8 +45,9 @@ public class MyModdedEnums // 自定义枚举
                     sLeaser.sprites[ghostSprite].alpha = 0.95f;
                 }
 
-            }*/
+            }*//*
         }
 
     }
 }
+*/

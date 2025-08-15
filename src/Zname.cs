@@ -9,6 +9,8 @@ using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
 using RWCustom;
 using static Player;
+using BepInEx.Logging;
+using System.Reflection;
 
 namespace MySlugcat
 {
@@ -252,6 +254,10 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			{
 				//初始化屏幕完成
 			}
+			if (ModManager.DLCShared)
+			{
+				//DLC共享?
+			}
 			if (ModManager.MSC)
 			{
 				//更多蛞蝓猫?_1
@@ -300,7 +306,65 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			//"The Martyr"          //"殉道者"
 			//"The Pilgrim"         //"朝圣者"
 			//"The Mother"          //"慈母"
-			//
+
+			// The Vanguard
+			//"The Dragonlord"      //"龙王"
+			// Rotund World
+			//"The Glutton"         //"贪食者"；暴食者；贪吃者；嗜食者；贪婪者
+
+
+
+			//"The Chieftain"       //"酋长" // 线状
+			/*return new WinState.FloatTracker(
+				this.PassageID,   // ID
+				dflt: 0f,          // 默认值
+				min: 0f,           // 最小值
+				showFrom: 0f,      // 开始显示的进度
+				max: 1f           // 最大值
+			);*/
+
+			//"The Survivor"        //"求生者" // 点状
+			/*return new WinState.IntegerTracker(
+				this.PassageID,   // ID
+				dflt: 0,          // 默认值
+				min: 0,           // 最小值
+				showFrom: 1,      // 开始显示的进度
+				max: 10           // 最大值
+			);*/
+
+			//"The Wanderer"        //"漫游者" // 布尔状 (点状不可逆?)
+			/*return new WinState.BoolArrayTracker(
+				this.PassageID,   // ID
+				SlugcatStats.SlugcatStoryRegions(RainWorld.lastActiveSaveSlot).Count
+			);*/
+
+			//"The Dragon Slayer"   //"屠龙者"   // 列表状 (点状不可逆?) 多个布尔条件（如任务清单）
+			/*return new WinState.ListTracker(
+				this.PassageID,   // ID
+				6
+			);*/                                 // 布尔状 (点状不可逆?)
+			/*return new WinState.BoolArrayTracker(
+				this.PassageID,   // ID
+				6
+			);*/
+
+			//"The Pilgrim"         //"朝圣者" 
+			/*int num = 0;
+			List<string> list = SlugcatStats.SlugcatStoryRegions(RainWorld.lastActiveSaveSlot);
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (list[i] != "MS" && World.CheckForRegionGhost(RainWorld.lastActiveSaveSlot, list[i]))
+				{
+					num++;
+				}
+			}
+			endgameTracker = new WinState.BoolArrayTracker(ID, num);*/
+
+			// 美味佳肴 HUD状
+			/*return new WinState.GourFeastTracker(
+				this.PassageID,   // ID
+				WinState.GourmandPassageTracker.Length
+			);*/
 
 		}
 
@@ -972,12 +1036,408 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 
 		}
 
+		private static void Options()
+		{
+			/*public Options()
+			{
+				Options.FrameSkill = this.config.Bind<bool>("FrameSkill", false, new ConfigurableInfo("Enable Frame Skill (default: false)", null, "", new object[]
+				{
+				"FrameSkill"
+				}));
+				Options.DeflagrationSkill = this.config.Bind<bool>("DeflagrationSkill", false, new ConfigurableInfo("Enable Deflagration Skill (default: false)", null, "", new object[]
+				{
+				"DeflagrationSkill"
+				}));
+				Options.KnitmeshSkill = this.config.Bind<bool>("KnitmeshSkill", false, new ConfigurableInfo("Enable Knitmesh Skill (default: false)", null, "", new object[]
+				{
+				"KnitmeshSkill"
+				}));
+
+				Options.pixelSize = this.config.Bind<float>("PixelSize", 15f, new ConfigurableInfo("50-1", null, "", new object[]
+				{
+				"Pixel Size"
+				}));
+
+				Options.logDebug = this.config.Bind<bool>("logDebug", false, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
+				{
+				"Log debug"
+				}));
+				Options.loglevel = this.config.Bind<float>("loglevel", 9f, new ConfigurableInfo("The maximum value is 10, and the minimum value is 0.", null, "", new object[]
+				{
+				"Log Level"
+				}));
+
+			}*/
+
+			/*public override void Initialize()
+		{
+			base.Initialize();
+			this.Tabs = new OpTab[]
+{
+				new OpTab(this, "General 1"),
+				new OpTab(this, "General 2"),
+				new OpTab(this, "Tools 1"),
+				new OpTab(this, "Tools 2"),
+				new OpTab(this, "Tool Settings")
+};
+			this.curTab = 0;
+			this.AddTitle();
+			float num = 90f;
+			float num2 = 460f;
+			float num3 = 40f;
+
+			if (pixelSize != null)
+			{
+				this.AddTextBox<float>(Options.pixelSize, new Vector2(num, num2 -= num3), 50f);
+			}
+
+			if (FrameSkill != null)
+			{
+				this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
+			}
+			if (DeflagrationSkill != null)
+			{
+				this.AddCheckBox(Options.DeflagrationSkill, new Vector2(num, num2 -= num3), null);
+			}
+			if (KnitmeshSkill != null)
+			{
+				this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
+			}
+
+			if (logDebug != null)
+			{
+				this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
+			}*/
+
+			/*            if (logDebug != null && copyID != null && FrameSkill != null && DeflagrationSkill != null && KnitmeshSkill != null)
+						{
+							this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
+							this.AddCheckBox(Options.DeflagrationSkill, new Vector2(num, num2 -= num3), null);
+							this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
+							this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
+							this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
+						}*/
+
+			//this.AddTextBox<float>(Options.loglevel, new Vector2(num, num2 -= num3), 50f);
+
+			/*if (loglevel != null)
+			{
+				Vector2 pos = new Vector2(num, num2 -= num3);
+				float width = 50f;
+				OpTextBox loglevelTextBox = new OpTextBox(Options.loglevel, pos, width)
+				{
+					allowSpace = true,
+					description = Options.loglevel.info.description
+				};
+				OpLabel loglevelLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, Options.loglevel.info.Tags[0] as string, false)
+				{
+					description = Options.loglevel.info.description
+				};
+				this.Tabs[this.curTab].AddItems(new UIelement[]
+				{
+				loglevelTextBox,
+				loglevelLabel
+				});
+			}
+		}
+
+		public override void Update()
+		{
+			if (loglevelTextBox != null && loglevelLabel != null)
+			{
+				//if (logDebug == null || logDebug.Value)
+				if (logDebug != null && logDebug.Value)
+				{
+					loglevelTextBox.Show();
+					loglevelLabel.Show();
+				}
+				else
+				{
+					loglevelTextBox.Hide();
+					loglevelLabel.Hide();
+				}
+			}
+
+		}
+
+		private void AddTitle()
+		{
+			OpLabel opLabel = new OpLabel(new Vector2(150f, 560f), new Vector2(300f, 30f), "Mouse Drag", FLabelAlignment.Center, true, null);
+			OpLabel opLabel2 = new OpLabel(new Vector2(150f, 540f), new Vector2(300f, 30f), "Version 1.1.0", FLabelAlignment.Center, false, null);
+			this.Tabs[this.curTab].AddItems(new UIelement[]
+			{
+				opLabel,
+				opLabel2
+			});
+		}
+
+		private void AddCheckBox(Configurable<bool> option, Vector2 pos, Color? c = null)
+		{
+			if (c == null)
+			{
+				c = new Color?(MenuColorEffect.rgbMediumGrey);
+			}
+			OpCheckBox opCheckBox = new OpCheckBox(option, pos)
+			{
+				description = option.info.description,
+				colorEdge = c.Value
+			};
+			OpLabel opLabel = new OpLabel(pos.x + 40f, pos.y + 2f, option.info.Tags[0] as string, false)
+			{
+				description = option.info.description,
+				color = c.Value
+			};
+			this.Tabs[this.curTab].AddItems(new UIelement[]
+			{
+				opCheckBox,
+				opLabel
+			});
+		}
+
+		private void AddTextBox<T>(Configurable<T> option, Vector2 pos, float width = 150f)
+		{
+			OpTextBox opTextBox = new OpTextBox(option, pos, width)
+			{
+				allowSpace = true,
+				description = option.info.description
+			};
+			OpLabel opLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, option.info.Tags[0] as string, false)
+			{
+				description = option.info.description
+			};
+			this.Tabs[this.curTab].AddItems(new UIelement[]
+			{
+				opTextBox,
+				opLabel
+			});
+		}
+
+		public void PostTranslate()
+		{
+			IEnumerable<FieldInfo> enumerable = from f in base.GetType().GetFields(BindingFlags.Static | BindingFlags.Public)
+												where f.FieldType.IsGenericType && f.FieldType.GetGenericTypeDefinition() == typeof(Configurable<>)
+												select f;
+			RainWorld rainWorld = Custom.rainWorld;
+			if (((rainWorld != null) ? rainWorld.inGameTranslator : null) == null || enumerable == null)
+			{
+				return;
+			}
+			foreach (FieldInfo fieldInfo in enumerable)
+			{
+				ConfigurableBase? configurableBase = (ConfigurableBase?)((fieldInfo != null) ? fieldInfo.GetValue(null) : null);
+				string? value;
+				if (configurableBase == null)
+				{
+					value = null;
+				}
+				else
+				{
+					ConfigurableInfo info = configurableBase.info;
+					value = ((info != null) ? info.description : null);
+				}
+				if (!string.IsNullOrEmpty(value) && configurableBase != null)
+				{
+					configurableBase.info.description = Custom.rainWorld.inGameTranslator.Translate(configurableBase.info.description.Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
+				}
+				int num = 0;
+				for (; ; )
+				{
+					int num2 = num;
+					int? num3;
+					if (configurableBase == null)
+					{
+						num3 = null;
+					}
+					else
+					{
+						ConfigurableInfo info2 = configurableBase.info;
+						if (info2 == null)
+						{
+							num3 = null;
+						}
+						else
+						{
+							object[] tags = info2.Tags;
+							num3 = ((tags != null) ? new int?(tags.Count<object>()) : null);
+						}
+					}
+					int? num4 = num3;
+					if (!(num2 < num4.GetValueOrDefault() & num4 != null))
+					{
+						break;
+					}
+					if (configurableBase != null && !string.IsNullOrEmpty(configurableBase.info.Tags[num] as string))
+					{
+						configurableBase.info.Tags[num] = Custom.rainWorld.inGameTranslator.Translate(((string)configurableBase.info.Tags[num]).Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
+					}
+					num++;
+				}
+			}
+			int num5 = 0;
+			for (; ; )
+			{
+				int num6 = num5;
+				OpTab[] tabs = this.Tabs;
+				int? num4 = (tabs != null) ? new int?(tabs.Length) : null;
+				if (!(num6 < num4.GetValueOrDefault() & num4 != null))
+				{
+					break;
+				}
+				if (this.Tabs[num5] != null && !string.IsNullOrEmpty(this.Tabs[num5].name))
+				{
+					this.Tabs[num5].name = Custom.rainWorld.inGameTranslator.Translate(this.Tabs[num5].name.Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
+				}
+				num5++;
+			}
+			Configurable<bool>? configurable = Options.logDebug;
+			if (configurable == null || configurable.Value)
+			{
+				Log.Logger(2, "Options", "Options.PostTranslate", "Options.PostTranslate, completed translation of options");
+			}
+		}*/
+
+
+
+	}
+
+		private static void Control()
+		{
+			//private static bool StartRunning = true;
+			//public static List<string> ownedPassages = new List<string>(); // 已拥有的通行证
+
+
+			//private static readonly object lockObject = new object();
+			//private static int lockbool = 0;
+
+
+			/*private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+{
+	orig.Invoke(player, eu);
+
+	if (player.dead)
+	{
+		PlayerDead[player.playerState.playerNumber] = true;
+	}
+}*/
+
+			/*public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+			{
+				orig(rainWorldGame);
+
+				if (lockbool > 0)
+				{
+					lockbool -= 1;
+				}
+			}*/
+
+
+			/*public static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+			{
+				orig(rainWorldGame);
+
+				if (StartRunning)
+				{
+					if (Options.pixelSize != null && Options.pixelSize.Value != null)
+					{
+						pixelSize = Options.pixelSize.Value;
+					}
+
+					AllPlayerSkill = false;
+					MySlugcatStats = 0;
+					Exhausted = true;
+					FrameSkill = false;
+					DeflagrationSkill = false;
+					KnitmeshSkill = false;
+					PerceptionSkill = false;
+					DigestionSkill = false;
+					FixedSkill = false;
+
+					StartRunning = false;
+				}
+			}*/
+
+
+			//private static int frameCounter = 0; // 帧计数器
+			//private const int N = 12000; // 每N帧执行一次（可调整）
+
+			/*private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+			{
+				orig.Invoke(player, eu);
+
+
+				// 每N帧执行一次自定义逻辑
+				if (++frameCounter >= N)
+				{
+					frameCounter = 0;
+					SetSkill(player);
+				}
+
+
+				//player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState
+				//player.SessionRecord.
+			}*/
+
+			/*public static void SetSkill(Player player)
+			{
+				MySlugcatStats = 0;
+				Exhausted = true;
+
+				FrameSkill = false;
+				DeflagrationSkill = false;
+				KnitmeshSkill = false;
+				PerceptionSkill = false;
+				DigestionSkill = false;
+				FixedSkill = false;
+
+				if (player.slugcatStats.name == Plugin.YourSlugID || SC.AllPlayerSkill)
+				{
+					WinState winState = player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState;
+					ownedPassages = new List<string>();
+					bool Survivor = false;
+
+					if (winState != null && winState.endgameTrackers.Count > 0)
+					{
+						for (int i = 0; i < winState.endgameTrackers.Count; i++)
+						{
+							if (winState.endgameTrackers[i].GoalFullfilled)
+							{
+								ownedPassages.Add(WinState.PassageDisplayName(winState.endgameTrackers[i].ID));
+								if (ownedPassages[i] == "The Survivor")
+								{
+									PerceptionSkill = true;
+									Survivor = true;
+								}
+							}
+						}
+					}
+
+					if (Survivor && ownedPassages != null && ownedPassages.Count > 0)
+					{
+						for (int i = 0; i < ownedPassages.Count; i++)
+						{
+							if (ownedPassages[i] == "The Outlaw")//"暴徒"
+							{
+								DeflagrationSkill = true;
+							}
+
+						}
+					}
+
+
+
+					//player.room.game.GetStorySession.saveState.deathPersistentSaveData.winState
+					//player.SessionRecord.
+				}
+			}*/
+		}
+
 		private static void MagicCat(Player player)
 		{
 			int N = player.playerState.playerNumber;
 			Vector2 pos = player.mainBodyChunk.pos;
 			Room room = player.room;
 			var color = player.ShortCutColor();
+			//room.rainIntensity
 
 			//
 

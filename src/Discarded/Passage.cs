@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using BepInEx;
 using MoreSlugcats;
@@ -11,31 +11,50 @@ namespace MySlugcat
     //已废弃
     public class Passage
     {
+		*//*public void OnEnable()
+		{
+			On.WinState.CycleCompleted += WinState_CycleCompleted;
+		}
 
-        /*private void WinStateConsumeEndGameHook(On.WinState.orig_ConsumeEndGame orig, WinState self)
+		private void WinState_CycleCompleted(On.WinState.orig_CycleCompleted orig, WinState self, RainWorldGame game)
+		{
+			if (self.GetTracker(WinState.EndgameID.Chieftain, addIfMissing: false) is WinState.FloatTracker chieftain && chieftain.progress >= chieftain.max)
+			{
+				orig(self, game);
+
+				chieftain.progress = chieftain.max;
+			}
+			else
+			{
+				orig(self, game);
+			}
+		}*/
+
+
+		/*private void WinStateConsumeEndGameHook(On.WinState.orig_ConsumeEndGame orig, WinState self)
         {
             orig(self);
-        }*/
+        }*//*
 
-        //"The Survivor"        //"幸存者"
-        //"The Hunter"          //"猎手"
-        //"The Saint"           //"圣徒"
-        //"The Wanderer"        //"漫游者"
-        //"The Chieftain"       //"酋长"
-        //"The Monk"            //"僧侣"
-        //"The Outlaw"          //"暴徒"
-        //"The Dragon Slayer"   //"屠龙者"
-        //"The Scholar"         //"学者"
-        //"The Friend"          //"朋友"
-        // ModManager.MSC
-        //"The Nomad"           //"流浪者"
-        //"The Martyr"          //"殉道者"
-        //"The Pilgrim"         //"朝圣者"
-        //"The Mother"          //"慈母"
-        //
+		//"The Survivor"        //"幸存者"
+		//"The Hunter"          //"猎手"
+		//"The Saint"           //"圣徒"
+		//"The Wanderer"        //"漫游者"
+		//"The Chieftain"       //"酋长"
+		//"The Monk"            //"僧侣"
+		//"The Outlaw"          //"暴徒"
+		//"The Dragon Slayer"   //"屠龙者"
+		//"The Scholar"         //"学者"
+		//"The Friend"          //"朋友"
+		// ModManager.MSC
+		//"The Nomad"           //"流浪者"
+		//"The Martyr"          //"殉道者"
+		//"The Pilgrim"         //"朝圣者"
+		//"The Mother"          //"慈母"
+		//
 
 
-        /*private WinState.EndgameID WinStateGetNextEndGame(On.WinState.orig_GetNextEndGame orig, WinState self)
+		*//*private WinState.EndgameID WinStateGetNextEndGame(On.WinState.orig_GetNextEndGame orig, WinState self)
         {
             *//*SC.ownedPassages = new List<string>();
             if (self.endgameTrackers.Count > 0)
@@ -86,8 +105,9 @@ namespace MySlugcat
                 result = this.ownedIDs[index];
             }
             return result;*//*
-        }*/
+        }*//*
 
 
-    }
+	}
 }
+*/

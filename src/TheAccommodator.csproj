@@ -4,6 +4,7 @@
 		<Nullable>enable</Nullable>
         <TargetFramework>net48</TargetFramework>
         <LangVersion>11</LangVersion>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
     
     <ItemGroup>
@@ -47,6 +48,9 @@
         </Reference>
         <Reference Include="BepInEx">
           <HintPath>..\lib\BepInEx.dll</HintPath>
+        </Reference>
+        <Reference Include="CustomPassageSupport">
+          <HintPath>..\lib\CustomPassageSupport.dll</HintPath>
         </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\lib\Fisobs.dll</HintPath>

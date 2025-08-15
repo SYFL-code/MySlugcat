@@ -1,135 +1,76 @@
 ﻿using BepInEx.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using UnityEngine;
 
 
 namespace MySlugcat
 {
-    public class Log
-    {
-        public static bool LogReset = true;
+	public static class Log
+	{
+		public static bool LogReset = true;
 
 
-        public static void Logger(float needloglevel, string about, string location, string message)
-        {
-            Configurable<bool>? logDebug = Options.logDebug;
-            Configurable<float>? loglevel = Options.loglevel;
+		public static void Logger(float needloglevel, string about, string location, string message)
+		{
+			bool logDebug = Control.LogDebug;
+			float loglevel = Control.Loglevel;
 
-            string Disabled = "FixedSkill";
-            bool isContains = Disabled.IndexOf(about, StringComparison.OrdinalIgnoreCase) >= 0;//true
+			string[] Enable = new string[] { "FixedSkill", "..."};
+			bool EnableOutputLog = Enable.Contains(about);
 
-            //if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
-            //if (true)
-            /*if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
-            {
-                string newContent = $"loglevel: {needloglevel.ToString()}, about: {about}, location: {location}\n   message: {message}";
-                try
-                {
-                    Console.WriteLine(newContent);
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"操作失败: {ex.Message}");
-                    return;
-                }
-                return;
-            }*/
+			if (logDebug && loglevel >= needloglevel && EnableOutputLog)
+			{
+				string newContent = $"loglevel: {needloglevel.ToString()}, about: {about}, location: {location}\n   message: {message}";
 
-            if ((logDebug == null || logDebug.Value) && loglevel != null && needloglevel < 0 && loglevel.Value >= -needloglevel)
-            {
-                string filePath = "LH_MySlugcat_log.txt";
-                string newContent = "\n";
+				OutputLog(newContent);
+			}
 
-                try
-                {
-                    Console.WriteLine(newContent);
-                    // 如果文件不存在，直接创建并写入 或 新进游戏
-                    if (!File.Exists(filePath) || LogReset)
-                    {
-                        File.WriteAllText(filePath, newContent + "\n" + $"=== 新日志 {DateTime.Now.ToString()} ===\n");
-                        Console.WriteLine($"已创建新文件,文件路径: {Path.GetFullPath(filePath)}");
-                        LogReset = false;
-                    }
-                    else
-                    {
-                        // 读取现有内容
-                        string existingContent = File.ReadAllText(filePath);
+			if (logDebug && needloglevel < 0 && loglevel >= -needloglevel && EnableOutputLog)
+			{
+				string newContent = "\n";
 
-                        // 将新内容放在顶部 + 原有内容
-                        File.WriteAllText(filePath, newContent + "\n" + existingContent);
-                    }
+				OutputLog(newContent);
+			}
+		}
 
-                    if ((logDebug == null || logDebug.Value) && loglevel.Value >= 10)
-                    {
-                        Console.WriteLine($"内容已添加到文件顶部: {Path.GetFullPath(filePath)}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"操作失败: {ex.Message}");
-                }
-            }
-            //return;
+		private static readonly object _lock = new object();
 
-            if ((logDebug == null || logDebug.Value) && loglevel != null && loglevel.Value >= needloglevel && !isContains)
-            {
+		private static void OutputLog(string newContent)
+		{
+			string filePath = "LH_MySlugcat_log.txt";
 
-                string filePath = "LH_MySlugcat_log.txt";
-                string newContent = $"loglevel: {needloglevel.ToString()}, about: {about}, location: {location}\n   message: {message}";
-                //string newContent = "吃吃吃！！！";
+			lock (_lock)
+			{
+				try
+				{
+					UnityEngine.Debug.Log(newContent);
+					Debug.Log(newContent);
+					Console.WriteLine(newContent);
 
-                try
-                {
-                    Debug.Log(newContent);
-                    Console.WriteLine(newContent);
-                    // 如果文件不存在，直接创建并写入 或 新进游戏
-                    if (!File.Exists(filePath) || LogReset)
-                    {
-                        File.WriteAllText(filePath, newContent + "\n" + $"=== 新日志 {DateTime.Now.ToString()} ===\n");
-                        Debug.Log($"已创建新文件,文件路径: {Path.GetFullPath(filePath)}");
-                        Console.WriteLine($"已创建新文件,文件路径: {Path.GetFullPath(filePath)}");
-                        LogReset = false;
-                    }
-                    else
-                    {
-                        // 读取现有内容
-                        string existingContent = File.ReadAllText(filePath);
+					// 如果文件不存在，直接创建并写入 或 新进游戏
+					if (!File.Exists(filePath) || LogReset)
+					{
+						File.WriteAllText(filePath, $"=== 新日志 {DateTime.Now} ===\n\n");
+						LogReset = false;
+					}
+					File.AppendAllText(filePath, newContent + "\n");
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"操作失败: {ex}");
+					Debug.Log(newContent);
+				}
+			}
 
-                        //string text = "第一行\n第二行\r\n第三行";
-                        int lineCount = 0;
-                        using (var reader = new StringReader(existingContent))
-                        {
-                            while (reader.ReadLine() != null)
-                            {
-                                lineCount++;
-                            }
-                            //Console.WriteLine($"行数: {lineCount}");
-                        }
+		}
 
-                        if (lineCount <= 4000)
-                        {
-                            // 将新内容放在顶部 + 原有内容
-                            File.WriteAllText(filePath, newContent + "\n" + existingContent);
-                        }
-                    }
 
-                    if ((logDebug == null || logDebug.Value) && loglevel.Value >= 10)
-                    {
-                        Debug.Log($"内容已添加到文件顶部: {Path.GetFullPath(filePath)}");
-                        Console.WriteLine($"内容已添加到文件顶部: {Path.GetFullPath(filePath)}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"操作失败: {ex}");
-                }
-            }
-
-        }
-    }
+	}
 }

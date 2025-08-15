@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BepInEx.Logging;
 using Menu;
 using Menu.Remix.MixedUI;
 using RWCustom;
@@ -11,284 +12,84 @@ namespace MySlugcat
 {
     public class Options : OptionInterface
     {
-        public int curTab;
 
-        /*public static Configurable<bool>? FrameSkill;
-        public static Configurable<bool>? DeflagrationSkill;
-        public static Configurable<bool>? KnitmeshSkill;*/
+        public readonly Configurable<float> PixelSize;
+		public readonly Configurable<float> Alpha;
 
-        public static Configurable<float>? pixelSize;
+		public readonly Configurable<bool> AllPlayerSkill;
 
-        public static Configurable<bool>? FrameSkill;
-        public static Configurable<bool>? DeflagrationSkill;
-        public static Configurable<bool>? KnitmeshSkill;
+		public readonly Configurable<bool> FrameSkill;
+        public readonly Configurable<bool> DeflagrationSkill;
+        public readonly Configurable<bool> KnitmeshSkill;
 
-        public static Configurable<bool>? logDebug;
+        public readonly Configurable<bool> LogDebug;
+        public readonly Configurable<float> Loglevel;
 
-        //public static Configurable<bool>? copyID;
+		public static readonly Options Instance = new Options();
 
-        public static Configurable<float>? loglevel;
-
-        OpTextBox? loglevelTextBox;
+		OpTextBox? loglevelTextBox;
         OpLabel? loglevelLabel;
 
-        public Options()
+		Options()
+		{
+			//设置默认值
+			PixelSize = config.Bind<float>("PixelSize_conf", 10f);
+			Alpha = config.Bind<float>("Alpha_conf", 0.9f);
+
+			AllPlayerSkill = config.Bind<bool>("AllPlayerSkill_conf", false);
+
+			FrameSkill = config.Bind<bool>("FrameSkill_conf", false);
+			DeflagrationSkill = config.Bind<bool>("DeflagrationSkill_conf", false);
+			KnitmeshSkill = config.Bind<bool>("KnitmeshSkill_conf", false);
+
+			LogDebug = config.Bind<bool>("logDebug_conf", false);
+			Loglevel = config.Bind<float>("Loglevel", 10f);
+		}
+
+		public override void Initialize()
         {
-            Options.FrameSkill = this.config.Bind<bool>("FrameSkill", false, new ConfigurableInfo("Enable Frame Skill (default: false)", null, "", new object[]
-            {
-                "FrameSkill"
-            }));
-            Options.DeflagrationSkill = this.config.Bind<bool>("DeflagrationSkill", false, new ConfigurableInfo("Enable Deflagration Skill (default: false)", null, "", new object[]
-            {
-                "DeflagrationSkill"
-            }));
-            Options.KnitmeshSkill = this.config.Bind<bool>("KnitmeshSkill", false, new ConfigurableInfo("Enable Knitmesh Skill (default: false)", null, "", new object[]
-            {
-                "KnitmeshSkill"
-            }));
-
-            Options.pixelSize = this.config.Bind<float>("PixelSize", 15f, new ConfigurableInfo("50-1", null, "", new object[]
-            {
-                "Pixel Size"
-            }));
-
-            Options.logDebug = this.config.Bind<bool>("logDebug", false, new ConfigurableInfo("Useful for debugging if you share your log files.", null, "", new object[]
-            {
-                "Log debug"
-            }));
-            Options.loglevel = this.config.Bind<float>("loglevel", 9f, new ConfigurableInfo("The maximum value is 10, and the minimum value is 0.", null, "", new object[]
+			OpTab opTab = new OpTab(this, "Options");
+			InGameTranslator inGameTranslator = Custom.rainWorld.inGameTranslator;
+			this.Tabs = new OpTab[]
 			{
-                "Log Level"
-            }));
+				opTab
+			};
+			//标题
+			opTab.AddItems(new UIelement[]
+			{
+				new OpLabel(10f, 540f, inGameTranslator.Translate("The Accommodator"), true)
+				{
+					alignment = FLabelAlignment.Left
+				}
+			});
+			//选项
+			opTab.AddItems(new UIelement[]
+			{
+				new OpTextBox(PixelSize, new Vector2(10, 450), 40f),
+				new OpLabel(new Vector2(75f, 450f), new Vector2(200f, 24f), inGameTranslator.Translate("PixelSize"), FLabelAlignment.Left, false, null),
+				new OpTextBox(Alpha, new Vector2(10, 420), 40f),
+				new OpLabel(new Vector2(75f, 420f), new Vector2(200f, 24f), inGameTranslator.Translate("Alpha"), FLabelAlignment.Left, false, null),
 
-        }
+				new OpCheckBox(AllPlayerSkill, new Vector2(10, 360)),
+				new OpLabel(new Vector2(75f, 360f), new Vector2(200f, 24f), inGameTranslator.Translate("AllPlayerSkill"), FLabelAlignment.Left, false, null),
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            this.Tabs = new OpTab[]
-{
-                new OpTab(this, "General 1"),
-                new OpTab(this, "General 2"),
-                new OpTab(this, "Tools 1"),
-                new OpTab(this, "Tools 2"),
-                new OpTab(this, "Tool Settings")
-};
-            this.curTab = 0;
-            this.AddTitle();
-            float num = 90f;
-            float num2 = 460f;
-            float num3 = 40f;
+				new OpCheckBox(LogDebug, new Vector2(10, 50)),
+				new OpLabel(new Vector2(75f, 50f), new Vector2(200f, 24f), inGameTranslator.Translate("LogDebug"), FLabelAlignment.Left, false, null),
+				new OpTextBox(Loglevel, new Vector2(10, 20), 50f),
+				new OpLabel(new Vector2(75f, 20f), new Vector2(200f, 24f), inGameTranslator.Translate("Loglevel"), FLabelAlignment.Left, false, null),
 
-            if (pixelSize != null)
-            {
-                this.AddTextBox<float>(Options.pixelSize, new Vector2(num, num2 -= num3), 50f);
-            }
+				/*new OpCheckBox(OpCheckBoxSaveIceData_conf, new Vector2(10, 390)),
+				new OpLabel(new Vector2(50f, 390f), new Vector2(200f, 24f), inGameTranslator.Translate("Save Ice data to the next cycle(Save bug not fixed yet)"), FLabelAlignment.Left, false, null),
+				new OpCheckBox(OpCheckBoxUnlockIceShieldNum_conf, new Vector2(10, 360)),
+				new OpLabel(new Vector2(50f, 360f), new Vector2(200f, 24f), inGameTranslator.Translate("Unlock the maximum number of ice shields"), FLabelAlignment.Left, false, null),*/
 
-            if (FrameSkill != null)
-            {
-                this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
-            }
-            if (DeflagrationSkill != null)
-            {
-                this.AddCheckBox(Options.DeflagrationSkill, new Vector2(num, num2 -= num3), null);
-            }
-            if (KnitmeshSkill != null)
-            {
-                this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
-            }
+				//new OpLabel(new Vector2(50f, 420f), new Vector2(200f, 24f), inGameTranslator.Translate("If scavenger dies, the players continue playing"), FLabelAlignment.Left, false, null),
+				/*radioButtonGroup,
+				radioButton1,
+				radioButton2*/
+			});
+		}
 
-            if (logDebug != null)
-            {
-                this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
-            }
-
-/*            if (logDebug != null && copyID != null && FrameSkill != null && DeflagrationSkill != null && KnitmeshSkill != null)
-            {
-                this.AddCheckBox(Options.FrameSkill, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.DeflagrationSkill, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.KnitmeshSkill, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.logDebug, new Vector2(num, num2 -= num3), null);
-                this.AddCheckBox(Options.copyID, new Vector2(num, num2 -= num3), null);
-            }*/
-
-            //this.AddTextBox<float>(Options.loglevel, new Vector2(num, num2 -= num3), 50f);
-
-            if (loglevel != null)
-            {
-                Vector2 pos = new Vector2(num, num2 -= num3);
-                float width = 50f;
-                OpTextBox loglevelTextBox = new OpTextBox(Options.loglevel, pos, width)
-                {
-                    allowSpace = true,
-                    description = Options.loglevel.info.description
-                };
-                OpLabel loglevelLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, Options.loglevel.info.Tags[0] as string, false)
-                {
-                    description = Options.loglevel.info.description
-                };
-                this.Tabs[this.curTab].AddItems(new UIelement[]
-                {
-                loglevelTextBox,
-                loglevelLabel
-                });
-            }
-        }
-
-        public override void Update()
-        {
-            if (loglevelTextBox != null && loglevelLabel != null)
-            {
-                //if (logDebug == null || logDebug.Value)
-                if (logDebug != null && logDebug.Value)
-                {
-                    loglevelTextBox.Show();
-                    loglevelLabel.Show();
-                }
-                else
-                {
-                    loglevelTextBox.Hide();
-                    loglevelLabel.Hide();
-                }
-            }
-
-        }
-
-        private void AddTitle()
-        {
-            OpLabel opLabel = new OpLabel(new Vector2(150f, 560f), new Vector2(300f, 30f), "Mouse Drag", FLabelAlignment.Center, true, null);
-            OpLabel opLabel2 = new OpLabel(new Vector2(150f, 540f), new Vector2(300f, 30f), "Version 1.1.0", FLabelAlignment.Center, false, null);
-            this.Tabs[this.curTab].AddItems(new UIelement[]
-            {
-                opLabel,
-                opLabel2
-            });
-        }
-
-        private void AddCheckBox(Configurable<bool> option, Vector2 pos, Color? c = null)
-        {
-            if (c == null)
-            {
-                c = new Color?(MenuColorEffect.rgbMediumGrey);
-            }
-            OpCheckBox opCheckBox = new OpCheckBox(option, pos)
-            {
-                description = option.info.description,
-                colorEdge = c.Value
-            };
-            OpLabel opLabel = new OpLabel(pos.x + 40f, pos.y + 2f, option.info.Tags[0] as string, false)
-            {
-                description = option.info.description,
-                color = c.Value
-            };
-            this.Tabs[this.curTab].AddItems(new UIelement[]
-            {
-                opCheckBox,
-                opLabel
-            });
-        }
-
-        private void AddTextBox<T>(Configurable<T> option, Vector2 pos, float width = 150f)
-        {
-            OpTextBox opTextBox = new OpTextBox(option, pos, width)
-            {
-                allowSpace = true,
-                description = option.info.description
-            };
-            OpLabel opLabel = new OpLabel(pos.x + width + 18f, pos.y + 2f, option.info.Tags[0] as string, false)
-            {
-                description = option.info.description
-            };
-            this.Tabs[this.curTab].AddItems(new UIelement[]
-            {
-                opTextBox,
-                opLabel
-            });
-        }
-
-        public void PostTranslate()
-        {
-            IEnumerable<FieldInfo> enumerable = from f in base.GetType().GetFields(BindingFlags.Static | BindingFlags.Public)
-                                                where f.FieldType.IsGenericType && f.FieldType.GetGenericTypeDefinition() == typeof(Configurable<>)
-                                                select f;
-            RainWorld rainWorld = Custom.rainWorld;
-            if (((rainWorld != null) ? rainWorld.inGameTranslator : null) == null || enumerable == null)
-            {
-                return;
-            }
-            foreach (FieldInfo fieldInfo in enumerable)
-            {
-                ConfigurableBase? configurableBase = (ConfigurableBase?)((fieldInfo != null) ? fieldInfo.GetValue(null) : null);
-                string? value;
-                if (configurableBase == null)
-                {
-                    value = null;
-                }
-                else
-                {
-                    ConfigurableInfo info = configurableBase.info;
-                    value = ((info != null) ? info.description : null);
-                }
-                if (!string.IsNullOrEmpty(value) && configurableBase != null)
-                {
-                    configurableBase.info.description = Custom.rainWorld.inGameTranslator.Translate(configurableBase.info.description.Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
-                }
-                int num = 0;
-                for (; ; )
-                {
-                    int num2 = num;
-                    int? num3;
-                    if (configurableBase == null)
-                    {
-                        num3 = null;
-                    }
-                    else
-                    {
-                        ConfigurableInfo info2 = configurableBase.info;
-                        if (info2 == null)
-                        {
-                            num3 = null;
-                        }
-                        else
-                        {
-                            object[] tags = info2.Tags;
-                            num3 = ((tags != null) ? new int?(tags.Count<object>()) : null);
-                        }
-                    }
-                    int? num4 = num3;
-                    if (!(num2 < num4.GetValueOrDefault() & num4 != null))
-                    {
-                        break;
-                    }
-                    if (configurableBase != null && !string.IsNullOrEmpty(configurableBase.info.Tags[num] as string))
-                    {
-                        configurableBase.info.Tags[num] = Custom.rainWorld.inGameTranslator.Translate(((string)configurableBase.info.Tags[num]).Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
-                    }
-                    num++;
-                }
-            }
-            int num5 = 0;
-            for (; ; )
-            {
-                int num6 = num5;
-                OpTab[] tabs = this.Tabs;
-                int? num4 = (tabs != null) ? new int?(tabs.Length) : null;
-                if (!(num6 < num4.GetValueOrDefault() & num4 != null))
-                {
-                    break;
-                }
-                if (this.Tabs[num5] != null && !string.IsNullOrEmpty(this.Tabs[num5].name))
-                {
-                    this.Tabs[num5].name = Custom.rainWorld.inGameTranslator.Translate(this.Tabs[num5].name.Replace("\n", "<LINE>")).Replace("<LINE>", "\n");
-                }
-                num5++;
-            }
-            Configurable<bool>? configurable = Options.logDebug;
-            if (configurable == null || configurable.Value)
-            {
-                Log.Logger(2, "Options", "Options.PostTranslate", "Options.PostTranslate, completed translation of options");
-            }
-        }
 
 
     }

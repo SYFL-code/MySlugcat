@@ -170,6 +170,16 @@ namespace MySlugcat
 		{
 			//base.Update();
 
+			// 更新洞的位置 (这里简化处理，实际应根据游戏逻辑更新)
+			// 重置所有洞状态
+			for (int i = 0; i < 100; i++)
+			{
+				holeActive[i] = false;
+				holeRadii[i] = HOLE_RADIUS; // 默认半径
+				holeEdge[i] = HOLE_EDGE;
+				holeColor[i] = HOLE_COLOR;
+			}
+
 			bool allPlayerDead = true;
 			bool NotVisionSystem = true;
 
@@ -213,16 +223,6 @@ namespace MySlugcat
 			{
 				ClearSprites();
 				return;
-			}
-
-			// 更新洞的位置 (这里简化处理，实际应根据游戏逻辑更新)
-			// 重置所有洞状态
-			for (int i = 0; i < 100; i++)
-			{
-				holeActive[i] = false;
-				holeRadii[i] = HOLE_RADIUS; // 默认半径
-				holeEdge[i] = HOLE_EDGE;
-				holeColor[i] = HOLE_COLOR;
 			}
 
 			if (hud.owner is Creature cre)

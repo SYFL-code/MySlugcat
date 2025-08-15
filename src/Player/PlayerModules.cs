@@ -93,6 +93,8 @@ internal static class PlayerModuleManager
 		public int  MySlugcatStats = 0;
 		/// <summary> 精疲力竭 </summary>
 		public bool Exhausted = false;
+		/// <summary> 饥饿 </summary>
+		public bool Hunger = false;
 		/// <summary> 视觉系统 </summary>
 		public bool VisionSystem = false;
 
@@ -175,6 +177,7 @@ internal static class PlayerModuleManager
 		{
 			MySlugcatStats = 0;
 			Exhausted = false;
+			Hunger = false;
 			VisionSystem = false;
 
 			FrameSkill = false;
@@ -190,6 +193,7 @@ internal static class PlayerModuleManager
 			{
 				MySlugcatStats = -1;
 				Exhausted = true;
+				Hunger = true;
 				VisionSystem = true;
 
 				FrameSkill = false;

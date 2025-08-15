@@ -29,6 +29,17 @@ namespace MySlugcat
 	/// </summary>
 	public static class Extension
 	{
+
+		public static int RandomValue(int min, int max)
+		{
+			return UnityEngine.Random.Range(min, max);
+		}
+
+		public static float RandomValue(float min, float max)
+		{
+			return UnityEngine.Random.Range(min, max);
+		}
+
 		/// <summary>
 		/// 玩家胃里的食物格数
 		/// </summary>
@@ -50,10 +61,12 @@ namespace MySlugcat
 		/// </summary>
 		/// <param name="player">目标玩家</param>
 		/// <param name="quartersToRemove">要扣掉的 ¼ 格总数</param>
-		public static void SubtractQuarterFood(Player player, int quartersToRemove)
+		public static bool SubtractQuarterFood(Player player, int quartersToRemove)
 		{
-			if (quartersToRemove <= 0) return;          // 健壮性
-			if (player == null || player.room == null) return;
+			if (quartersToRemove <= 0) return false;          // 健壮性
+			if (player == null || player.room == null) return false;
+
+			int Deduct = 0;
 
 			var hud = player.room.game.cameras[0]?.hud;
 			var meter = hud?.foodMeter;
@@ -78,10 +91,12 @@ namespace MySlugcat
 				}
 
 				// 每扣一次都刷新 UI
+				Deduct += 1;
 				hud?.PlaySound(sound);
 				meter?.Update();
 				meter?.quarterPipShower?.Reset();
 			}
+			return Deduct == quartersToRemove;
 		}
 
 		/*/// <summary>

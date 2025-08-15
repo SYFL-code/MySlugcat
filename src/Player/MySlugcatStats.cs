@@ -67,9 +67,25 @@ namespace MySlugcat
 			}
         }
 
-        private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+        private static int HungerDegree = (int)(40 * 60 * Extension.RandomValue(5f, 10f));
+
+		private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
         {
             orig(player, eu);
+
+            if (!player.room.game.IsArenaSession)
+            {
+				if (--HungerDegree <= 0)
+                {
+					HungerDegree = (int)(40 * 60 * Extension.RandomValue(3f, 10f));
+
+                    if (!Extension.SubtractQuarterFood(player, 1))
+                    {
+                        player.Die();
+                    }
+				}
+
+			}
 
             if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.Exhausted)
             {

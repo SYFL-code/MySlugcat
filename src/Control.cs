@@ -39,17 +39,15 @@ namespace MySlugcat
 		public static bool LogDebug = false;
 		public static float Loglevel = 10f;
 
-		public static void Hook()
+		/*public static void Hook()
 		{
 			On.RainWorldGame.Update += RainWorldGame_Update;
 			On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
-		}
+		}*/
 
-        private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
+        public static void Player_ctor(ref bool Execute, ref On.Player.orig_ctor orig, ref Player player, ref AbstractCreature abstractCreature, ref World world)
         {
-            orig.Invoke(player, abstractCreature, world);
-
             if (Options.Instance.PixelSize != null && Options.Instance.PixelSize.Value != null)
             {
                 pixelSize = Options.Instance.PixelSize.Value;
@@ -64,10 +62,8 @@ namespace MySlugcat
 			}
 		}
 
-		private static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+		public static void RainWorldGame_Update(ref bool Execute, ref On.RainWorldGame.orig_Update orig, ref RainWorldGame rainWorldGame)
 		{
-			orig(rainWorldGame);
-
 			if (Options.Instance.LogDebug != null && Options.Instance.LogDebug.Value != null)
 			{
 				LogDebug = Options.Instance.LogDebug.Value;

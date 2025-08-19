@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using System.CodeDom.Compiler;
 using System.Security.Permissions;
 using static CreatureTemplate.Relationship.Type;
 
@@ -164,16 +165,16 @@ sealed class friends_of_friends
 	}
 
 	// 插件启用时的初始化方法
-	public static void Hook()
+	/*public static void Hook()
 	{
 		On.RelationshipTracker.DynamicRelationship.Update += DynamicRelationship_Update;
 		On.LizardAI.DoIWantToBiteThisCreature += LizardAI_DoIWantToBiteThisCreature;
-	}
+	}*/
 
 	/// <summary>
 	/// 动态关系更新方法
 	/// </summary>
-	public static void DynamicRelationship_Update(On.RelationshipTracker.DynamicRelationship.orig_Update orig, RelationshipTracker.DynamicRelationship self)
+	public static void DynamicRelationship_Update(ref bool Execute, ref On.RelationshipTracker.DynamicRelationship.orig_Update orig, ref RelationshipTracker.DynamicRelationship self)
 	{
 		if (FriendOfFriendRelationship(self.rt.AI.creature, self.trackerRep.representedCreature) is CreatureTemplate.Relationship fof)
 		{
@@ -184,6 +185,7 @@ sealed class friends_of_friends
 			}
 			self.trackerRep.priority = fof.intensity * self.trackedByModuleWeigth;
 			self.currentRelationship = fof;
+			Execute = false;
 		}
 		else
 		{
@@ -194,8 +196,9 @@ sealed class friends_of_friends
 	/// <summary>
 	/// 判断蜥蜴AI是否想要咬一个生物
 	/// </summary>
-	public static bool LizardAI_DoIWantToBiteThisCreature(On.LizardAI.orig_DoIWantToBiteThisCreature orig, LizardAI self, Tracker.CreatureRepresentation otherCrit)
+	public static bool LizardAI_DoIWantToBiteThisCreature(ref bool Execute, ref bool return_, ref On.LizardAI.orig_DoIWantToBiteThisCreature orig, ref LizardAI self, ref  Tracker.CreatureRepresentation otherCrit)
 	{
+		Execute = false;
 		if (!orig(self, otherCrit))
 		{
 			return false;

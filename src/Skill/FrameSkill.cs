@@ -558,9 +558,8 @@ namespace MySlugcat
 			}
 		}
 
-		public static Creature Player_Die(Player player)
+		public static void Player_Die(ref bool Execute, ref On.Player.orig_Die orig, ref Player player)
 		{
-			Creature creature = player;
 			if (!player.dead && player.GetModule().FrameSkill)
 			{
 				Log.Logger(7, "FrameDie", "MySlugcat:FrameSkill:Player_Die_st", $"");
@@ -576,12 +575,11 @@ namespace MySlugcat
 					var hs = obj.State as HealthState;
 					if (hs != null)
 					{
-						hs.health -= 1.5f;
+						hs.health -= 3f;
 					}
-					creature = obj;
+					Execute = false;
 				}
 			}
-			return creature;
 		}
 
 /*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)

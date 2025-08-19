@@ -21,16 +21,14 @@ namespace MySlugcat
 		private const int BeforeRainToFlee = 60;
 
 
-		public static void Hook()
+		/*public static void Hook()
 		{
 			On.Player.Update += Player_Update;
 			On.Creature.Update += Creature_Update;
 			On.LizardGraphics.DrawSprites += LizardGraphics_DrawSprites;
-			//On.LizardGraphics.ApplyPalette += LizardGraphics_ApplyPalette;
 			On.ScavengerGraphics.DrawSprites += ScavengerGraphics_DrawSprites;
-			//On.ScavengerGraphics.ApplyPalette += ScavengerGraphics_ApplyPalette;
 			On.Creature.Die += Creature_Die;
-		}
+		}*/
 
 		/*private static void LizardGraphics_ApplyPalette(On.LizardGraphics.orig_ApplyPalette orig, LizardGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
 		{
@@ -54,7 +52,7 @@ namespace MySlugcat
 			}
 		}*/
 
-		private static void LizardGraphics_DrawSprites(On.LizardGraphics.orig_DrawSprites orig, LizardGraphics lizardGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+		public static void LizardGraphics_DrawSprites(ref bool Execute, ref On.LizardGraphics.orig_DrawSprites orig, ref LizardGraphics lizardGraphics, ref RoomCamera.SpriteLeaser sLeaser, ref RoomCamera rCam, ref float timeStacker, ref Vector2 camPos)
 		{
 			orig(lizardGraphics, sLeaser, rCam, timeStacker, camPos);
 
@@ -86,10 +84,8 @@ namespace MySlugcat
 			}
 		}
 
-		private static void ScavengerGraphics_DrawSprites(On.ScavengerGraphics.orig_DrawSprites orig, ScavengerGraphics scavGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+		public static void ScavengerGraphics_DrawSprites(ref bool Execute, ref On.ScavengerGraphics.orig_DrawSprites orig, ref ScavengerGraphics scavGraphics, ref RoomCamera.SpriteLeaser sLeaser, ref RoomCamera rCam, ref float timeStacker, ref Vector2 camPos)
 		{
-			orig(scavGraphics, sLeaser, rCam, timeStacker, camPos);
-
 			if (!rCam.room.game.DEBUGMODE)
 			{
 				Creature scavenger = scavGraphics.scavenger;
@@ -210,7 +206,7 @@ namespace MySlugcat
 			}
 		}
 
-		private static void Creature_Die(On.Creature.orig_Die orig, Creature creature)
+		public static void Creature_Die(ref bool Execute, ref On.Creature.orig_Die orig, ref Creature creature)
 		{
 			if (creature.abstractCreature.GetModule(out var module_c))
 			{
@@ -230,15 +226,12 @@ namespace MySlugcat
 			orig(creature);
 		}
 
-		private static void Creature_Update(On.Creature.orig_Update orig, Creature creature, bool eu)
+		public static void Creature_Update(ref bool Execute, ref On.Creature.orig_Update orig, ref Creature creature, ref bool eu)
 		{
 			if (creature.room == null || creature.firstChunk == null)
 			{
-				orig.Invoke(creature, eu);
 				return;
 			}
-
-			orig.Invoke(creature, eu);
 
 			if (creature.abstractCreature.GetModule(out var module_c))
 			{
@@ -427,16 +420,12 @@ namespace MySlugcat
 
 		}
 
-		private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
 		{
-			orig.Invoke(player, eu);
-
-			//creature.Template.shortcutColor = new Color(0.2f, 0.2f, 0.2f, 1f);
-
 			int N = player.playerState.playerNumber;
 			if (player.GetModule(out var module) && module.SpawnNecrophytes)
 			{
-				if (Key.JmpCounter[N] >= 60 && !player.input[0].jmp && player.input[1].jmp)
+				if (module.JmpCounter >= 60 && !player.input[0].jmp && player.input[1].jmp)
 				{
 					if (!player.dead)
 					{

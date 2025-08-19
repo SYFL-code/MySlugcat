@@ -16,6 +16,7 @@ using IL;
 using RewiredConsts;
 using SlugBase.Features;
 using static HarmonyLib.Code;
+using System.CodeDom.Compiler;
 
 
 namespace MySlugcat;
@@ -178,13 +179,13 @@ internal static class AbCreatureModuleManager
 internal static class AbCreatureHooks
 {
 
-	public static void HookOn()
+	/*public static void HookOn()
 	{
 		//On.Creature.ctor += Creature_ctor;
 		//On.Creature.Die += Creature_Die;
 		On.AbstractCreature.ctor += AbstractCreature_ctor;
 		On.AbstractPhysicalObject.Destroy += AbstractPhysicalObject_Destroy;
-	}
+	}*/
 
 	/*private static void Creature_ctor(On.Creature.orig_ctor orig, Creature creature,
 		AbstractCreature ac, World world)
@@ -193,15 +194,13 @@ internal static class AbCreatureHooks
 		CreatureModuleManager.RegisterCreature(creature);        // ① 注册
 	}*/
 
-	private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature ac, World world, CreatureTemplate template, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
+	public static void AbstractCreature_ctor(ref bool Execute, ref On.AbstractCreature.orig_ctor orig, ref AbstractCreature ac, ref World world, ref CreatureTemplate template, ref Creature realizedCreature, ref WorldCoordinate pos, ref EntityID ID)
 	{
-		orig(ac, world, template, realizedCreature, pos, ID);
 		AbCreatureModuleManager.RegisterAbCreature(ac);        // ① 注册
 	}
 
-	private static void AbstractPhysicalObject_Destroy(On.AbstractPhysicalObject.orig_Destroy orig, AbstractPhysicalObject abPhysicalObject)
+	public static void AbstractPhysicalObject_Destroy(ref bool Execute, ref On.AbstractPhysicalObject.orig_Destroy orig, ref AbstractPhysicalObject abPhysicalObject)
 	{
-		orig(abPhysicalObject);
 		if (abPhysicalObject is AbstractCreature abcreature)
 		{
 			if (abPhysicalObject.slatedForDeletion)

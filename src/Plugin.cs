@@ -42,20 +42,9 @@ namespace MySlugcat
 			On.RainWorld.OnModsInit += RainWorld_OnModsInit;
 			On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
 
-			PlayerHooks.HookOn();
-			AbCreatureHooks.HookOn();
-			AbPhysicalObjectHooks.HookOn();
-			MySlugcatStats.Hook();
 			//Content.Register(new EnderPearlFisob());
 			//玩家能力
 			Hook.HookOn();
-			MyPlayer.Hook();
-            //Exhausted.Hook();
-            Control.Hook();
-			VisionSystem.Hook();
-			NecrophytesCreature.Hook();
-			friends_of_friends.Hook();
-			Key.Hook();
 			//Perception.Hook();
 			//IntelHUD.Hook();
 			//PointerSkillHook.Hook();
@@ -63,10 +52,6 @@ namespace MySlugcat
 			DeflagrationSkill.Hook();
 			KillingAuraHook.Hook();
 			KnitmeshSkill.Hook();
-			DigestionSkill.Hook();
-
-			//游戏内容设置
-			MyGame.Hook();
 
 			//Intros.Hook();
 			FixedSkill.Hook();

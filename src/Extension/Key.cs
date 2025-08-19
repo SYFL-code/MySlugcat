@@ -31,7 +31,7 @@ namespace MySlugcat
         // player.input[1].jmp 玩家上一帧是否按下跳跃键
 
         //按下按键的时长(40次 = 1秒)
-        //jump 跳跃键
+        /*//jump 跳跃键
         public static int[] JmpCounter = Enumerable.Repeat(0, 100).ToArray();
         //pckp 拾取键
         public static int[] pckpCounter = Enumerable.Repeat(0, 100).ToArray();
@@ -48,166 +48,304 @@ namespace MySlugcat
         //x X键  输入为正（右）、零（无输入）、负（左）
         public static int[] xHCounter = Enumerable.Repeat(0, 100).ToArray();
         public static int[] xNCounter = Enumerable.Repeat(0, 100).ToArray();
-        public static int[] xLCounter = Enumerable.Repeat(0, 100).ToArray();
+        public static int[] xLCounter = Enumerable.Repeat(0, 100).ToArray();*/
 
 
-        public static void Hook()
+		/*public static void Hook()
         {
             On.Player.Update += Player_Update;
-        }
+        }*/
 
-        private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
         {
-            orig(player, eu);
+            if (player.GetModule(out var module))
+            {
+				//jmp
+				if (player.input[0].jmp)
+				{
+					module.JmpCounter++;
+				}
+				else
+				{
+					if (!player.input[1].jmp)
+					{
+						module.JmpCounter = 0;
+					}
+				}
 
-            int N = player.playerState.playerNumber;
+				//pckp
+				if (player.input[0].pckp)
+				{
+					module.pckpCounter++;
+				}
+				else
+				{
+					if (!player.input[1].pckp)
+					{
+						module.pckpCounter = 0;
+					}
+				}
 
-            //jmp
+				//thrw
+				if (player.input[0].thrw)
+				{
+					module.thrwCounter++;
+				}
+				else
+				{
+					if (!player.input[1].thrw)
+					{
+						module.thrwCounter = 0;
+					}
+				}
+
+				//mp
+				if (player.input[0].mp)
+				{
+					module.mpCounter++;
+				}
+				else
+				{
+					if (!player.input[1].mp)
+					{
+						module.mpCounter = 0;
+					}
+				}
+
+				//spec
+				if (player.input[0].spec)
+				{
+					module.specCounter++;
+				}
+				else
+				{
+					if (!player.input[1].spec)
+					{
+						module.specCounter = 0;
+					}
+				}
+
+				//y
+				if (player.input[0].y > 0)
+				{
+					module.yHCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].y > 0))
+					{
+						module.yHCounter = 0;
+					}
+				}
+
+				if (player.input[0].y == 0)
+				{
+					module.yNCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].y == 0))
+					{
+						module.yNCounter = 0;
+					}
+				}
+
+				if (player.input[0].y < 0)
+				{
+					module.yLCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].y < 0))
+					{
+						module.yLCounter = 0;
+					}
+				}
+
+				//x
+				if (player.input[0].x > 0)
+				{
+					module.xHCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].x > 0))
+					{
+						module.xHCounter = 0;
+					}
+				}
+
+				if (player.input[0].x == 0)
+				{
+					module.xNCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].x == 0))
+					{
+						module.xNCounter = 0;
+					}
+				}
+
+				if (player.input[0].x < 0)
+				{
+					module.xLCounter++;
+				}
+				else
+				{
+					if (!(player.input[1].x < 0))
+					{
+						module.xLCounter = 0;
+					}
+				}
+			}
+
+            //int N = player.playerState.playerNumber;
+
+            /*//jmp
             if (player.input[0].jmp)
             {
-                JmpCounter[N]++;
+                JmpCounter++;
             }
             else
             {
                 if (!player.input[1].jmp)
                 {
-                    JmpCounter[N] = 0;
+                    JmpCounter = 0;
                 }
             }
 
             //pckp
             if (player.input[0].pckp)
             {
-                pckpCounter[N]++;
+                pckpCounter++;
             }
             else
             {
                 if (!player.input[1].pckp)
                 {
-                    pckpCounter[N] = 0;
+                    pckpCounter = 0;
                 }
             }
 
             //thrw
             if (player.input[0].thrw)
             {
-                thrwCounter[N]++;
+                thrwCounter++;
             }
             else
             {
                 if (!player.input[1].thrw)
                 {
-                    thrwCounter[N] = 0;
+                    thrwCounter = 0;
                 }
             }
 
             //mp
             if (player.input[0].mp)
             {
-                mpCounter[N]++;
+                mpCounter++;
             }
             else
             {
                 if (!player.input[1].mp)
                 {
-                    mpCounter[N] = 0;
+                    mpCounter = 0;
                 }
             }
 
             //spec
             if (player.input[0].spec)
             {
-                specCounter[N]++;
+                specCounter++;
             }
             else
             {
                 if (!player.input[1].spec)
                 {
-                    specCounter[N] = 0;
+                    specCounter = 0;
                 }
             }
 
             //y
             if (player.input[0].y > 0)
             {
-                yHCounter[N]++;
+                yHCounter++;
             }
             else
             {
                 if (!(player.input[1].y > 0))
                 {
-                    yHCounter[N] = 0;
+                    yHCounter = 0;
                 }
             }
 
             if (player.input[0].y == 0)
             {
-                yNCounter[N]++;
+                yNCounter++;
             }
             else
             {
                 if (!(player.input[1].y == 0))
                 {
-                    yNCounter[N] = 0;
+                    yNCounter = 0;
                 }
             }
 
             if (player.input[0].y < 0)
             {
-                yLCounter[N]++;
+                yLCounter++;
             }
             else
             {
                 if (!(player.input[1].y < 0))
                 {
-                    yLCounter[N] = 0;
+                    yLCounter = 0;
                 }
             }
 
             //x
             if (player.input[0].x > 0)
             {
-                xHCounter[N]++;
+                xHCounter++;
             }
             else
             {
                 if (!(player.input[1].x > 0))
                 {
-                    xHCounter[N] = 0;
+                    xHCounter = 0;
                 }
             }
 
             if (player.input[0].x == 0)
             {
-                xNCounter[N]++;
+                xNCounter++;
             }
             else
             {
                 if (!(player.input[1].x == 0))
                 {
-                    xNCounter[N] = 0;
+                    xNCounter = 0;
                 }
             }
 
             if (player.input[0].x < 0)
             {
-                xLCounter[N]++;
+                xLCounter++;
             }
             else
             {
                 if (!(player.input[1].x < 0))
                 {
-                    xLCounter[N] = 0;
+                    xLCounter = 0;
                 }
-            }
+            }*/
 
 
 
 
 
         }
-
-
     }
 }
 

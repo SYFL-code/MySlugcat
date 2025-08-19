@@ -35,18 +35,17 @@ namespace MySlugcat
     public class MySlugcatStats
     {
 
-        public static void Hook()
+		/*public static void Hook()
         {
             On.SlugcatStats.ctor += SlugcatStats_ctor;
             On.Player.MovementUpdate += Player_MovementUpdate;
             On.Player.Update += Player_Update;
             On.Player.ThrownSpear += Player_ThrownSpear;
-        }
+        }*/
 
-        private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats slugcatStats, SlugcatStats.Name slugcat, bool malnourished)
+		public static void SlugcatStats_ctor(ref bool Execute, ref On.SlugcatStats.orig_ctor orig, ref SlugcatStats slugcatStats, ref SlugcatStats.Name slugcat, ref bool malnourished)
         {
             //if ((slugcat == Plugin.YourSlugID || SC.AllPlayerSkill) && SC.MySlugcatStats = -1)
-            orig(slugcatStats, slugcat, malnourished);
 
 			var Players = PlayerModuleManager.GetActivePlayers();
 			foreach (var player in Players)
@@ -69,10 +68,8 @@ namespace MySlugcat
 
         private static int HungerDegree = (int)(40 * 60 * Extension.RandomValue(5f, 10f));
 
-		private static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
+		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
         {
-            orig(player, eu);
-
 			if (player.GetModule(out var module))
             {
                 if (module.Exhausted)
@@ -120,11 +117,12 @@ namespace MySlugcat
 
         }
 
-        private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
+		public static void Player_ThrownSpear(ref bool Execute, ref On.Player.orig_ThrownSpear orig, ref Player player, ref Spear spear)
         {
-            if (player.GetModule().MySlugcatStats == -1)
+			if (player.GetModule().MySlugcatStats == -1)
             {
-                spear.throwModeFrames = 18;
+				Execute = false;
+				spear.throwModeFrames = 18;
                 spear.spearDamageBonus = 0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
                 BodyChunk firstChunk = spear.firstChunk;
                 firstChunk.vel.x = firstChunk.vel.x * 0.77f;
@@ -176,14 +174,9 @@ namespace MySlugcat
 
                 }*/
             }
-            else
-            {
-                orig(player, spear);
-            }
-
         }
 
-        private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player player, bool eu)
+		public static void Player_MovementUpdate(ref bool Execute, ref On.Player.orig_MovementUpdate orig, ref Player player, ref bool eu)
         {
             if (player.GetModule().MySlugcatStats == 1)
             {
@@ -218,14 +211,7 @@ namespace MySlugcat
                         //bodyChunk2.vel.y = bodyChunk2.vel.y + (player.jumpBoost + 1f) * 0.3f;
                     }
                 }
-
-                orig(player, eu);
             }
-            else
-            {
-                orig(player, eu);
-            }
-
 
         }
 

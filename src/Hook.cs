@@ -32,17 +32,69 @@ namespace MySlugcat
 
 		public static void HookOn()
 		{
+			On.RainWorldGame.Update += RainWorldGame_Update;
+
 			On.Player.ctor += Player_ctor;
 			On.Player.Update += Player_Update;
+			On.Player.MovementUpdate += Player_MovementUpdate;
+			On.Player.SwallowObject += Player_SwallowObject;
+			On.Player.ThrownSpear += Player_ThrownSpear;
+			On.Player.Die += Player_Die;
 			On.Player.Destroy += Player_Destroy;
 
+			On.SlugcatStats.ctor += SlugcatStats_ctor;
+
+			On.Creature.Update += Creature_Update;
+			On.LizardGraphics.DrawSprites += LizardGraphics_DrawSprites;
+			On.ScavengerGraphics.DrawSprites += ScavengerGraphics_DrawSprites;
+			On.Creature.Die += Creature_Die;
+
+			On.AbstractCreature.ctor += AbstractCreature_ctor;
+			On.AbstractPhysicalObject.ctor += AbstractPhysicalObject_ctor;
+			On.AbstractPhysicalObject.Destroy += AbstractPhysicalObject_Destroy;
 
 			On.Spear.HitSomething += Spear_HitSomething;
 			On.Rock.HitSomething += Rock_HitSomething;
 			On.Weapon.HitSomething += Weapon_HitSomething;
 			On.Weapon.Update += Weapon_Update;
+
+			// 睡眠HUD初始化
+			//On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
+			// 单人模式HUD初始化
+			On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+			// 多人模式HUD初始化
+			On.HUD.HUD.InitMultiplayerHud += HUD_InitMultiplayerHud;
+			// 狩猎模式HUD初始化
+			On.HUD.HUD.InitSafariHud += HUD_InitSafariHud;
+			// 快速瞬移通行证HUD初始化
+			//On.HUD.HUD.InitTeleportHud += HUD_InitTeleportHud;
+
+			On.RelationshipTracker.DynamicRelationship.Update += DynamicRelationship_Update;
+			On.LizardAI.DoIWantToBiteThisCreature += LizardAI_DoIWantToBiteThisCreature;
+
+			//打开外层空间大门
+			On.RegionGate.customOEGateRequirements += RegionGate_customOEGateRequirements;
 		}
 
+		private static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame rainWorldGame)
+		{
+			bool Execute = true;
+
+			orig(rainWorldGame);
+
+			try
+			{
+				Control.RainWorldGame_Update(ref Execute, ref orig, ref rainWorldGame);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+		
+		#region Player
 		private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
 		{
 			bool Execute = true;
@@ -61,9 +113,10 @@ namespace MySlugcat
 
 			try
 			{
+				Control.Player_ctor(ref Execute, ref orig, ref player, ref abstractCreature, ref world);
+				if (!Execute) return;
 				PlayerHooks.Player_ctor(ref Execute, ref orig, ref player, ref abstractCreature, ref world);
 				if (!Execute) return;
-
 			}
 			catch (Exception e)
 			{
@@ -74,9 +127,32 @@ namespace MySlugcat
 		public static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
 		{
 			bool Execute = true;
+
+			orig(player, eu);
+
 			try
 			{
-				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				MySlugcatStats.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+				Key.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+				NecrophytesCreature.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+				DigestionSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player player, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				MySlugcatStats.Player_MovementUpdate(ref Execute, ref orig, ref player, ref eu);
 				if (!Execute) return;
 
 			}
@@ -89,7 +165,65 @@ namespace MySlugcat
 
 			try
 			{
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
+		{
+			bool Execute = true;
+			try
+			{
+				DigestionSkill.Player_SwallowObject(ref Execute, ref orig, ref player, ref grasp);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(player, grasp);
+		}
+
+		public static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
+		{
+			bool Execute = true;
+			try
+			{
+				MySlugcatStats.Player_ThrownSpear(ref Execute, ref orig, ref player, ref spear);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(player, spear);
+		}
+
+		public static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
+		{
+			bool Execute = true;
+			try
+			{
 				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(player);
+
+			try
+			{
+				PlayerHooks.Player_Destroy(ref Execute, ref orig, ref player);
 				if (!Execute) return;
 
 			}
@@ -99,17 +233,227 @@ namespace MySlugcat
 			}
 		}
 
-		public static void Player_Destroy(ref bool Execute, ref On.Player.orig_Destroy orig, ref Player player)
+		private static void Player_Die(On.Player.orig_Die orig, Player player)
 		{
-			if (player.dead || player.slatedForDeletetion)
+			bool Execute = true;
+			try
 			{
-				PlayerModuleManager.UnregisterPlayer(player);  // ② 注销
+				FrameSkill.Player_Die(ref Execute, ref orig, ref player);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			bool return_ = player.dead;
+			orig(player);
+
+			try
+			{
+				DeflagrationSkill.Player_Die(ref Execute, ref return_, ref orig, ref player);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
 			}
 		}
 
+		public static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats slugcatStats, SlugcatStats.Name slugcat, bool malnourished)
+		{
+			bool Execute = true;
+			try
+			{
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(slugcatStats, slugcat, malnourished);
+
+			try
+			{
+				MySlugcatStats.SlugcatStats_ctor(ref Execute, ref orig, ref slugcatStats, ref slugcat, ref malnourished);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+		#endregion
+
+		#region Creature
+		public static void Creature_Update(On.Creature.orig_Update orig, Creature creature, bool eu)
+		{
+			bool Execute = true;
+
+			orig(creature, eu);
+
+			try
+			{
+				NecrophytesCreature.Creature_Update(ref Execute, ref orig, ref creature, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void Creature_Die(On.Creature.orig_Die orig, Creature creature)
+		{
+			bool Execute = true;
+
+			orig(creature);
+
+			try
+			{
+				NecrophytesCreature.Creature_Die(ref Execute, ref orig, ref creature);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void LizardGraphics_DrawSprites(On.LizardGraphics.orig_DrawSprites orig, LizardGraphics lizardGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+		{
+			bool Execute = true;
+
+			orig(lizardGraphics, sLeaser, rCam, timeStacker, camPos);
+
+			try
+			{
+				NecrophytesCreature.LizardGraphics_DrawSprites(ref Execute, ref orig, ref lizardGraphics, ref sLeaser, ref rCam, ref timeStacker, ref camPos);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void ScavengerGraphics_DrawSprites(On.ScavengerGraphics.orig_DrawSprites orig, ScavengerGraphics scavGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+		{
+			bool Execute = true;
+
+			orig(scavGraphics, sLeaser, rCam, timeStacker, camPos);
+
+			try
+			{
+				NecrophytesCreature.ScavengerGraphics_DrawSprites(ref Execute, ref orig, ref scavGraphics, ref sLeaser, ref rCam, ref timeStacker, ref camPos);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+		#endregion
+
+		#region Abstract
+		private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature abstractCreature, World world, CreatureTemplate template, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
+		{
+			bool Execute = true;
+			try
+			{
+				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(abstractCreature, world, template, realizedCreature, pos, ID);
+
+			try
+			{
+				AbCreatureHooks.AbstractCreature_ctor(ref Execute, ref orig, ref abstractCreature, ref world, ref template, ref realizedCreature, ref pos, ref ID);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void AbstractPhysicalObject_ctor(On.AbstractPhysicalObject.orig_ctor orig, AbstractPhysicalObject abPhysicalObject, World world, AbstractPhysicalObject.AbstractObjectType type, PhysicalObject realizedPhysicalObject, WorldCoordinate pos, EntityID ID)
+		{
+			bool Execute = true;
+			try
+			{
+				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(abPhysicalObject, world, type, realizedPhysicalObject, pos, ID);
+
+			try
+			{
+				AbPhysicalObjectHooks.AbstractPhysicalObject_ctor(ref Execute, ref orig, ref abPhysicalObject, ref world, ref type, ref realizedPhysicalObject, ref pos, ref ID);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		private static void AbstractPhysicalObject_Destroy(On.AbstractPhysicalObject.orig_Destroy orig, AbstractPhysicalObject abPhysicalObject)
+		{
+			bool Execute = true;
+			try
+			{
+				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(abPhysicalObject);
+
+			try
+			{
+				AbPhysicalObjectHooks.AbstractPhysicalObject_Destroy(ref Execute, ref orig, ref abPhysicalObject);
+				if (!Execute) return;
+				AbCreatureHooks.AbstractPhysicalObject_Destroy(ref Execute, ref orig, ref abPhysicalObject);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+		#endregion
+
+		#region Weapon
 		public static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
 		{
-			Log.OutputLog($"spear({spear != null})_thrownBy({spear?.thrownBy?.GetType()})_r({result.obj?.GetType()})_");
+			//Log.OutputLog($"spear({spear != null})_thrownBy({spear?.thrownBy?.GetType()})_r({result.obj?.GetType()})_");
 			bool Execute = true;
 			bool ret = false;
 			try
@@ -121,19 +465,19 @@ namespace MySlugcat
 				ret = PenetrationSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
 
-				ret = orig(spear, result, eu);
-				Log.OutputLog($"Spear ret({ret})_");
 			}
 			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
+			ret = orig(spear, result, eu);
+			Log.OutputLog($"Spear ret({ret})_");
 			return ret;
 		}
 
 		public static bool Rock_HitSomething(On.Rock.orig_HitSomething orig, Rock rock, SharedPhysics.CollisionResult result, bool eu)
 		{
-			Log.OutputLog($"rock({rock != null})_thrownBy({rock?.thrownBy?.GetType()})_r({result.obj?.GetType()})_");
+			//Log.OutputLog($"rock({rock != null})_thrownBy({rock?.thrownBy?.GetType()})_r({result.obj?.GetType()})_");
 			bool Execute = true;
 			bool ret = false;
 			try
@@ -141,19 +485,19 @@ namespace MySlugcat
 				ret = PenetrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
 
-				ret = orig(rock, result, eu);
-				Log.OutputLog($"Rock ret({ret})_");
 			}
 			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
+			ret = orig(rock, result, eu);
+			Log.OutputLog($"Rock ret({ret})_");
 			return ret;
 		}
 
 		public static bool Weapon_HitSomething(On.Weapon.orig_HitSomething orig, Weapon weapon, SharedPhysics.CollisionResult result, bool eu)
 		{
-			Log.OutputLog($"weapon({weapon != null})_r({result.obj?.GetType()})_");
+			//Log.OutputLog($"weapon({weapon != null})_r({result.obj?.GetType()})_");
 			bool Execute = true;
 			bool ret = false;
 			try
@@ -161,13 +505,13 @@ namespace MySlugcat
 				ret = PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
 				if (!Execute) return ret;
 
-				ret = orig(weapon, result, eu);
-				Log.OutputLog($"Weaponret({ret})_");
 			}
 			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
+			ret = orig(weapon, result, eu);
+			Log.OutputLog($"Weaponret({ret})_");
 			return ret;
 		}
 
@@ -196,8 +540,118 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 		}
+		#endregion
 
 
+		#region HUD
+		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD HUD, RoomCamera cam)
+		{
+			bool Execute = true;
+			try
+			{
+				VisionSystem.HUD_InitSinglePlayerHud(ref Execute, ref orig, ref HUD, ref cam);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(HUD, cam);
+		}
+
+		private static void HUD_InitMultiplayerHud(On.HUD.HUD.orig_InitMultiplayerHud orig, HUD.HUD HUD, ArenaGameSession session)
+		{
+			bool Execute = true;
+			try
+			{
+				VisionSystem.HUD_InitMultiplayerHud(ref Execute, ref orig, ref HUD, ref session);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(HUD, session);
+		}
+
+		private static void HUD_InitSafariHud(On.HUD.HUD.orig_InitSafariHud orig, HUD.HUD HUD, RoomCamera cam)
+		{
+			bool Execute = true;
+			try
+			{
+				VisionSystem.HUD_InitSafariHud(ref Execute, ref orig, ref HUD, ref cam);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(HUD, cam);
+		}
+		#endregion
+
+		#region Friends of friends
+		public static void DynamicRelationship_Update(On.RelationshipTracker.DynamicRelationship.orig_Update orig, RelationshipTracker.DynamicRelationship self)
+		{
+			bool Execute = true;
+			try
+			{
+				friends_of_friends.DynamicRelationship_Update(ref Execute, ref orig, ref self);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(self);
+		}
+
+		public static bool LizardAI_DoIWantToBiteThisCreature(On.LizardAI.orig_DoIWantToBiteThisCreature orig, LizardAI lizardAI, Tracker.CreatureRepresentation otherCrit)
+		{
+			bool Execute = true;
+			bool ret = true;
+			try
+			{
+				ret = friends_of_friends.LizardAI_DoIWantToBiteThisCreature(ref Execute, ref ret, ref orig, ref lizardAI, ref otherCrit);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			ret = orig(lizardAI, otherCrit);
+			return ret;
+		}
+		#endregion
+
+		public static bool RegionGate_customOEGateRequirements(On.RegionGate.orig_customOEGateRequirements orig, RegionGate regionGate)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = MyGame.RegionGate_customOEGateRequirements(ref Execute, ref ret, ref orig, ref regionGate);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			ret = orig(regionGate);
+			return ret;
+		}
 
 	}
 }

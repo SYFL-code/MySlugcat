@@ -413,9 +413,9 @@ namespace MySlugcat
             }
         }
 
-        public static void Player_Die(Creature self, bool orig)
+        public static void Player_Die(ref bool Execute, ref bool return_, ref On.Player.orig_Die orig, ref Player player)
         {
-            if (self is Player player && !orig && player.dead && player.GetModule().DeflagrationSkill)
+            if (!return_ && player.dead && player.GetModule().DeflagrationSkill)
             {
                 if (100 > UnityEngine.Random.Range(0, 100))
                 {

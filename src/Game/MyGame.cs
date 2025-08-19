@@ -9,27 +9,28 @@ namespace MySlugcat
 {
     public class MyGame
     {
-        public static void Hook()
+        /*public static void Hook()
         {
             //打开外层空间大门
             On.RegionGate.customOEGateRequirements += RegionGate_customOEGateRequirements;
-        }
+        }*/
 
         //解锁归乡门
-        private static bool RegionGate_customOEGateRequirements(On.RegionGate.orig_customOEGateRequirements orig, RegionGate self)
+        public static bool RegionGate_customOEGateRequirements(ref bool Execute, ref bool return_, ref On.RegionGate.orig_customOEGateRequirements orig, ref RegionGate regionGate)
         {
             if (!ModManager.MSC)
             {
                 return false;
             }
 
-            if (self.room.game.StoryCharacter == Plugin.YourSlugID)
+            if (regionGate.room.game.StoryCharacter == Plugin.YourSlugID)
             {
                 return true;
             }
             else
             {
-                return orig.Invoke(self);
+                Execute = false;
+				return orig.Invoke(regionGate);
             }
         }
     }

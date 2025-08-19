@@ -1,4 +1,4 @@
-﻿using On;
+﻿/*using On;
 using IL;
 using System;
 using Mono.Cecil;
@@ -31,9 +31,9 @@ namespace MySlugcat
         {
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
-            On.Player.Die += Player_Die;
+            //On.Player.Die += Player_Die;
 
-/*            //咬住挣脱
+*//*            //咬住挣脱
             On.Creature.Violence += Creature_Violence;
             //挣脱蜥蜴
             On.Lizard.Bite += Lizard_Bite;
@@ -53,7 +53,7 @@ namespace MySlugcat
             On.Spear.HitSomething += Spear_HitSomething;
             On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
             //挣脱魔王秃鹫
-            On.Vulture.Carry += Vulture_Carry;*/
+            On.Vulture.Carry += Vulture_Carry;*//*
 
             //增强矛的伤害
             //On.Spear.HitSomething += Spear_HitSomething;
@@ -72,7 +72,7 @@ namespace MySlugcat
         }
 
 
-/*        private static void SaveState_LoadGame(On.SaveState.orig_LoadGame orig, SaveState saveState, string str, RainWorldGame game)
+*//*        private static void SaveState_LoadGame(On.SaveState.orig_LoadGame orig, SaveState saveState, string str, RainWorldGame game)
         {
             //24_2_16 保存bug
             //if (MyOption.Instance.OpCheckBoxSaveIceData_conf.Value == false)
@@ -274,7 +274,7 @@ namespace MySlugcat
 
 
 
-        private static void Player_Die(On.Player.orig_Die orig, Player player)
+        /*private static void Player_Die(On.Player.orig_Die orig, Player player)
         {
             if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
             {
@@ -298,9 +298,9 @@ namespace MySlugcat
                 orig(player);
             }
 
-        }
+        }*//*
 
 
 
     }
-}
+}*/

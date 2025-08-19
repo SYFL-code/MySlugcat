@@ -18,7 +18,7 @@ namespace MySlugcat
 	public class VisionSystem : HudPart
 	{
 
-		public static void Hook()
+		/*public static void Hook()
 		{
 			// 睡眠HUD初始化
 			//On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
@@ -30,7 +30,7 @@ namespace MySlugcat
 			On.HUD.HUD.InitSafariHud += HUD_InitSafariHud;
 			// 快速瞬移通行证HUD初始化
 			//On.HUD.HUD.InitTeleportHud += HUD_InitTeleportHud;
-		}
+		}*/
 
 		/*private static void HUD_InitSleepHud(On.HUD.HUD.orig_InitSleepHud orig, HUD.HUD HUD, Menu.SleepAndDeathScreen sleepAndDeathScreen, HUD.Map.MapData mapData, SlugcatStats charStats)
 		{
@@ -42,7 +42,7 @@ namespace MySlugcat
 			orig.Invoke(HUD, sleepAndDeathScreen, mapData, charStats);
 		}*/
 
-		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD HUD, RoomCamera cam)
+		public static void HUD_InitSinglePlayerHud(ref bool Execute, ref On.HUD.HUD.orig_InitSinglePlayerHud orig, ref HUD.HUD HUD, ref  RoomCamera cam)
 		{
 			if (cam.room.game.StoryCharacter == Plugin.YourSlugID)
 			{
@@ -51,7 +51,7 @@ namespace MySlugcat
 			orig.Invoke(HUD, cam);
 		}
 
-		private static void HUD_InitMultiplayerHud(On.HUD.HUD.orig_InitMultiplayerHud orig, HUD.HUD HUD, ArenaGameSession session)
+		public static void HUD_InitMultiplayerHud(ref bool Execute, ref On.HUD.HUD.orig_InitMultiplayerHud orig, ref HUD.HUD HUD, ref ArenaGameSession session)
 		{
 			if (session.room.game.StoryCharacter == Plugin.YourSlugID)
 			{
@@ -60,7 +60,7 @@ namespace MySlugcat
 			orig.Invoke(HUD, session);
 		}
 
-		private static void HUD_InitSafariHud(On.HUD.HUD.orig_InitSafariHud orig, HUD.HUD HUD, RoomCamera cam)
+		public static void HUD_InitSafariHud(ref bool Execute, ref On.HUD.HUD.orig_InitSafariHud orig, ref HUD.HUD HUD, ref RoomCamera cam)
 		{
 			if (cam.room.game.StoryCharacter == Plugin.YourSlugID)
 			{

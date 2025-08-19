@@ -141,13 +141,13 @@ namespace MySlugcat
 
             int N = player.playerState.playerNumber;
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (player.GetModule().KnitmeshSkill)
+            if (player.GetModule(out var module) && module.KnitmeshSkill)
             {
                 //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;
                 //if (KnitmeshSkill != null&& KnitmeshSkill.Value)
                 float timeStacker = Time.deltaTime;
-                if (15 > Key.mpCounter[N] && !player.input[0].mp && player.input[1].mp)
+                if (15 > module.mpCounter && !player.input[0].mp && player.input[1].mp)
                 {
                     Knitmesh(player, player.room, player.mainBodyChunk.pos);
                 }

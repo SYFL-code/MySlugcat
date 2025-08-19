@@ -172,13 +172,13 @@ internal static class AbPhysicalObjectModuleManager
 internal static class AbPhysicalObjectHooks
 {
 
-	public static void HookOn()
+	/*public static void HookOn()
 	{
 		//On.PhysicalObject.ctor += PhysicalObject_ctor;
 		//On.PhysicalObject.Die += PhysicalObject_Die;
 		On.AbstractPhysicalObject.ctor += AbstractPhysicalObject_ctor;
 		On.AbstractPhysicalObject.Destroy += AbstractPhysicalObject_Destroy;
-	}
+	}*/
 
 	/*private static void PhysicalObject_ctor(On.PhysicalObject.orig_ctor orig, PhysicalObject PhysicalObject,
 		AbstractPhysicalObject ac, World world)
@@ -187,15 +187,13 @@ internal static class AbPhysicalObjectHooks
 		PhysicalObjectModuleManager.RegisterPhysicalObject(PhysicalObject);        // ① 注册
 	}*/
 
-	private static void AbstractPhysicalObject_ctor(On.AbstractPhysicalObject.orig_ctor orig, AbstractPhysicalObject ac, World world, AbstractPhysicalObject.AbstractObjectType type, PhysicalObject realizedPhysicalObject, WorldCoordinate pos, EntityID ID)
+	public static void AbstractPhysicalObject_ctor(ref bool Execute, ref On.AbstractPhysicalObject.orig_ctor orig, ref AbstractPhysicalObject ac, ref World world, ref AbstractPhysicalObject.AbstractObjectType type, ref PhysicalObject realizedPhysicalObject, ref WorldCoordinate pos, ref EntityID ID)
 	{
-		orig(ac, world, type, realizedPhysicalObject, pos, ID);
 		AbPhysicalObjectModuleManager.RegisterAbPhysicalObject(ac);        // ① 注册
 	}
 
-	private static void AbstractPhysicalObject_Destroy(On.AbstractPhysicalObject.orig_Destroy orig, AbstractPhysicalObject abPhysicalObject)
+	public static void AbstractPhysicalObject_Destroy(ref bool Execute, ref On.AbstractPhysicalObject.orig_Destroy orig, ref AbstractPhysicalObject abPhysicalObject)
 	{
-		orig(abPhysicalObject);
 		if (abPhysicalObject != null)
 		{
 			if (abPhysicalObject.slatedForDeletion)

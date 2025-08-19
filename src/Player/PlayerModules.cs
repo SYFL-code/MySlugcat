@@ -215,14 +215,67 @@ internal static class PlayerModuleManager
 		private const string TheGluttonPassage = "The Glutton";
 		#endregion
 
+		#region 按键Key
+		// player.input[0].jmp 玩家当前帧是否按下跳跃键
+		// player.input[1].jmp 玩家上一帧是否按下跳跃键
+
+		//按下按键的时长(40次 = 1秒)
+		//jump 跳跃键
+		public int JmpCounter = 0;
+		//pckp 拾取键
+		public int pckpCounter = 0;
+		//throw 投掷键
+		public int thrwCounter = 0;
+		//map 地图键
+		public int mpCounter = 0;
+		//special 特殊键
+		public int specCounter = 0;
+		//y Y键  输入为正（上）、零（无输入）、负（下）
+		public int yHCounter = 0;
+		public int yNCounter = 0;
+		public int yLCounter = 0;
+		//x X键  输入为正（右）、零（无输入）、负（左）
+		public int xHCounter = 0;
+		public int xNCounter = 0;
+		public int xLCounter = 0;
+		#endregion
+
 		#region 其他字段
 		#endregion
+
+
 
 
 		public PlayerModule(Player player)
 		{
 			//playerRef = new WeakReference<Player>(player);
 			this.player = player;
+
+			#region 按键Key
+			// player.input[0].jmp 玩家当前帧是否按下跳跃键
+			// player.input[1].jmp 玩家上一帧是否按下跳跃键
+
+			//按下按键的时长(40次 = 1秒)
+			//jump 跳跃键
+			JmpCounter = 0;
+			//pckp 拾取键
+			pckpCounter = 0;
+			//throw 投掷键
+			thrwCounter = 0;
+			//map 地图键
+			mpCounter = 0;
+			//special 特殊键
+			specCounter = 0;
+			//y Y键  输入为正（上）、零（无输入）、负（下）
+			yHCounter = 0;
+			yNCounter = 0;
+			yLCounter = 0;
+			//x X键  输入为正（右）、零（无输入）、负（左）
+			xHCounter = 0;
+			xNCounter = 0;
+			xLCounter = 0;
+			#endregion
+
 			Console.WriteLine("Passages_1: " + string.Join(", ", Passages));
 			SetSkill(player);
 			//Log.Logger();

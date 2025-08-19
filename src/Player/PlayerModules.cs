@@ -64,20 +64,74 @@ internal static class PlayerModuleManager
 	{
 		if (_dirty)
 		{
-			_rwLock.EnterReadLock();   // 写锁即可，读锁已够用
+			_rwLock.EnterWriteLock(); // 使用写锁以确保线程安全
 			try
 			{
 				_snapshot.Clear();
 				_snapshot.AddRange(_activePlayers);
 				_dirty = false;
 			}
-			finally { _rwLock.ExitReadLock(); }
+			finally { _rwLock.ExitWriteLock(); }
 		}
 		return _snapshot;
+	}
 
-		/*_rwLock.EnterReadLock();
-		try { return new List<Player>(_activePlayers); }
-		finally { _rwLock.ExitReadLock(); }*/
+	public static PlayerModule GetModule(this Player player)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (PlayerModules.TryGetValue(player, out var module_))
+			{
+				return module_;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 PlayerModules 中时，创建并注册模块
+			PlayerModule module = new PlayerModule(player);
+			PlayerModules.Add(player, module);
+			if (!_activePlayers.Contains(player))
+			{
+				_activePlayers.Add(player);
+				_dirty = true;
+			}
+			return module;
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
+	public static bool GetModule(this Player player, out PlayerModule module)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (PlayerModules.TryGetValue(player, out var module_))
+			{
+				module = module_;
+				return true;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 PlayerModules 中时，创建并注册模块
+			PlayerModule module__ = new PlayerModule(player);
+			PlayerModules.Add(player, module__);
+			if (!_activePlayers.Contains(player))
+			{
+				_activePlayers.Add(player);
+				_dirty = true;
+			}
+			module = module__;
+			return true;
+		}
+		finally { _rwLock.ExitWriteLock(); }
 	}
 
 
@@ -114,6 +168,8 @@ internal static class PlayerModuleManager
 		public bool FixedSkill = false;
 		/// <summary> 杀戮光环 </summary>
 		public bool KillingAuraSkill = false;
+		/// <summary> 穿透能力 </summary>
+		public bool PenetrationSkill = false;
 
 		//public int HungryCoolDown = 12000;//冷却计时器
 		#endregion
@@ -188,6 +244,7 @@ internal static class PlayerModuleManager
 			SpawnNecrophytes = false;
 			FixedSkill = false;
 			KillingAuraSkill = false;
+			PenetrationSkill = false;
 
 			if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
 			{
@@ -204,6 +261,7 @@ internal static class PlayerModuleManager
 				SpawnNecrophytes = true;//
 				FixedSkill = false;
 				KillingAuraSkill = true;//
+				PenetrationSkill = true;//
 
 				var session = player?.room?.game?.GetStorySession;
 				if (session == null) return;
@@ -232,26 +290,40 @@ internal static class PlayerModuleManager
 					}
 				}
 
-				var passSet = new HashSet<string>(Passages);
-				if (Survivor && passSet != null && passSet.Count > 0)
+				if (Survivor)
 				{
-					if (passSet.Contains(TheOutlawPassage))//"暴徒"
+					if (session.saveState != null && session.saveState.deathPersistentSaveData.deaths > 50)
 					{
-						DeflagrationSkill = true;
+						FrameSkill = true;
 					}
-					if (passSet.Contains(TheHunterPassage))//"猎手"
+
+					var passSet = new HashSet<string>(Passages);
+					if (passSet != null && passSet.Count > 0)
 					{
-						KillingAuraSkill = true;
-					}
-					if (passSet.Contains(TheChieftainPassage) && passSet.Contains(TheFriendPassage))//"酋长"&"朋友"
-					{
-						SpawnNecrophytes = true;
-					}
-					if (passSet.Contains(TheGluttonPassage))//"贪食者"
-					{
-						DigestionSkill = true;
+						if (passSet.Contains(TheOutlawPassage))//"暴徒"
+						{
+							DeflagrationSkill = true;
+						}
+						if (passSet.Contains(TheHunterPassage))//"猎手"
+						{
+							KillingAuraSkill = true;
+						}
+						if (passSet.Contains(TheChieftainPassage) && passSet.Contains(TheFriendPassage))//"酋长"&"朋友"
+						{
+							SpawnNecrophytes = true;
+						}
+						if (passSet.Contains(TheGluttonPassage))//"贪食者"
+						{
+							DigestionSkill = true;
+						}
+						if (passSet.Contains(TheOutlawPassage) && passSet.Contains(TheDragonSlayerPassage))//"暴徒"&"屠龙者"
+						{
+							PenetrationSkill = true;
+						}
 					}
 				}
+
+
 			}
 		}
 	}

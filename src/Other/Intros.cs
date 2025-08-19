@@ -1,45 +1,105 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BepInEx;
-using IL.Menu;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoMod.Utils;
-using On;
+using HarmonyLib;
 using SlugBase;
 using SlugBase.Features;
+using Menu;
 using UnityEngine;
-using System.Collections;
-using System.IO;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Mono.Collections.Generic;
-using MonoMod.RuntimeDetour;
-
 
 namespace MySlugcat
 {
-	// 包含了一些控制插件行为的静态字段和方法
 	public static class Intros
 	{
+		/* ---------- 1. 静态构造：永远有 harmony ---------- */
+		private static readonly Harmony harmony = new("my.slugcat.intros");
+
+		static Intros()
+		{
+			try
+			{
+				harmony.Patch(AccessTools.Constructor(typeof(IntroRoll)),
+							  postfix: new HarmonyMethod(typeof(Intros), nameof(Postfix)));
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError($"[MySlugcat.Intros] Patch failed: {ex}");
+			}
+		}
+
+		/* ---------- 2. 配置开关 ---------- */
 		public static bool mscCheckbox = false;// 允许 MSC 开场动画
 		public static bool slugbaseCheckbox = false;// 允许 Slugbase 蛞蝓猫的开场动画（实验性功能）
 		public static bool onlySlugbaseCheckbox = true;// 仅启用 Slugbase 蛞蝓猫的开场动画
 
-		// 定义了标题名称数组
-		/// <summary>
-		/// 插件自己的标题卡名称列表。当完全禁用 MSC/SlugBase 时可单独使用。
-		/// </summary>
-		public static readonly string[] titles = new string[]
-		{
-			"MySlugcat"
-		};
+		/* ---------- 3. 配置常量 ---------- */
+		private const string Prefix = "Intro_Roll_C_";   // 前缀统一收口
+		private static readonly string[] VanillaCards = { "MySlugcat" };
+		private static readonly string[] MscCards = { "Artificer", "Gourmand", "Spear", "Rivulet", "Saint", "Inv" };
 
-		// 注册钩子函数
+		/* ---------- 4. 计算标题卡（无重复、无空值、无异常） ---------- */
+		private static string[] ComputeTitleCards()
+		{
+			var list = new HashSet<string>();   // 天然去重+无序
+
+			// 4-1 先加 SlugBase（若启用且已加载）
+			if (slugbaseCheckbox && IsSlugBaseReady())
+			{
+				var tf = GameFeatures.TitleCard;
+				foreach (var c in SlugBaseCharacter.Registry.Values)
+					if (tf.TryGet(c, out var n) && !string.IsNullOrEmpty(n))
+						list.Add(Prefix + n);
+
+				if (onlySlugbaseCheckbox && list.Count > 0)
+					return list.ToArray();      // 纯 SlugBase
+			}
+
+			// 4-2 加自己的
+			foreach (var t in VanillaCards)
+				list.Add(Prefix + t);
+
+			// 4-3 加 MSC（若启用）
+			if (mscCheckbox)
+				foreach (var t in MscCards)
+					list.Add(Prefix + t);
+
+			return list.ToArray();
+		}
+
+		/* ---------- 5. Postfix：健壮字段注入 ---------- */
+		private static void Postfix(IntroRoll __instance)
+		{
+			try
+			{
+				var f = AccessTools.Field(typeof(IntroRoll), "titleCards");
+				if (f == null || f.IsInitOnly || f.IsLiteral) return;
+
+				var cards = ComputeTitleCards();
+				if (cards.Length == 0) return;   // 避免空数组导致游戏异常
+
+				f.SetValue(__instance, cards);
+			}
+			catch (Exception ex)
+			{
+				Debug.LogError($"[MySlugcat.Intros] Failed to set titleCards: {ex}");
+			}
+		}
+
+		/* ---------- 6. SlugBase 是否已就绪 ---------- */
+		private static bool IsSlugBaseReady()
+			=> GameFeatures.TitleCard != null &&
+			   SlugBaseCharacter.Registry != null;
+	}
+}
+
+
+
+
+
+
+/*		// 注册钩子函数
 		/// <summary>
 		/// 注册 IL 钩子，修改 Menu.IntroRoll 的构造函数，把最终标题卡字符串替换掉。
 		/// </summary>
@@ -65,7 +125,7 @@ namespace MySlugcat
 		{
 			ILCursor ilcursor = new ILCursor(il);
 
-			/* ---------- 处理 MSC 路径 ---------- */
+			*//* ---------- 处理 MSC 路径 ---------- *//*
 			// 定位 ldstr "Intro_Roll_C_"  -> call string.Concat(...)
 			ILCursor ilcursor2 = ilcursor;
 			Func<Instruction, bool>[] array = new Func<Instruction, bool>[1];
@@ -95,7 +155,7 @@ namespace MySlugcat
 				//Debug.LogError("IL hook IntroRoll_ctor, MSC, failed!");
 			}
 
-			/* ---------- 处理非 MSC 路径 ---------- */
+			*//* ---------- 处理非 MSC 路径 ---------- *//*
 			ilcursor.Index = 0; // 重置游标
 			ILCursor ilcursor4 = ilcursor;
 			Func<Instruction, bool>[] array3 = new Func<Instruction, bool>[1];
@@ -229,8 +289,6 @@ namespace MySlugcat
 		private static bool ShouldApplySlugbaseIntros()
 		{
 			return IsSlugbaseEnabled() && (!slugbaseCheckbox || onlySlugbaseCheckbox);
-		}
+		}*/
 
 
-	}
-}

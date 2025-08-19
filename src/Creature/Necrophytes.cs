@@ -61,7 +61,7 @@ namespace MySlugcat
 			if (!rCam.room.game.DEBUGMODE)
 			{
 				Creature lizard = lizardGraphics.lizard;
-				if (IsNecrophyte(lizard) && AbCreatureModuleManager.AbCreatureModules.TryGetValue(lizard.abstractCreature, out var module_c) && module_c.IsNecrophyte)
+				if (IsNecrophyte(lizard) && lizard.abstractCreature.GetModule(out var module_c) && module_c.IsNecrophyte)
 				{
 					if (lizard is Lizard || lizard is Scavenger)
 					{
@@ -93,7 +93,7 @@ namespace MySlugcat
 			if (!rCam.room.game.DEBUGMODE)
 			{
 				Creature scavenger = scavGraphics.scavenger;
-				if (IsNecrophyte(scavenger) && AbCreatureModuleManager.AbCreatureModules.TryGetValue(scavenger.abstractCreature, out var module_c) && module_c.IsNecrophyte)
+				if (IsNecrophyte(scavenger) && scavenger.abstractCreature.GetModule(out var module_c) && module_c.IsNecrophyte)
 				{
 					if (scavenger is Lizard || scavenger is Scavenger)
 					{
@@ -212,7 +212,7 @@ namespace MySlugcat
 
 		private static void Creature_Die(On.Creature.orig_Die orig, Creature creature)
 		{
-			if (AbCreatureModuleManager.AbCreatureModules.TryGetValue(creature.abstractCreature, out var module_c))
+			if (creature.abstractCreature.GetModule(out var module_c))
 			{
 				if (IsNecrophyte(creature) && module_c.IsNecrophyte)
 				{
@@ -240,7 +240,7 @@ namespace MySlugcat
 
 			orig.Invoke(creature, eu);
 
-			if (AbCreatureModuleManager.AbCreatureModules.TryGetValue(creature.abstractCreature, out var module_c))
+			if (creature.abstractCreature.GetModule(out var module_c))
 			{
 				if (module_c.IsNecrophyte)
 				{
@@ -434,7 +434,7 @@ namespace MySlugcat
 			//creature.Template.shortcutColor = new Color(0.2f, 0.2f, 0.2f, 1f);
 
 			int N = player.playerState.playerNumber;
-			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.SpawnNecrophytes)
+			if (player.GetModule(out var module) && module.SpawnNecrophytes)
 			{
 				if (Key.JmpCounter[N] >= 60 && !player.input[0].jmp && player.input[1].jmp)
 				{
@@ -446,7 +446,7 @@ namespace MySlugcat
 							Creature creature = room.abstractRoom.creatures[i].realizedCreature;
 							if (creature != null)
 							{
-								if (creature.dead && AbCreatureModuleManager.AbCreatureModules.TryGetValue(creature.abstractCreature, out var module_c) && !module_c.IsNecrophyte && !module_c.NecrophyteDying)
+								if (creature.abstractCreature.GetModule(out var module_c) && !module_c.IsNecrophyte && !module_c.NecrophyteDying)
 								{
 									if (creature is Lizard || creature is Scavenger)
 									{
@@ -513,7 +513,7 @@ namespace MySlugcat
 			}
 			bool isNecrophyte = false;
 
-			if (AbCreatureModuleManager.AbCreatureModules.TryGetValue(creature.abstractCreature, out var module_c) && module_c.IsNecrophyte)
+			if (creature.abstractCreature.GetModule(out var module_c) && module_c.IsNecrophyte)
 			{
 				isNecrophyte = true;
 			}
@@ -646,8 +646,7 @@ namespace MySlugcat
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsDying(Creature c) =>
-		AbCreatureModuleManager.AbCreatureModules.TryGetValue(c.abstractCreature, out var m) && m.NecrophyteDying;
-
+			c.abstractCreature.GetModule(out var m) && m.NecrophyteDying;
 
 	}
 }

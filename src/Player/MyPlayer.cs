@@ -31,8 +31,6 @@ namespace MySlugcat
         {
             //On.Player.ctor += Player_ctor;
             //On.Player.Update += Player_Update;
-
-            On.Spear.HitSomething += Spear_HitSomething;
             On.Player.Die += Player_Die;
 
 /*            //咬住挣脱
@@ -275,32 +273,6 @@ namespace MySlugcat
         }*/
 
 
-
-
-        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
-        {
-            Log.Logger(-7, "", "", "");
-            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sst", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
-            //Console.WriteLine($"\n MySlugcat MyPlayer:sst Spear_HitSomething: sst {result.obj?.GetType()}, {result.obj == null}");
-            PhysicalObject? obje = FrameSkill.Spear_HitSomething(spear, result, eu);
-            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_st", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
-            //Console.WriteLine($"MySlugcat MyPlayer:st Spear_HitSomething: st {obje?.GetType()}, {obje == null}");
-            if (obje != null)
-            {
-                result.obj = obje;
-            }
-
-            Weapon.Mode mode = spear.mode;
-            bool obj = orig.Invoke(spear, result, eu);
-
-            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_zh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
-            //Console.WriteLine($"MySlugcat MyPlayer:zh Spear_HitSomething: zh , GetType {result.obj?.GetType()}, result.obj {result.obj == null}");
-            DeflagrationSkill.Spear_HitSomething(spear, result, eu, obj, mode);
-            Log.Logger(7, "Spear", "MySlugcat:MyPlayer:Spear_HitSomething_sh", $"result.obj_Type ({result.obj?.GetType()}), result.obj_NulL ({result.obj == null})");
-            //Console.WriteLine($"MySlugcat MyPlayer:sh Spear_HitSomething: sh {result.obj?.GetType()}, {result.obj == null}");
-
-            return obj;
-        }
 
         private static void Player_Die(On.Player.orig_Die orig, Player player)
         {

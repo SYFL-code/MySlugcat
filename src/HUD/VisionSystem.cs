@@ -186,7 +186,7 @@ namespace MySlugcat
 			var Players = PlayerModuleManager.GetActivePlayers();
 			foreach (var player in Players)
 			{
-				if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.VisionSystem)
+				if (player.GetModule().VisionSystem)
 				{
 					NotVisionSystem = false;
 				}
@@ -203,7 +203,7 @@ namespace MySlugcat
 				return;
 			}
 
-			if (allPlayerDead == true && Clear == 0)
+			if (allPlayerDead && Clear == 0)
 			{
 				Clear = 0.025f;
 				HOLE_COLOR = new Color(1f, 1f, 1f);

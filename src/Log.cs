@@ -42,7 +42,7 @@ namespace MySlugcat
 
 		private static readonly object _lock = new object();
 
-		private static void OutputLog(string newContent)
+		public static void OutputLog(string newContent)
 		{
 			string filePath = "LH_MySlugcat_log.txt";
 

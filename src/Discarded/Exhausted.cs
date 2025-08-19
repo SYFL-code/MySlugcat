@@ -38,7 +38,7 @@ namespace MySlugcat
 		*//*private static void Hungry_Update(On.Player.orig_Update orig, Player player, bool eu)
 		{
 			orig.Invoke(player, eu);
-			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module))
+			if (player.GetModule(out var module))
 			{
 				module.OnPlayerUpdate(player);
 				// 饥饿

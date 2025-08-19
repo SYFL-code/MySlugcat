@@ -82,7 +82,7 @@ namespace MySlugcat
 			{
 				if (player_.playerState.playerNumber == N && player_.room != null && !player_.inShortcut && !player_.dead)
 				{
-					if (PlayerModuleManager.PlayerModules.TryGetValue(player_, out var module) && module.PerceptionSkill)
+					if (player_.GetModule(out var module) && module.PerceptionSkill)
 					{
 						isShow = true;
 						player = player_;
@@ -166,7 +166,7 @@ namespace MySlugcat
 			if (room == null) return;
 
 			int N = player.playerState.playerNumber;
-			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.KillingAuraSkill)
+			if (player.GetModule().KillingAuraSkill)
 			{
 				// 确保只创建一次
 				if (!HaveFSprite.ContainsKey(N) || !HaveFSprite[N])
@@ -186,7 +186,7 @@ namespace MySlugcat
 			if (room == null || player.dead || player.inShortcut) return;
 
 			int N = player.playerState.playerNumber;
-			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.KillingAuraSkill)
+			if (player.GetModule().KillingAuraSkill)
 			{
 				// 不存在就初始化
 				if (!CoolDown.ContainsKey(N)) CoolDown[N] = 0;

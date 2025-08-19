@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BepInEx;
 using UnityEngine;
+using MoreSlugcats;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
 using RWCustom;
@@ -61,7 +62,7 @@ foreach (AbstractCreature ac in self.creature.world.game.Players)
 creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 	(creature.abstractCreature.creatureTemplate.communityID, creature.abstractCreature.world.RegionNumber, (player.State as PlayerState).playerNumber, 1.0f);*/
 
-			/*if (PlayerModuleManager.PlayerModules.TryGetValue(self, out var module))
+			/*if (self.GetModule(out var module))
 			{
 				module.Hungry_Update(self);
 			}*/
@@ -366,6 +367,15 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 				WinState.GourmandPassageTracker.Length
 			);*/
 
+		}
+
+		private static void CosmeticSprite()//装饰品精灵集
+		{
+			Vector2 pos = new Vector2(0f, 0f);
+
+			MoreSlugcats.LightningMachine activateLightning = 
+				new MoreSlugcats.LightningMachine
+				(pos, new Vector2(pos.x, pos.y), new Vector2(pos.x, pos.y + 10f), 0f, false, true, 0.3f, 1f, 1f);
 		}
 
 		private static void 着色器()

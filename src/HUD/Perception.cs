@@ -190,7 +190,7 @@ namespace MySlugcat
 				{
 					if (player_.playerState.playerNumber == N && player_.room == owner.room && !player_.dead)
 					{
-						if (PlayerModuleManager.PlayerModules.TryGetValue(player_, out var module) && module.PerceptionSkill)
+						if (player_.GetModule(out var module) && module.PerceptionSkill)
 						{
 							isShow = true;
 							player = player_;

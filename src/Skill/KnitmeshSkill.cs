@@ -39,7 +39,7 @@ namespace MySlugcat
         private static void Knitmesh(Player player, Room room, Vector2 pos)
         {
             //Log.Logger(6, "Knitmesh", "MySlugcat:KnitmeshSkill:Knitmesh_st", $"Skill_bool ({SC.KnitmeshSkill})");
-            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
+            if (player.GetModule().KnitmeshSkill)
             {
                 List<Creature>? creatures = Extension.CreaturesInRange(room, pos, UnityEngine.Random.Range(280f, 400f), false, player, false, true);
 
@@ -141,7 +141,7 @@ namespace MySlugcat
 
             int N = player.playerState.playerNumber;
             //Log.Logger(10, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID})");
-            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.KnitmeshSkill)
+            if (player.GetModule().KnitmeshSkill)
             {
                 //Log.Logger(9, "Knitmesh", "MySlugcat:KnitmeshSkill:Player_Update", $"({player.slugcatStats.name == Plugin.YourSlugID}), ({player.input[0].mp}), ({!player.input[1].mp})");
                 //Configurable<bool>? KnitmeshSkill = Options.KnitmeshSkill;

@@ -62,7 +62,7 @@ namespace MySlugcat
 			Room room = player.room;
 			float LightIntensity = Mathf.Pow(Mathf.Sin(burning[N] * 3.1415927f), 0.4f);
 
-			if (!PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DigestionSkill)
+			if (!player.GetModule().DigestionSkill)
 			{
 				burning[N] = 0f;
 			}
@@ -113,7 +113,7 @@ namespace MySlugcat
 		public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
 		{
 			//Log.Logger(6, "Digestion", "MySlugcat:Digestion:Player_SwallowObject_sst", $"Name ({player.slugcatStats.name == Plugin.YourSlugID}), ({SC.DigestionSkill})");
-			if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.DigestionSkill)
+			if (player.GetModule().DigestionSkill)
 			{
 				if (grasp < 0 || player.grasps[grasp] == null)
 				{

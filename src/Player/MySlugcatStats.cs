@@ -53,7 +53,7 @@ namespace MySlugcat
 			{
 				if (player.slugcatStats == slugcatStats)
 				{
-					if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
+					if (player.GetModule().MySlugcatStats == -1)
 					{
 						slugcatStats.runspeedFac = 0.74f;
 						slugcatStats.bodyWeightFac = 0.68f;
@@ -73,49 +73,56 @@ namespace MySlugcat
         {
             orig(player, eu);
 
-            if (!player.room.game.IsArenaSession)
+			if (player.GetModule(out var module))
             {
-				if (--HungerDegree <= 0)
+                if (module.Exhausted)
                 {
-					HungerDegree = (int)(40 * 60 * Extension.RandomValue(3f, 10f));
+					// 精疲力竭
+					player.gourmandAttackNegateTime--;
 
-                    if (!Extension.SubtractQuarterFood(player, 1))
-                    {
-                        player.Die();
-                    }
+					if (player.lungsExhausted && (!player.gourmandExhausted))
+					{
+						player.aerobicLevel = 1f;
+					}
+
+					if ((double)player.aerobicLevel >= 0.95)
+					{
+						player.gourmandExhausted = true;
+					}
+					if (player.aerobicLevel < 0.4f)
+					{
+						player.gourmandExhausted = false;
+					}
+					if (player.gourmandExhausted)
+					{
+						player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+						player.lungsExhausted = true;
+					}
 				}
 
-			}
+                if (module.Hunger)
+                {
+					if (!player.room.game.IsArenaSession)
+					{
+						if (--HungerDegree <= 0)
+						{
+							HungerDegree = (int)(40 * 60 * Extension.RandomValue(3f, 10f));
 
-            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.Exhausted)
-            {
-                // 精疲力竭
-                player.gourmandAttackNegateTime--;
+							if (!Extension.SubtractQuarterFood(player, 1))
+							{
+								player.Die();
+							}
+						}
 
-                if (player.lungsExhausted && (!player.gourmandExhausted))
-                {
-                    player.aerobicLevel = 1f;
-                }
-
-                if ((double)player.aerobicLevel >= 0.95)
-                {
-                    player.gourmandExhausted = true;
-                }
-                if (player.aerobicLevel < 0.4f)
-                {
-                    player.gourmandExhausted = false;
-                }
-                if (player.gourmandExhausted)
-                {
-                    player.slowMovementStun = Math.Max(player.slowMovementStun, (int)Custom.LerpMap(player.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
-                    player.lungsExhausted = true;
-                }
+					}
+				}
             }
+
         }
 
         private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player player, Spear spear)
         {
-            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == -1)
+            if (player.GetModule().MySlugcatStats == -1)
             {
                 spear.throwModeFrames = 18;
                 spear.spearDamageBonus = 0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
@@ -178,7 +185,7 @@ namespace MySlugcat
 
         private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player player, bool eu)
         {
-            if (PlayerModuleManager.PlayerModules.TryGetValue(player, out var module) && module.MySlugcatStats == 1)
+            if (player.GetModule().MySlugcatStats == 1)
             {
                 int num2 = 0;
                 for (int i = 0; i < 4; i++)

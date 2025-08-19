@@ -76,6 +76,11 @@
       <Folder Include="Discarded\Objects\" />
     </ItemGroup>
     
+    <ItemGroup>
+      <PackageReference Include="FastWin32" Version="1.0.0" />
+      <PackageReference Include="Lib.Harmony" Version="2.3.6" />
+    </ItemGroup>
+    
     <Target Name="GenerateMod" AfterTargets="PostBuildEvent">
 		<ItemGroup>
 			<RemovePlugins Include="../mod/newest/plugins/*.dll" />

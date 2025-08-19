@@ -13,6 +13,7 @@ using static MySlugcat.PlayerModuleManager;
 using static MySlugcat.AbCreatureModuleManager;
 using On;
 using IL;
+using RewiredConsts;
 
 
 namespace MySlugcat;
@@ -88,6 +89,63 @@ internal static class AbCreatureModuleManager
 		}
 		finally { _rwLock.ExitReadLock(); }*/
 	}
+
+	public static AbCreatureModule GetModule(this AbstractCreature abCreature)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (AbCreatureModules.TryGetValue(abCreature, out var module_))
+			{
+				return module_;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 AbCreatureModules 中时，创建并注册模块
+			AbCreatureModule module = new AbCreatureModule(abCreature);
+			AbCreatureModules.Add(abCreature, module);
+			_activeAbCreatures.Add(abCreature);
+			_dirty = true;
+			return module;
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
+	public static bool GetModule(this AbstractCreature abCreature, out AbCreatureModule module)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (AbCreatureModules.TryGetValue(abCreature, out var module_))
+			{
+				module = module_;
+				return true;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 AbCreatureModules 中时，创建并注册模块
+			AbCreatureModule module__ = new AbCreatureModule(abCreature);
+			AbCreatureModules.Add(abCreature, module__);
+			if (!_activeAbCreatures.Contains(abCreature))
+			{
+				_activeAbCreatures.Add(abCreature);
+				_dirty = true;
+			}
+			module = module__;
+			return true;
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
+
 
 	internal class AbCreatureModule
 	{

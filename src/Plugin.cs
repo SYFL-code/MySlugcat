@@ -47,6 +47,7 @@ namespace MySlugcat
 			MySlugcatStats.Hook();
 			//Content.Register(new EnderPearlFisob());
 			//玩家能力
+			Hook.HookOn();
 			MyPlayer.Hook();
             //Exhausted.Hook();
             Control.Hook();
@@ -66,8 +67,10 @@ namespace MySlugcat
 			//游戏内容设置
 			MyGame.Hook();
 
-			Intros.Hook();
+			//Intros.Hook();
 			FixedSkill.Hook();
+
+			//Intros.DoPatching();
 		}
 
 		private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)

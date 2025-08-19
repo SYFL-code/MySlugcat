@@ -282,7 +282,7 @@ namespace MySlugcat
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}
-				if (((AbCreatureModuleManager.AbCreatureModules.TryGetValue(c.abstractCreature, out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
+				if (((c.abstractCreature.GetModule(out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}
@@ -347,7 +347,7 @@ namespace MySlugcat
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}
-				if (((AbCreatureModuleManager.AbCreatureModules.TryGetValue(c.abstractCreature, out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
+				if (((c.abstractCreature.GetModule(out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}
@@ -465,7 +465,7 @@ namespace MySlugcat
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}
-				if (((AbCreatureModuleManager.AbCreatureModules.TryGetValue(c.abstractCreature, out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
+				if (((c.abstractCreature.GetModule(out var module_c) && module_c.NecrophyteDying) || c.dead == true) && !IncludeDeadCreature)// 死亡的生物
 				{
 					continue; // 跳过无效项，继续检查下一个
 				}

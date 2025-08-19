@@ -22,6 +22,9 @@ using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
 using System.Reflection;
 using System.ComponentModel;
+using static MySlugcat.PlayerModuleManager;
+using System.Runtime.CompilerServices;
+using static MySlugcat.AbPhysicalObjectModuleManager;
 
 
 namespace MySlugcat
@@ -29,8 +32,15 @@ namespace MySlugcat
 	/// <summary> 穿透能力 </summary>
 	public class PenetrationSkill
 	{
+
 		public static void Weapon_Update(ref bool Execute, ref Creature? thrownBy, ref On.Weapon.orig_Update orig, ref Weapon weapon, ref bool eu)
 		{
+			AbPhysicalObjectModule weaponModule = weapon.abstractPhysicalObject.GetModule();
+			if (weaponModule != null && weapon.mode != Weapon.Mode.Thrown)
+			{
+				weaponModule.WeaponPenetration.Clear();
+			}
+
 			if (thrownBy != null && weapon.thrownBy == null && thrownBy is Player player && player.GetModule().PenetrationSkill)
 			{
 				weapon.thrownBy = player;
@@ -43,21 +53,25 @@ namespace MySlugcat
 			{
 				if (result.obj is Creature creature)
 				{
-					if (creature.State is HealthState hs)
+					AbPhysicalObjectModule weaponModule = weapon.abstractPhysicalObject.GetModule();
+					if (weaponModule != null && weaponModule.WeaponPenetration.Add(creature.abstractPhysicalObject))
 					{
-						weapon.room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
-						/*if (hs.health < 0.25f)
+						if (creature.State is HealthState hs)
 						{
-							creature.Die();
-						}*/
-						hs.health -= 0.25f;
-						if (creature is Scavenger scavenger)
-						{
-							creature.Stun(30);
-						}
-						else
-						{
-							creature.Stun(10);
+							weapon.room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
+							/*if (hs.health < 0.25f)
+							{
+								creature.Die();
+							}*/
+							hs.health -= Mathf.Max(0.4f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.15f, 0.001f);
+							if (creature is Scavenger scavenger)
+							{
+								creature.Stun(30);
+							}
+							else
+							{
+								creature.Stun(20);
+							}
 						}
 					}
 				}
@@ -77,21 +91,25 @@ namespace MySlugcat
 			{
 				if (result.obj is Creature creature)
 				{
-					if (creature.State is HealthState hs)
+					AbPhysicalObjectModule weaponModule = rock.abstractPhysicalObject.GetModule();
+					if (weaponModule != null && weaponModule.WeaponPenetration.Add(creature.abstractPhysicalObject))
 					{
-						rock.room.PlaySound(SoundID.Rock_Hit_Creature, rock.firstChunk);
-						/*if (hs.health < 0.25f)
+						if (creature.State is HealthState hs)
 						{
-							creature.Die();
-						}*/
-						hs.health -= 0.1f;
-						if (creature is Scavenger scavenger)
-						{
-							creature.Stun(80);
-						}
-						else
-						{
-							creature.Stun(20);
+							rock.room.PlaySound(SoundID.Rock_Hit_Creature, rock.firstChunk);
+							/*if (hs.health < 0.25f)
+							{
+								creature.Die();
+							}*/
+							hs.health -= Mathf.Max(0.3f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.1f, 0.001f);
+							if (creature is Scavenger scavenger)
+							{
+								creature.Stun(80);
+							}
+							else
+							{
+								creature.Stun(60);
+							}
 						}
 					}
 				}
@@ -111,57 +129,60 @@ namespace MySlugcat
 			{
 				if (result.obj is Creature creature)
 				{
-					if (creature is Player player_)
+					AbPhysicalObjectModule weaponModule = spear.abstractPhysicalObject.GetModule();
+					if (weaponModule != null && weaponModule.WeaponPenetration.Add(creature.abstractPhysicalObject))
 					{
-						player_.Die();
-					}
-					if (creature.State is HealthState hs)
-					{
-						spear.room.PlaySound(SoundID.Spear_Stick_In_Creature, spear.firstChunk);
-
-						float spearDamageBonus = 1f;
-						switch (player.slugcatStats.throwingSkill)
+						if (creature is Player player_)
 						{
-							case 0:
-								spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
-								BodyChunk firstChunk = spear.firstChunk;
-								break;
-
-							case 1:
-								spearDamageBonus = 1f;
-								break;
-
-							case 2:
-								spearDamageBonus = 1.25f;
-								break;
-
-							case 3:
-								spearDamageBonus = 1.5f;
-								break;
-
-							default:
-								spearDamageBonus = 1f;
-								break;
+							player_.Die();
 						}
-						if (player.slugcatStats.name == Plugin.YourSlugID)
+						if (creature.State is HealthState hs)
 						{
-							spearDamageBonus = 0.6f;
-						}
+							spear.room.PlaySound(SoundID.Spear_Stick_In_Creature, spear.firstChunk);
 
-						if (hs.health < spearDamageBonus)
-						{
-							creature.Die();
-						}
-						hs.health -= (spearDamageBonus / 2f) + 0.2f;
-						if (creature is Scavenger scavenger)
-						{
-							creature.Stun(40);
-						}
-						else
-						{
-							creature.Stun(10);
-						}
+							float spearDamageBonus = 1f;
+							switch (player.slugcatStats.throwingSkill)
+							{
+								case 0:
+									spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
+									break;
 
+								case 1:
+									spearDamageBonus = 1f;
+									break;
+
+								case 2:
+									spearDamageBonus = 1.25f;
+									break;
+
+								case 3:
+									spearDamageBonus = 1.5f;
+									break;
+
+								default:
+									spearDamageBonus = 1f;
+									break;
+							}
+							if (player.slugcatStats.name == Plugin.YourSlugID)
+							{
+								spearDamageBonus = Mathf.Max(3f * Mathf.Pow(UnityEngine.Random.value, 10f) - 2.1f, 0.001f);
+							}
+
+							if (hs.health < spearDamageBonus)
+							{
+								creature.Die();
+							}
+							hs.health -= spearDamageBonus;
+							if (creature is Scavenger scavenger)
+							{
+								creature.Stun(40);
+							}
+							else
+							{
+								creature.Stun(40);
+							}
+
+						}
 					}
 				}
 				result.obj = null;

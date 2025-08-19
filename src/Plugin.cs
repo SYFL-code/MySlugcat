@@ -44,6 +44,7 @@ namespace MySlugcat
 
 			PlayerHooks.HookOn();
 			AbCreatureHooks.HookOn();
+			AbPhysicalObjectHooks.HookOn();
 			MySlugcatStats.Hook();
 			//Content.Register(new EnderPearlFisob());
 			//玩家能力

@@ -332,24 +332,23 @@ internal static class PlayerModuleManager
 internal static class PlayerHooks
 {
 
-	public static void HookOn()
+	/*public static void HookOn()
 	{
 		On.Player.ctor += Player_ctor;
 		On.Player.Destroy += Player_Destroy;
-	}
+	}*/
 
-	private static void Player_ctor(On.Player.orig_ctor orig, Player player,
-		AbstractCreature ac, World world)
+	public static void Player_ctor(ref bool Execute, ref On.Player.orig_ctor orig, ref Player player, ref AbstractCreature ac, ref World world)
 	{
-		orig(player, ac, world);
 		PlayerModuleManager.RegisterPlayer(player);        // ① 注册
 	}
 
-	private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
+	public static void Player_Destroy(ref bool Execute, ref On.Player.orig_Destroy orig, ref Player player)
 	{
-		orig(player);
 		if (player.dead || player.slatedForDeletetion)
+		{
 			PlayerModuleManager.UnregisterPlayer(player);  // ② 注销
+		}
 	}
 
 

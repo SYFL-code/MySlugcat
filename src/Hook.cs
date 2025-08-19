@@ -32,12 +32,43 @@ namespace MySlugcat
 
 		public static void HookOn()
 		{
+			On.Player.ctor += Player_ctor;
 			On.Player.Update += Player_Update;
+			On.Player.Destroy += Player_Destroy;
+
 
 			On.Spear.HitSomething += Spear_HitSomething;
 			On.Rock.HitSomething += Rock_HitSomething;
 			On.Weapon.HitSomething += Weapon_HitSomething;
 			On.Weapon.Update += Weapon_Update;
+		}
+
+		private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
+		{
+			bool Execute = true;
+			try
+			{
+				//PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(player, abstractCreature, world);
+
+			try
+			{
+				PlayerHooks.Player_ctor(ref Execute, ref orig, ref player, ref abstractCreature, ref world);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
 		}
 
 		public static void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
@@ -65,6 +96,14 @@ namespace MySlugcat
 			catch (Exception e)
 			{
 				Debug.LogException(e);
+			}
+		}
+
+		public static void Player_Destroy(ref bool Execute, ref On.Player.orig_Destroy orig, ref Player player)
+		{
+			if (player.dead || player.slatedForDeletetion)
+			{
+				PlayerModuleManager.UnregisterPlayer(player);  // ② 注销
 			}
 		}
 

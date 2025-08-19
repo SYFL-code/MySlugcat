@@ -14,6 +14,8 @@ using static MySlugcat.AbCreatureModuleManager;
 using On;
 using IL;
 using RewiredConsts;
+using SlugBase.Features;
+using static HarmonyLib.Code;
 
 
 namespace MySlugcat;
@@ -181,7 +183,7 @@ internal static class AbCreatureHooks
 		//On.Creature.ctor += Creature_ctor;
 		//On.Creature.Die += Creature_Die;
 		On.AbstractCreature.ctor += AbstractCreature_ctor;
-		On.UpdatableAndDeletable.Destroy += UpdatableAndDeletable_Destroy;
+		On.AbstractPhysicalObject.Destroy += AbstractPhysicalObject_Destroy;
 	}
 
 	/*private static void Creature_ctor(On.Creature.orig_ctor orig, Creature creature,
@@ -197,17 +199,14 @@ internal static class AbCreatureHooks
 		AbCreatureModuleManager.RegisterAbCreature(ac);        // ① 注册
 	}
 
-	private static void UpdatableAndDeletable_Destroy(On.UpdatableAndDeletable.orig_Destroy orig, UpdatableAndDeletable uAndD)
+	private static void AbstractPhysicalObject_Destroy(On.AbstractPhysicalObject.orig_Destroy orig, AbstractPhysicalObject abPhysicalObject)
 	{
-		orig(uAndD);
-		if (uAndD is Creature creature)
+		orig(abPhysicalObject);
+		if (abPhysicalObject is AbstractCreature abcreature)
 		{
-			if (creature.dead || creature.slatedForDeletetion)
+			if (abPhysicalObject.slatedForDeletion)
 			{
-				if (creature.abstractCreature != null)
-				{
-					AbCreatureModuleManager.UnregisterAbCreature(creature.abstractCreature);  // ② 注销
-				}
+				AbCreatureModuleManager.UnregisterAbCreature(abcreature);  // ② 注销
 			}
 		}
 

@@ -34,6 +34,7 @@ namespace MySlugcat
 		{
 			On.RainWorldGame.Update += RainWorldGame_Update;
 
+			#region Player
 			On.Player.ctor += Player_ctor;
 			On.Player.Update += Player_Update;
 			On.Player.MovementUpdate += Player_MovementUpdate;
@@ -43,21 +44,42 @@ namespace MySlugcat
 			On.Player.Destroy += Player_Destroy;
 
 			On.SlugcatStats.ctor += SlugcatStats_ctor;
+			#endregion
 
+			#region Creature
 			On.Creature.Update += Creature_Update;
+			On.Creature.Die += Creature_Die;
 			On.LizardGraphics.DrawSprites += LizardGraphics_DrawSprites;
 			On.ScavengerGraphics.DrawSprites += ScavengerGraphics_DrawSprites;
-			On.Creature.Die += Creature_Die;
+			#endregion
 
+			#region Abstract
 			On.AbstractCreature.ctor += AbstractCreature_ctor;
 			On.AbstractPhysicalObject.ctor += AbstractPhysicalObject_ctor;
 			On.AbstractPhysicalObject.Destroy += AbstractPhysicalObject_Destroy;
+			#endregion
 
+			#region Weapon
 			On.Spear.HitSomething += Spear_HitSomething;
+			On.Spear.SetRandomSpin += Spear_SetRandomSpin;
 			On.Rock.HitSomething += Rock_HitSomething;
 			On.Weapon.HitSomething += Weapon_HitSomething;
+			On.Weapon.SetRandomSpin += Weapon_SetRandomSpin;
+			On.PuffBall.HitSomething += PuffBall_HitSomething;
+			On.PuffBall.Explode += PuffBall_Explode;
+			On.FlareBomb.StartBurn += FlareBomb_StartBurn;
+			On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
+			On.MoreSlugcats.LillyPuck.SetRandomSpin += LillyPuck_SetRandomSpin;
 			On.Weapon.Update += Weapon_Update;
+			#endregion
 
+			#region Bee
+			On.SporePlant.Bee.Update += Bee_Update;
+			On.SporePlant.Bee.ApplyPalette += Bee_ApplyPalette;
+			On.SporePlant.Bee.LookForRandomCreatureToHunt += Bee_ToHunt;
+			#endregion
+
+			#region HUD
 			// 睡眠HUD初始化
 			//On.HUD.HUD.InitSleepHud += HUD_InitSleepHud;
 			// 单人模式HUD初始化
@@ -68,9 +90,12 @@ namespace MySlugcat
 			On.HUD.HUD.InitSafariHud += HUD_InitSafariHud;
 			// 快速瞬移通行证HUD初始化
 			//On.HUD.HUD.InitTeleportHud += HUD_InitTeleportHud;
+			#endregion
 
+			#region Friends of friends
 			On.RelationshipTracker.DynamicRelationship.Update += DynamicRelationship_Update;
 			On.LizardAI.DoIWantToBiteThisCreature += LizardAI_DoIWantToBiteThisCreature;
+			#endregion
 
 			//打开外层空间大门
 			On.RegionGate.customOEGateRequirements += RegionGate_customOEGateRequirements;
@@ -138,7 +163,11 @@ namespace MySlugcat
 				if (!Execute) return;
 				NecrophytesCreature.Player_Update(ref Execute, ref orig, ref player, ref eu);
 				if (!Execute) return;
+				DeflagrationSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
 				DigestionSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+				KnitmeshSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
 				if (!Execute) return;
 			}
 			catch (Exception e)
@@ -450,6 +479,60 @@ namespace MySlugcat
 		}
 		#endregion
 
+		#region Bee
+		public static void Bee_Update(On.SporePlant.Bee.orig_Update orig, SporePlant.Bee bee, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				KnitmeshSkill.Bee_Update(ref Execute, ref orig, ref bee, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(bee, eu);
+		}
+
+		public static void Bee_ApplyPalette(On.SporePlant.Bee.orig_ApplyPalette orig, SporePlant.Bee bee, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+		{
+			bool Execute = true;
+			try
+			{
+				KnitmeshSkill.Bee_ApplyPalette(ref Execute, ref orig, ref bee, ref sLeaser, ref rCam, ref palette);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(bee, sLeaser, rCam, palette);
+		}
+
+		public static bool Bee_ToHunt(On.SporePlant.Bee.orig_LookForRandomCreatureToHunt orig, SporePlant.Bee bee)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = KnitmeshSkill.Bee_ToHunt(ref Execute, ref ret, ref orig, ref bee);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+			ret = orig(bee);
+			return ret;
+		}
+		#endregion
+
 		#region Weapon
 		public static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
 		{
@@ -482,6 +565,8 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				ret = DeflagrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = PenetrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
 
@@ -492,6 +577,44 @@ namespace MySlugcat
 			}
 			ret = orig(rock, result, eu);
 			Log.OutputLog($"Rock ret({ret})_");
+			return ret;
+		}
+
+		private static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck lillyPuck, SharedPhysics.CollisionResult result, bool eu)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = DeflagrationSkill.LillyPuck_HitSomething(ref Execute, ref ret, ref orig, ref lillyPuck, ref result, ref eu);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+			ret = orig(lillyPuck, result, eu);
+			Log.OutputLog($"lillyPuck ret({ret})_");
+			return ret;
+		}
+
+		public static bool PuffBall_HitSomething(On.PuffBall.orig_HitSomething orig, PuffBall puffBall, SharedPhysics.CollisionResult result, bool eu)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = DeflagrationSkill.PuffBall_HitSomething(ref Execute, ref ret, ref orig, ref puffBall, ref result, ref eu);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+			ret = orig(puffBall, result, eu);
+			Log.OutputLog($"PuffBall ret({ret})_");
 			return ret;
 		}
 
@@ -513,6 +636,57 @@ namespace MySlugcat
 			ret = orig(weapon, result, eu);
 			Log.OutputLog($"Weaponret({ret})_");
 			return ret;
+		}
+
+		public static void Spear_SetRandomSpin(On.Spear.orig_SetRandomSpin orig, Spear spear)
+		{
+			bool Execute = true;
+
+			orig(spear);
+
+			try
+			{
+				DeflagrationSkill.Spear_SetRandomSpin(ref Execute, ref orig, ref spear);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void Weapon_SetRandomSpin(On.Weapon.orig_SetRandomSpin orig, Weapon weapon)
+		{
+			bool Execute = true;
+
+			orig(weapon);
+
+			try
+			{
+				DeflagrationSkill.Weapon_SetRandomSpin(ref Execute, ref orig, ref weapon);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void LillyPuck_SetRandomSpin(On.MoreSlugcats.LillyPuck.orig_SetRandomSpin orig, LillyPuck lillyPuck)
+		{
+			bool Execute = true;
+
+			orig(lillyPuck);
+
+			try
+			{
+				DeflagrationSkill.LillyPuck_SetRandomSpin(ref Execute, ref orig, ref lillyPuck);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
 		}
 
 		private static void Weapon_Update(On.Weapon.orig_Update orig, Weapon weapon, bool eu)
@@ -540,8 +714,41 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 		}
-		#endregion
 
+		private static void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall puffBall)
+		{
+			bool Execute = true;
+
+			orig(puffBall);
+
+			try
+			{
+				DeflagrationSkill.PuffBall_Explode(ref Execute, ref orig, ref puffBall);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void FlareBomb_StartBurn(On.FlareBomb.orig_StartBurn orig, FlareBomb flareBomb)
+		{
+			bool Execute = true;
+
+			orig(flareBomb);
+
+			try
+			{
+				DeflagrationSkill.FlareBomb_StartBurn(ref Execute, ref orig, ref flareBomb);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+		#endregion
 
 		#region HUD
 		private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD HUD, RoomCamera cam)

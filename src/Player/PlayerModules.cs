@@ -134,6 +134,36 @@ internal static class PlayerModuleManager
 		finally { _rwLock.ExitWriteLock(); }
 	}
 
+	public static PlayerModule GetModuleE(this Player player, out PlayerModule module)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (PlayerModules.TryGetValue(player, out var module_))
+			{
+				module = module_;
+				return module_;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 PlayerModules 中时，创建并注册模块
+			PlayerModule module__ = new PlayerModule(player);
+			PlayerModules.Add(player, module__);
+			if (!_activePlayers.Contains(player))
+			{
+				_activePlayers.Add(player);
+				_dirty = true;
+			}
+			module = module__;
+			return module__;
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
 
 	internal class PlayerModule
 	{

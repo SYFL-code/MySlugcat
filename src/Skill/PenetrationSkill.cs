@@ -45,6 +45,11 @@ namespace MySlugcat
 			{
 				weapon.thrownBy = player;
 			}
+
+			if (weapon.thrownBy != null && weapon.mode == Weapon.Mode.Free && weapon.thrownBy is Player player_ && player_.GetModule().DeflagrationSkill)
+			{
+				weapon.thrownBy = null;
+			}
 		}
 
 		public static bool Weapon_HitSomething(ref bool Execute, ref bool return_, ref On.Weapon.orig_HitSomething orig, ref Weapon weapon, ref SharedPhysics.CollisionResult result, ref bool eu)

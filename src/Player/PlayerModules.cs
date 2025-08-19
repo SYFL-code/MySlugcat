@@ -200,6 +200,8 @@ internal static class PlayerModuleManager
 		public bool KillingAuraSkill = false;
 		/// <summary> 穿透能力 </summary>
 		public bool PenetrationSkill = false;
+		/// <summary> 迅捷能力 </summary>
+		public int Swift = 0;
 
 		//public int HungryCoolDown = 12000;//冷却计时器
 		#endregion
@@ -328,6 +330,7 @@ internal static class PlayerModuleManager
 			FixedSkill = false;
 			KillingAuraSkill = false;
 			PenetrationSkill = false;
+			Swift = 0;
 
 			if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
 			{
@@ -345,6 +348,7 @@ internal static class PlayerModuleManager
 				FixedSkill = false;
 				KillingAuraSkill = true;//
 				PenetrationSkill = true;//
+				Swift = 1;//
 
 				var session = player?.room?.game?.GetStorySession;
 				if (session == null) return;

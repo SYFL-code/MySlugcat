@@ -48,8 +48,6 @@ namespace MySlugcat
 			//Perception.Hook();
 			//IntelHUD.Hook();
 			//PointerSkillHook.Hook();
-			FrameSkill.Hook();
-			KillingAuraHook.Hook();
 
 			//Intros.Hook();
 			FixedSkill.Hook();

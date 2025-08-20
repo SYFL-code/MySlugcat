@@ -273,6 +273,7 @@ internal static class PlayerModuleManager
 		#endregion
 
 		#region 其他字段
+		public KillingAuraSkill? KASkill = null;
 		#endregion
 
 

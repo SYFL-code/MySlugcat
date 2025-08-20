@@ -28,7 +28,7 @@ namespace MySlugcat
 	//嫁祸能力
 	public class FrameSkill
 	{
-		public static void Hook()
+		/*public static void Hook()
 		{
 			//On.Player.ctor += Player_ctor;
 			//On.Player.Update += Player_Update;
@@ -57,7 +57,7 @@ namespace MySlugcat
 			On.Vulture.Carry += Vulture_Carry;
 
 			//On.Player.Die += Player_Die;
-		}
+		}*/
 
 /*        public static void Object(PhysicalObject obj, Room room, WorldCoordinate pos)
 		{
@@ -339,7 +339,8 @@ namespace MySlugcat
 				Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_st", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
 				Teleport.SetObjectPosition(creature, playerpos);
 				Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_zh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
-				Teleport.SetObjectPosition(player, creaturepos);
+				player.SuperHardSetPosition(creaturepos);
+				//Teleport.SetObjectPosition(player, creaturepos);
 				Log.Logger(7, "Frame", "MySlugcat:FrameSkill:Frame_Teleport_sh", $"P({player})， PV({player.mainBodyChunk.pos}), C({creature}), CV({creature.mainBodyChunk.pos})");
 
 				if (creature is Lizard lizard)
@@ -529,14 +530,15 @@ namespace MySlugcat
 		}
 		//#nullable disable
 
-		private static void Player_Destroy(On.Player.orig_Destroy orig, Player player)
+		public static void Player_Destroy(ref bool Execute, ref On.Player.orig_Destroy orig, ref Player player)
 		{
-			if (((player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)) && !player.dead && player.GetModule().FrameSkill)
+			if (!player.dead && player.GetModule().FrameSkill)
 			{
 				Creature? obj = FrameSkill.Frame(player, false, player, 20);
 
 				if (obj != null)
 				{
+					Execute = false;
 					player.dead = false;
 					player.stun = 0;
 					obj.Destroy();
@@ -547,14 +549,6 @@ namespace MySlugcat
 						hs.health -= 1.5f;
 					}*/
 				}
-				else
-				{
-					orig(player);
-				}
-			}
-			else
-			{
-				orig(player);
 			}
 		}
 
@@ -657,9 +651,24 @@ namespace MySlugcat
 			return return_;
 		}
 
-		private static bool ScavengerBomb_HitSomething(On.ScavengerBomb.orig_HitSomething orig, ScavengerBomb bomb, SharedPhysics.CollisionResult result, bool eu)
+		public static bool ScavengerBomb_HitSomething(ref bool Execute, ref bool return_, ref On.ScavengerBomb.orig_HitSomething orig, ref ScavengerBomb bomb, ref SharedPhysics.CollisionResult result, ref bool eu)
 		{
-			//如果被命中的不是玩家
+			if (result.obj != null && result.obj is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? obj = Frame(player, false, player);
+				if (obj != null)
+				{
+					Vector2 creaturepos = obj.mainBodyChunk.pos;
+
+					Teleport.SetObjectPosition(bomb, creaturepos);
+
+					result.obj = obj;
+					player.stun = 0;
+				}
+			}
+			return return_;
+
+			/*//如果被命中的不是玩家
 			if (result.obj is not Player player)
 				return orig.Invoke(bomb, result, eu);
 
@@ -686,12 +695,51 @@ namespace MySlugcat
 				player.stun = 0;
 			}
 
-			return resultbool;
+			return resultbool;*/
 		}
 
-		private static void Creature_Violence(On.Creature.orig_Violence orig, Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
+		public static void Creature_Violence(ref bool Execute, ref On.Creature.orig_Violence orig, ref Creature creature, ref BodyChunk source, ref Vector2? directionAndMomentum, ref BodyChunk hitChunk, ref PhysicalObject.Appendage.Pos hitAppendage, ref  Creature.DamageType type, ref float damage, ref float stunBonus)
 		{
-			if (hitChunk == null)
+			if (hitChunk != null && hitChunk.owner is Player player && player.GetModule().FrameSkill && creature is not Lizard && 
+				(type == Creature.DamageType.Bite ||
+			   type == Creature.DamageType.Electric ||
+			   type == Creature.DamageType.Stab))
+			{
+				Execute = false;
+
+				//偷渡虫情况特殊处理
+				if (source != null && source.owner is StowawayBug)
+				{
+					//钩子伤害不处理
+					if (damage < 1f)
+						orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+					else
+					{
+						Creature? newobj2 = Frame(player, false, player);
+						if (newobj2 != null)
+						{
+							hitChunk.owner = newobj2;
+							//eggBug.Stun(10);
+							player.stun = 0;
+						}
+
+						//Frame(player, false, player);
+						orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
+						player.stun = 0;
+					}
+					return;
+				}
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					hitChunk.owner = newobj;
+					player.stun = 0;
+				}
+				//防止玩家被咬死
+				orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
+			}
+
+			/*if (hitChunk == null)
 			{
 				orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
 				return;
@@ -702,12 +750,12 @@ namespace MySlugcat
 				orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
 				return;
 			}
-/*            //如果玩家不是MySlugcat则运行原程序
+*//*            //如果玩家不是MySlugcat则运行原程序
 			if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
 			{
 				orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
 				return;
-			}*/
+			}*//*
 			if (!player.GetModule().FrameSkill)
 			{
 				orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
@@ -715,12 +763,12 @@ namespace MySlugcat
 			}
 			//取玩家变量
 			//GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
-			/*            //如果没有冰盾
+			*//*            //如果没有冰盾
 						if (pv.iceShieldList.Count == 0)
 						{
 							orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
 							return;
-						}*/
+						}*//*
 
 			if (creature is Lizard)
 			{
@@ -771,13 +819,25 @@ namespace MySlugcat
 			//creature.Stun(10);
 			//Frame(player, false, player);
 			//防止玩家被咬死
-			orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);
+			orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, 0, stunBonus);*/
 		}
 
-		private static void Lizard_Bite(On.Lizard.orig_Bite orig, Lizard lizard, BodyChunk chunk)
+		public static void Lizard_Bite(ref bool Execute, ref On.Lizard.orig_Bite orig, ref Lizard lizard, ref BodyChunk chunk)
 		{
+			if (chunk != null && chunk.owner is Player player && player.GetModule().FrameSkill)
+			{
+				Execute = false;
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					chunk.owner = newobj;
+					player.stun = 0;
+				}
+				orig.Invoke(lizard, chunk);
+			}
+
 			//orig.Invoke(lizard, chunk);
-			if (chunk == null)
+			/*if (chunk == null)
 			{
 				orig.Invoke(lizard, chunk);
 				return;
@@ -787,12 +847,12 @@ namespace MySlugcat
 				orig.Invoke(lizard, chunk);
 				return;
 			}
-			/*//如果玩家不是MySlugcat则运行原程序
+			*//*//如果玩家不是MySlugcat则运行原程序
 			if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
 			{
 				orig.Invoke(lizard, chunk);
 				return;
-			}*/
+			}*//*
 			if (!player.GetModule().FrameSkill)
 			{
 				orig.Invoke(lizard, chunk);
@@ -811,10 +871,10 @@ namespace MySlugcat
 
 			//lizard.Stun(10);
 			//Frame(player, false, player);
-			orig.Invoke(lizard, chunk);
+			orig.Invoke(lizard, chunk);*/
 		}
 
-		private static void DaddyLongLegs_Eat(On.DaddyLongLegs.orig_Eat orig, DaddyLongLegs daddyLongLegs, bool eu)
+		public static void DaddyLongLegs_Eat(ref bool Execute, ref On.DaddyLongLegs.orig_Eat orig, ref DaddyLongLegs daddyLongLegs, ref bool eu)
 		{
 			/*if (!SC.FrameSkill)
 			{
@@ -858,13 +918,23 @@ namespace MySlugcat
 							foreach (var p in daddyLongLegs.tentacles)
 								p.grabChunk = null;
 						}*/
-			orig.Invoke(daddyLongLegs, eu);
+
 		}
 
-		private static void Centipede_UpdateGrasp(On.Centipede.orig_UpdateGrasp orig, Centipede centipede, int g)
+		public static void Centipede_UpdateGrasp(ref bool Execute, ref On.Centipede.orig_UpdateGrasp orig, ref Centipede centipede, ref int g)
 		{
-			//orig.Invoke(centipede, g);
-			if (centipede.grasps == null ||
+			if (centipede.grasps != null && centipede.grasps[g] != null && centipede.grasps[g].grabbed is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					centipede.grasps[g].grabbed = newobj;
+					//eggBug.Stun(10);
+					player.stun = 0;
+				}
+			}
+
+			/*if (centipede.grasps == null ||
 				centipede.grasps[g] == null)
 			{
 				orig.Invoke(centipede, g);
@@ -875,12 +945,12 @@ namespace MySlugcat
 				orig.Invoke(centipede, g);
 				return;
 			}
-			/*//如果玩家不是MySlugcat则运行原程序
+			*//*//如果玩家不是MySlugcat则运行原程序
 			if (player.slugcatStats.name != Plugin.YourSlugID && !SC.AllPlayerSkill)
 			{
 				orig.Invoke(centipede, g);
 				return;
-			}*/
+			}*//*
 			if (!player.GetModule().FrameSkill)
 			{
 				orig.Invoke(centipede, g);
@@ -900,10 +970,10 @@ namespace MySlugcat
 			orig.Invoke(centipede, g);
 
 			//centipede.Stun(10);
-			//Frame(player, false, player);
+			//Frame(player, false, player);*/
 		}
 
-		private static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel bigEel)
+		public static void BigEel_JawsSnap(ref bool Execute, ref On.BigEel.orig_JawsSnap orig, ref BigEel bigEel)
 		{
 			for (int j = 0; j < bigEel.room.physicalObjects.Length; j++)
 			{
@@ -947,7 +1017,7 @@ namespace MySlugcat
 				}
 			}
 
-			orig.Invoke(bigEel);
+			//orig.Invoke(bigEel);
 
 			/*bigEel.snapFrame = true;
 			bigEel.room.PlaySound(SoundID.Leviathan_Bite, bigEel.mainBodyChunk);
@@ -1066,10 +1136,20 @@ namespace MySlugcat
 			}*/
 		}
 
-		private static void TentaclePlant_Carry(On.TentaclePlant.orig_Carry orig, TentaclePlant tentaclePlant, bool eu)
+		public static void TentaclePlant_Carry(ref bool Execute, ref On.TentaclePlant.orig_Carry orig, ref TentaclePlant tentaclePlant, ref bool eu)
 		{
+			if (tentaclePlant.grasps != null && tentaclePlant.grasps[0] != null && tentaclePlant.grasps[0].grabbedChunk != null && tentaclePlant.grasps[0].grabbedChunk.owner is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					tentaclePlant.grasps[0].grabbedChunk.owner = newobj;
+					player.stun = 0;
+				}
+			}
+
 			//orig.Invoke(tentaclePlant, eu);
-			if (tentaclePlant.grasps == null ||
+			/*if (tentaclePlant.grasps == null ||
 				tentaclePlant.grasps[0] == null ||
 				tentaclePlant.grasps[0].grabbedChunk == null)
 			{
@@ -1096,12 +1176,27 @@ namespace MySlugcat
 				//eggBug.Stun(10);
 				player.stun = 0;
 			}
-			orig.Invoke(tentaclePlant, eu);
+			orig.Invoke(tentaclePlant, eu);*/
 		}
 
-		private static void PoleMimic_Carry(On.PoleMimic.orig_Carry orig, PoleMimic poleMimic, bool eu)
+		public static void PoleMimic_Carry(ref bool Execute, ref On.PoleMimic.orig_Carry orig, ref PoleMimic poleMimic, ref bool eu)
 		{
-			//orig.Invoke(poleMimic, eu);
+			if (poleMimic.grasps != null && poleMimic.grasps[0] != null && poleMimic.grasps[0].grabbedChunk != null && poleMimic.grasps[0].grabbedChunk.owner is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					poleMimic.grasps[0].grabbedChunk.owner = newobj;
+					//eggBug.Stun(10);
+					player.stun = 0;
+					for (int i = 0; i < poleMimic.stickChunks.Length; i++)
+					{
+						poleMimic.stickChunks[i] = null;
+					}
+				}
+			}
+
+			/*//orig.Invoke(poleMimic, eu);
 			if (poleMimic.grasps == null ||
 				poleMimic.grasps[0] == null ||
 				poleMimic.grasps[0].grabbedChunk == null)
@@ -1136,12 +1231,22 @@ namespace MySlugcat
 				}
 			}
 
-			orig.Invoke(poleMimic, eu);
+			orig.Invoke(poleMimic, eu);*/
 		}
 
-		private static void EggBug_CarryObject(On.EggBug.orig_CarryObject orig, EggBug eggBug, bool eu)
+		public static void EggBug_CarryObject(ref bool Execute, ref On.EggBug.orig_CarryObject orig, ref EggBug eggBug, ref bool eu)
 		{
-			//orig.Invoke(eggBug, eu);
+			if (eggBug.grasps[0].grabbed != null && eggBug.grasps[0].grabbed is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? newobj = Frame(player, false, player);
+				if (newobj != null)
+				{
+					eggBug.grasps[0].grabbed = newobj;
+					player.stun = 0;
+				}
+			}
+
+			/*//orig.Invoke(eggBug, eu);
 			PhysicalObject obj = eggBug.grasps[0].grabbed;
 			if (obj == null)
 			{
@@ -1170,12 +1275,24 @@ namespace MySlugcat
 				//eggBug.Stun(10);
 				player.stun = 0;
 			}
-			orig.Invoke(eggBug, eu);
+			orig.Invoke(eggBug, eu);*/
 		}
 
-		private static void Vulture_Carry(On.Vulture.orig_Carry orig, Vulture vulture)
+		public static void Vulture_Carry(ref bool Execute, ref On.Vulture.orig_Carry orig, ref Vulture vulture)
 		{
-			if (vulture.IsKing == false)
+			if (vulture.IsKing && vulture.grasps != null && vulture.grasps[0] != null && vulture.grasps[0].grabbedChunk != null && vulture.grasps[0].grabbedChunk.owner is Player player && player.GetModule().FrameSkill)
+			{
+				Creature? obj = Frame(player, false, player);
+				if (obj != null)
+				{
+					vulture.grasps[0].grabbedChunk.owner = null;
+					vulture.grasps[0].grabbedChunk.owner = obj;
+					vulture.grasps[0].grabbed = obj;
+					player.stun = 0;
+				}
+			}
+
+			/*if (vulture.IsKing == false)
 			{
 				orig.Invoke(vulture);
 				return;
@@ -1215,7 +1332,7 @@ namespace MySlugcat
 			if (obj != null)
 			{
 				player.stun = 0;
-			}
+			}*/
 		}
 
 

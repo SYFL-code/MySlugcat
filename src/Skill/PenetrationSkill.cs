@@ -109,11 +109,49 @@ namespace MySlugcat
 							hs.health -= Mathf.Max(0.3f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.1f, 0.001f);
 							if (creature is Scavenger scavenger)
 							{
-								creature.Stun(80);
+								creature.Stun(90);
 							}
 							else
 							{
-								creature.Stun(60);
+								creature.Stun(90);
+							}
+						}
+					}
+				}
+				result.obj = null;
+				Execute = false;
+				return false;
+			}
+			else
+			{
+				return return_;
+			}
+		}
+
+		public static bool ScavengerBomb_HitSomething(ref bool Execute, ref bool return_, ref On.ScavengerBomb.orig_HitSomething orig, ref ScavengerBomb bomb, ref SharedPhysics.CollisionResult result, ref bool eu)
+		{
+			if (bomb.thrownBy is Player player && player.GetModule().PenetrationSkill)
+			{
+				if (result.obj is Creature creature)
+				{
+					AbPhysicalObjectModule weaponModule = bomb.abstractPhysicalObject.GetModule();
+					if (weaponModule != null && weaponModule.WeaponPenetration.Add(creature.abstractPhysicalObject))
+					{
+						if (creature.State is HealthState hs)
+						{
+							bomb.room.PlaySound(SoundID.Rock_Hit_Creature, bomb.firstChunk);
+							/*if (hs.health < 0.25f)
+							{
+								creature.Die();
+							}*/
+							hs.health -= Mathf.Max(0.5f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.1f, 0.001f);
+							if (creature is Scavenger scavenger)
+							{
+								creature.Stun(90);
+							}
+							else
+							{
+								creature.Stun(90);
 							}
 						}
 					}
@@ -137,10 +175,6 @@ namespace MySlugcat
 					AbPhysicalObjectModule weaponModule = spear.abstractPhysicalObject.GetModule();
 					if (weaponModule != null && weaponModule.WeaponPenetration.Add(creature.abstractPhysicalObject))
 					{
-						if (creature is Player player_)
-						{
-							player_.Die();
-						}
 						if (creature.State is HealthState hs)
 						{
 							spear.room.PlaySound(SoundID.Spear_Stick_In_Creature, spear.firstChunk);
@@ -180,11 +214,11 @@ namespace MySlugcat
 							hs.health -= spearDamageBonus;
 							if (creature is Scavenger scavenger)
 							{
-								creature.Stun(40);
+								creature.Stun(90);
 							}
 							else
 							{
-								creature.Stun(40);
+								creature.Stun(90);
 							}
 
 						}

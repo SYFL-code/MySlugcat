@@ -246,14 +246,14 @@ namespace MySlugcat
 		/// <summary>
 		/// 查找获取一定范围内所有生物
 		/// </summary>
-		public static List<Creature>? CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature, Player? player = null, bool IncludeTameCreature = false)
+		public static List<Creature> CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature, Player? player = null, bool IncludeTameCreature = false)
 		{
 			List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
 			float radiusSquared = radius * radius;
 
 			if (!(room.abstractRoom.creatures.Count > 0))
 			{
-				return null;
+				return new List<Creature>();
 			}
 
 			foreach (AbstractCreature abstractCreature in room.abstractRoom.creatures)

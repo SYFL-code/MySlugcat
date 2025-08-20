@@ -28,7 +28,7 @@ namespace MySlugcat
 //  备注  : 已逐行添加中文注释，可直接替换原文件使用
 // ---------------------------------------------------------
 
-using System;
+/*using System;
 using RWCustom;
 using UnityEngine;
 
@@ -37,9 +37,9 @@ namespace MoreSlugcats
 	// Token: 0x020003A9 RID: 937
 	public class LightningMachine : UpdatableAndDeletable
 	{
-		/* =====================================================
+		*//* =====================================================
          * 构造方法：初始化闪电参数
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BA5 RID: 11173 RVA: 0x003347B8 File Offset: 0x003329B8
 		public LightningMachine(Vector2 pos, Vector2 startPoint, Vector2 endPoint,
 								float chance, bool permanent, bool radial,
@@ -62,9 +62,9 @@ namespace MoreSlugcats
 			this.soundLoop.Volume = 0f;
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 永久闪电更新逻辑：保持一条持续存在的闪电
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BA6 RID: 11174 RVA: 0x0033485C File Offset: 0x00332A5C
 		public void PermaLightning()
 		{
@@ -85,9 +85,9 @@ namespace MoreSlugcats
 			this.permaLightning.lightningType = this.lightningType;
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 径向闪电：每次随机新方向后立即触发一次
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BA7 RID: 11175 RVA: 0x003348FB File Offset: 0x00332AFB
 		public void RadialLightning()
 		{
@@ -95,9 +95,9 @@ namespace MoreSlugcats
 			this.Strike();                // 立即触发
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 触发一次闪电（非永久/非径向模式）
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BA8 RID: 11176 RVA: 0x00334910 File Offset: 0x00332B10
 		public void Strike()
 		{
@@ -108,7 +108,7 @@ namespace MoreSlugcats
 			// 计算闪电颜色（HSL -> RGB）
 			this.color = Custom.HSL2RGB(this.lightningType - 0.0001f, 1f, 0.6f);
 
-			/* ---------- 永久模式 ---------- */
+			*//* ---------- 永久模式 ---------- *//*
 			if (this.permanent)
 			{
 				this.room.AddObject(this.permaLightning = new LightningBolt(
@@ -117,20 +117,20 @@ namespace MoreSlugcats
 				return;
 			}
 
-			/* ---------- 随机触发 ---------- */
+			*//* ---------- 随机触发 ---------- *//*
 			if (UnityEngine.Random.value <= num && this.random)
 			{
 				this.ready = true;
 			}
 
-			/* ---------- 计数器触发 ---------- */
+			*//* ---------- 计数器触发 ---------- *//*
 			if (this.counter > 1f && !this.random)
 			{
 				this.ready = true;
 				this.counter = 0f;
 			}
 
-			/* ---------- 真正生成闪电 ---------- */
+			*//* ---------- 真正生成闪电 ---------- *//*
 			if (this.ready)
 			{
 				// 关闭持续电流声
@@ -180,9 +180,9 @@ namespace MoreSlugcats
 			}
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 射线检测：返回闪电实际落点（如果命中地形会偏移）
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BA9 RID: 11177 RVA: 0x00334BB0 File Offset: 0x00332DB0
 		public Vector2 Trace(Vector2 start, Vector2 end)
 		{
@@ -197,9 +197,9 @@ namespace MoreSlugcats
 			return end; // 未命中地形，直接返回端点
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 主循环：根据模式调用不同更新函数
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x06002BAA RID: 11178 RVA: 0x00334C14 File Offset: 0x00332E14
 		public override void Update(bool eu)
 		{
@@ -228,9 +228,9 @@ namespace MoreSlugcats
 			base.Update(eu); // 父类更新
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 属性：径向模式下的随机端点（扇形范围内）
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x1700076A RID: 1898
 		// (get) Token: 0x06002BAB RID: 11179 RVA: 0x00334C7C File Offset: 0x00332E7C
 		public Vector2 rSecPoint
@@ -251,9 +251,9 @@ namespace MoreSlugcats
 			}
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 属性：获取闪电目标点
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x1700076B RID: 1899
 		// (get) Token: 0x06002BAC RID: 11180 RVA: 0x00334D5A File Offset: 0x00332F5A
 		public Vector2 Target
@@ -266,9 +266,9 @@ namespace MoreSlugcats
 			}
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 属性：获取闪电起始点
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x1700076C RID: 1900
 		// (get) Token: 0x06002BAD RID: 11181 RVA: 0x00334D94 File Offset: 0x00332F94
 		public Vector2 Source
@@ -281,9 +281,9 @@ namespace MoreSlugcats
 			}
 		}
 
-		/* =====================================================
+		*//* =====================================================
          * 字段：所有公开/内部字段
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x040028A7 RID: 10407
 		public Vector2 pos;              // 生成器中心
 										 // Token: 0x040028A8 RID: 10408
@@ -331,13 +331,13 @@ namespace MoreSlugcats
 										 // Token: 0x040028BD RID: 10429
 		public bool light;               // 是否产生光源
 
-		/* =====================================================
+		*//* =====================================================
          * 内部类：闪电命中特效（光爆/火花）
-         * ===================================================== */
+         * ===================================================== *//*
 		// Token: 0x020009F0 RID: 2544
 		public class Impact : CosmeticSprite
 		{
-			/* ---------------- 构造 ---------------- */
+			*//* ---------------- 构造 ---------------- *//*
 			// Token: 0x060050B6 RID: 20662 RVA: 0x0055ED48 File Offset: 0x0055CF48
 			public Impact(Vector2 pos, float size, Color color)
 			{
@@ -351,7 +351,7 @@ namespace MoreSlugcats
 				this.lifeTime = Mathf.Lerp(2f, 16f, size * UnityEngine.Random.value);
 			}
 
-			/* ---------------- 更新 ---------------- */
+			*//* ---------------- 更新 ---------------- *//*
 			// Token: 0x060050B7 RID: 20663 RVA: 0x0055EDAC File Offset: 0x0055CFAC
 			public override void Update(bool eu)
 			{
@@ -367,7 +367,7 @@ namespace MoreSlugcats
 				this.life = Mathf.Max(0f, this.life - 1f / this.lifeTime);
 			}
 
-			/* ---------------- 初始化精灵 ---------------- */
+			*//* ---------------- 初始化精灵 ---------------- *//*
 			// Token: 0x060050B8 RID: 20664 RVA: 0x0055EE44 File Offset: 0x0055D044
 			public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
 			{
@@ -392,7 +392,7 @@ namespace MoreSlugcats
 				this.AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Water"));
 			}
 
-			/* ---------------- 绘制 ---------------- */
+			*//* ---------------- 绘制 ---------------- *//*
 			// Token: 0x060050B9 RID: 20665 RVA: 0x0055EFC8 File Offset: 0x0055D1C8
 			public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam,
 											 float timeStacker, Vector2 camPos)
@@ -434,7 +434,7 @@ namespace MoreSlugcats
 										   Mathf.Lerp(0.9f, 1f, UnityEngine.Random.value);
 			}
 
-			/* ---------------- 带 circle 参数的构造 ---------------- */
+			*//* ---------------- 带 circle 参数的构造 ---------------- *//*
 			// Token: 0x060050BA RID: 20666 RVA: 0x0055F249 File Offset: 0x0055D449
 			public Impact(Vector2 pos, float size, Color color, bool circle)
 				: this(pos, size, color)
@@ -442,7 +442,7 @@ namespace MoreSlugcats
 				this.circle = circle;
 			}
 
-			/* ---------------- 字段 ---------------- */
+			*//* ---------------- 字段 ---------------- *//*
 			// Token: 0x04005314 RID: 21268
 			public float size;      // 尺寸
 									// Token: 0x04005315 RID: 21269
@@ -457,4 +457,4 @@ namespace MoreSlugcats
 			public bool circle;     // 是否使用圆形贴图
 		}
 	}
-}
+}*/

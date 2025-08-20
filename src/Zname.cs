@@ -68,6 +68,15 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 			}*/
 		}
 
+		private static void Hook()
+		{
+			// ref 
+
+			// ref bool Execute, ref 
+
+			// ref bool Execute, ref bool return_, ref 
+		}
+
 		private static void Plugin()
 		{
 			//using static PlayerModuleManager;

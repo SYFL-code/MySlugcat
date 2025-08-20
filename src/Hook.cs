@@ -43,6 +43,10 @@ namespace MySlugcat
 			On.Player.Die += Player_Die;
 			On.Player.Destroy += Player_Destroy;
 
+			On.PlayerGraphics.InitiateSprites += PlayerGraphics_InitiateSprites;
+			On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
+			On.PlayerGraphics.AddToContainer += PlayerGraphics_AddToContainer;
+
 			On.SlugcatStats.ctor += SlugcatStats_ctor;
 			#endregion
 
@@ -71,6 +75,30 @@ namespace MySlugcat
 			On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
 			On.MoreSlugcats.LillyPuck.SetRandomSpin += LillyPuck_SetRandomSpin;
 			On.Weapon.Update += Weapon_Update;
+			#endregion
+
+			#region 挣脱
+			//咬住挣脱
+			On.Creature.Violence += Creature_Violence;
+			//挣脱蜥蜴
+			On.Lizard.Bite += Lizard_Bite;
+			//挣脱蘑菇
+			On.DaddyLongLegs.Eat += DaddyLongLegs_Eat;
+			//挣脱蜈蚣
+			On.Centipede.UpdateGrasp += Centipede_UpdateGrasp;
+			//挣脱利维坦
+			On.BigEel.JawsSnap += BigEel_JawsSnap;
+			//挣脱红树
+			On.TentaclePlant.Carry += TentaclePlant_Carry;
+			//挣脱拟态草
+			On.PoleMimic.Carry += PoleMimic_Carry;
+			//挣脱火虫
+			On.EggBug.CarryObject += EggBug_CarryObject;
+			//冰盾转换
+			//On.Spear.HitSomething += Spear_HitSomething;
+			On.ScavengerBomb.HitSomething += ScavengerBomb_HitSomething;
+			//挣脱魔王秃鹫
+			On.Vulture.Carry += Vulture_Carry;
 			#endregion
 
 			#region Bee
@@ -168,6 +196,8 @@ namespace MySlugcat
 				DigestionSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
 				if (!Execute) return;
 				KnitmeshSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
+				if (!Execute) return;
+				KillingAuraSkill.Player_Update(ref Execute, ref orig, ref player, ref eu);
 				if (!Execute) return;
 			}
 			catch (Exception e)
@@ -291,6 +321,69 @@ namespace MySlugcat
 			}
 		}
 
+		public static void PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics playerGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+		{
+			bool Execute = true;
+
+			orig.Invoke(playerGraphics, sLeaser, rCam);
+
+			try
+			{
+				if (playerGraphics.player.GetModuleE(out var module).KillingAuraSkill)
+				{
+					module.KASkill = new KillingAuraSkill();
+					module.KASkill.InitiateSprites(ref Execute, ref orig, ref playerGraphics, ref sLeaser, ref rCam);
+					if (!Execute) return;
+				}
+				//重新添加自身的所有图像
+				playerGraphics.AddToContainer(sLeaser, rCam, null);
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics playerGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+		{
+			bool Execute = true;
+
+			orig.Invoke(playerGraphics, sLeaser, rCam, timeStacker, camPos);
+
+			try
+			{
+				if (playerGraphics.player.GetModuleE(out var module).KillingAuraSkill)
+				{
+					module.KASkill?.DrawSprites(ref Execute, ref orig, ref playerGraphics, ref sLeaser, ref rCam, ref timeStacker, ref camPos);
+					if (!Execute) return;
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void PlayerGraphics_AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics playerGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContainer)
+		{
+			bool Execute = true;
+
+			orig.Invoke(playerGraphics, sLeaser, rCam, newContainer);
+
+			try
+			{
+				if (playerGraphics.player.GetModuleE(out var module).KillingAuraSkill)
+				{
+					module.KASkill?.AddToContainer(ref Execute, ref orig, ref playerGraphics, ref sLeaser, ref rCam, ref newContainer);
+					if (!Execute) return;
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
 		public static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats slugcatStats, SlugcatStats.Name slugcat, bool malnourished)
 		{
 			bool Execute = true;
@@ -317,6 +410,8 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 		}
+		
+		
 		#endregion
 
 		#region Creature
@@ -479,6 +574,171 @@ namespace MySlugcat
 		}
 		#endregion
 
+		#region 挣脱
+		private static void Creature_Violence(On.Creature.orig_Violence orig, Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.Creature_Violence(ref Execute, ref orig, ref creature, ref source, ref directionAndMomentum, ref hitChunk, ref hitAppendage, ref type, ref damage, ref stunBonus);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(creature, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+
+			try
+			{
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
+		public static void Lizard_Bite(On.Lizard.orig_Bite orig, Lizard lizard, BodyChunk chunk)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.Lizard_Bite(ref Execute, ref orig, ref lizard, ref chunk);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(lizard, chunk);
+		}
+
+		public static void DaddyLongLegs_Eat(On.DaddyLongLegs.orig_Eat orig, DaddyLongLegs daddyLongLegs, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.DaddyLongLegs_Eat(ref Execute, ref orig, ref daddyLongLegs, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(daddyLongLegs, eu);
+		}
+
+		public static void Centipede_UpdateGrasp(On.Centipede.orig_UpdateGrasp orig, Centipede centipede, int g)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.Centipede_UpdateGrasp(ref Execute, ref orig, ref centipede, ref g);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(centipede, g);
+		}
+
+		public static void BigEel_JawsSnap(On.BigEel.orig_JawsSnap orig, BigEel bigEel)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.BigEel_JawsSnap(ref Execute, ref orig, ref bigEel);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(bigEel);
+		}
+
+		public static void TentaclePlant_Carry(On.TentaclePlant.orig_Carry orig, TentaclePlant tentaclePlant, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.TentaclePlant_Carry(ref Execute, ref orig, ref tentaclePlant, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(tentaclePlant, eu);
+		}
+
+		public static void PoleMimic_Carry(On.PoleMimic.orig_Carry orig, PoleMimic poleMimic, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.PoleMimic_Carry(ref Execute, ref orig, ref poleMimic, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(poleMimic, eu);
+		}
+
+		public static void EggBug_CarryObject(On.EggBug.orig_CarryObject orig, EggBug eggBug, bool eu)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.EggBug_CarryObject(ref Execute, ref orig, ref eggBug, ref eu);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(eggBug, eu);
+		}
+
+		public static void Vulture_Carry(On.Vulture.orig_Carry orig, Vulture vulture)
+		{
+			bool Execute = true;
+			try
+			{
+				FrameSkill.Vulture_Carry(ref Execute, ref orig, ref vulture);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig.Invoke(vulture);
+		}
+		#endregion
+
 		#region Bee
 		public static void Bee_Update(On.SporePlant.Bee.orig_Update orig, SporePlant.Bee bee, bool eu)
 		{
@@ -541,6 +801,14 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				if (!spear.HitThisObject(result.obj))
+				{
+					result.obj = null;
+					ret = false;
+					Execute = false;
+					if (!Execute) return ret;
+				}
+
 				ret = FrameSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
 				ret = DeflagrationSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
@@ -555,6 +823,29 @@ namespace MySlugcat
 			}
 			ret = orig(spear, result, eu);
 			Log.OutputLog($"Spear ret({ret})_");
+			return ret;
+		}
+
+		public static bool ScavengerBomb_HitSomething(On.ScavengerBomb.orig_HitSomething orig, ScavengerBomb bomb, SharedPhysics.CollisionResult result, bool eu)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = FrameSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
+				if (!Execute) return ret;
+				ret = DeflagrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
+				if (!Execute) return ret;
+				ret = PenetrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+			ret = orig(bomb, result, eu);
+			Log.OutputLog($"Rock ret({ret})_");
 			return ret;
 		}
 

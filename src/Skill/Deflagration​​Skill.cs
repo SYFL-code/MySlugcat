@@ -250,6 +250,18 @@ namespace MySlugcat
 
 		}
 
+		public static bool ScavengerBomb_HitSomething(ref bool Execute, ref bool return_, ref On.ScavengerBomb.orig_HitSomething orig, ref ScavengerBomb bomb, ref SharedPhysics.CollisionResult result, ref bool eu)
+		{
+			if (bomb.thrownBy != null && bomb.thrownBy is Player player && player.GetModule().DeflagrationSkill)
+			{
+				if (60 > UnityEngine.Random.Range(0, 100) && (result.obj != null))
+				{
+					Explode(bomb, result.chunk, player);
+				}
+			}
+			return return_;
+		}
+
 		public static bool Rock_HitSomething(ref bool Execute, ref bool return_, ref On.Rock.orig_HitSomething orig, ref Rock rock, ref SharedPhysics.CollisionResult result, ref bool eu)
 		{
 			if (rock.thrownBy != null && rock.thrownBy is Player player && player.GetModule().DeflagrationSkill)

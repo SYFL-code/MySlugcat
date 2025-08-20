@@ -154,7 +154,7 @@ internal static class AbPhysicalObjectModuleManager
 
 		#region 字段
 		/// <summary> 武器穿透对象 </summary>
-		public HashSet<AbstractPhysicalObject> WeaponPenetration = new();
+		public PhysicalObject? stuckInObject = null;
 		#endregion
 
 

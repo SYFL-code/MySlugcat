@@ -72,9 +72,16 @@ namespace MySlugcat
 			On.PuffBall.HitSomething += PuffBall_HitSomething;
 			On.PuffBall.Explode += PuffBall_Explode;
 			On.FlareBomb.StartBurn += FlareBomb_StartBurn;
-			On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
-			On.MoreSlugcats.LillyPuck.SetRandomSpin += LillyPuck_SetRandomSpin;
 			On.Weapon.Update += Weapon_Update;
+			if (ModManager.MSC)
+			{
+				On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
+				On.MoreSlugcats.LillyPuck.SetRandomSpin += LillyPuck_SetRandomSpin;
+			}
+			if (ModManager.Watcher)
+			{
+				On.Boomerang.HitSomething += Boomerang_HitSomething;
+			}
 			#endregion
 
 			#region 挣脱
@@ -437,8 +444,6 @@ namespace MySlugcat
 		{
 			bool Execute = true;
 
-			orig(creature);
-
 			try
 			{
 				NecrophytesCreature.Creature_Die(ref Execute, ref orig, ref creature);
@@ -449,6 +454,8 @@ namespace MySlugcat
 			{
 				Debug.LogException(e);
 			}
+
+			orig(creature);
 		}
 
 		public static void LizardGraphics_DrawSprites(On.LizardGraphics.orig_DrawSprites orig, LizardGraphics lizardGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
@@ -811,9 +818,9 @@ namespace MySlugcat
 
 				ret = FrameSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
-				ret = DeflagrationSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
-				ret = PenetrationSkill.Spear_HitSomething(ref Execute, ref ret, ref orig, ref spear, ref result, ref eu);
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -834,9 +841,10 @@ namespace MySlugcat
 			{
 				ret = FrameSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
-				ret = DeflagrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
-				ret = PenetrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
+				//ret = PenetrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -856,9 +864,10 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
-				ret = DeflagrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
-				ret = PenetrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref rock, ref result, ref eu);
+				//ret = PenetrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -871,13 +880,34 @@ namespace MySlugcat
 			return ret;
 		}
 
+		public static bool Boomerang_HitSomething(On.Boomerang.orig_HitSomething orig, Boomerang boomerang, SharedPhysics.CollisionResult result, bool eu)
+		{
+			bool Execute = true;
+			bool ret = false;
+			try
+			{
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
+				if (!Execute) return ret;
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
+				if (!Execute) return ret;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+			ret = orig(boomerang, result, eu);
+			Log.OutputLog($"boomerang ret({ret})_");
+			return ret;
+		}
+
 		private static bool LillyPuck_HitSomething(On.MoreSlugcats.LillyPuck.orig_HitSomething orig, LillyPuck lillyPuck, SharedPhysics.CollisionResult result, bool eu)
 		{
 			bool Execute = true;
 			bool ret = false;
 			try
 			{
-				ret = DeflagrationSkill.LillyPuck_HitSomething(ref Execute, ref ret, ref orig, ref lillyPuck, ref result, ref eu);
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -896,7 +926,7 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
-				ret = DeflagrationSkill.PuffBall_HitSomething(ref Execute, ref ret, ref orig, ref puffBall, ref result, ref eu);
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -916,7 +946,8 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
-				ret = PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
+				//ret = PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}

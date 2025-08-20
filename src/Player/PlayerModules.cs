@@ -273,6 +273,8 @@ internal static class PlayerModuleManager
 		#endregion
 
 		#region 其他字段
+		public int lastFrameSkillTick = -100;
+
 		public KillingAuraSkill? KASkill = null;
 		#endregion
 
@@ -340,16 +342,16 @@ internal static class PlayerModuleManager
 				Hunger = true;
 				VisionSystem = true;
 
-				FrameSkill = false;
-				DeflagrationSkill = false;
-				KnitmeshSkill = false;
-				PerceptionSkill = false;
+				FrameSkill = true;//
+				DeflagrationSkill = true;//
+				KnitmeshSkill = true;//
+				PerceptionSkill = true;//
 				DigestionSkill = true;//
 				SpawnNecrophytes = true;//
 				FixedSkill = false;
 				KillingAuraSkill = true;//
 				PenetrationSkill = true;//
-				Swift = 1;//
+				Swift = 0;
 
 				var session = player?.room?.game?.GetStorySession;
 				if (session == null) return;

@@ -63,20 +63,23 @@ namespace MySlugcat
 			sLeaser.sprites[sprite_index].x = sLeaser.sprites[3].x;
 			sLeaser.sprites[sprite_index].y = sLeaser.sprites[3].y;
 			sLeaser.sprites[sprite_index].y -= 5f;
+			sLeaser.sprites[sprite_index].color = new Color(1f, 0.5f, 0.5f, 0.1f);
 		}
 
-		public int lastKillingAuraDamaged = int.MinValue;
+		public int lastKillingAuraDamaged = 0;
 
 		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
 		{
 			if (player.GetModuleE(out var module).KillingAuraSkill)
 			{
 				KillingAuraSkill? kaSkill = module.KASkill;
+				//Console.WriteLine($"Null({kaSkill != null})_clock({player.room.world.game.clock})_lastKillingAuraDamaged_({kaSkill.lastKillingAuraDamaged})");
 				if (kaSkill != null)
 				{
-					if (player.room.world.game.clock - kaSkill.lastKillingAuraDamaged >= 120)
+					int now = player.room?.world?.game?.clock ?? -99999;
+					if (now - kaSkill.lastKillingAuraDamaged >= 120)
 					{
-						kaSkill.lastKillingAuraDamaged = player.room.world.game.clock;
+						kaSkill.lastKillingAuraDamaged = now;
 
 						// 执行你的操作
 						//List<Creature> creatures = Extension.CreaturesInRange(player.room, player.mainBodyChunk.pos, Radius, false, player, true, false, player, false);
@@ -108,10 +111,10 @@ namespace MySlugcat
 				return;
 			if (sprite_index < 0 || sprite_index >= sLeaser.sprites.Length) return;
 			//添加到图层
-			FContainer fcontainer = (newContatiner == null) ? rCam.ReturnFContainer("Midground") : newContatiner;
+			FContainer fcontainer = rCam.ReturnFContainer("Background");
 			fcontainer.AddChild(sLeaser.sprites[sprite_index]);
 			//调整图层顺序
-			sLeaser.sprites[sprite_index].MoveBehindOtherNode(sLeaser.sprites[3]);
+			//sLeaser.sprites[sprite_index].MoveBehindOtherNode(sLeaser.sprites[3]);
 		}
 	}
 }

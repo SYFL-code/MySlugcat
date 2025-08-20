@@ -187,10 +187,6 @@ sealed class friends_of_friends
 			self.currentRelationship = fof;
 			Execute = false;
 		}
-		else
-		{
-			orig(self);
-		}
 	}
 
 	/// <summary>

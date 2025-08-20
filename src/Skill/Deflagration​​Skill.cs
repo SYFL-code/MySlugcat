@@ -206,10 +206,49 @@ namespace MySlugcat
 		{
 			if (spear.thrownBy != null && spear.thrownBy is Player player && player.GetModule().DeflagrationSkill)
 			{
-				if (17 > UnityEngine.Random.Range(0, 100) && (result.obj != null))
+				if (13 > UnityEngine.Random.Range(0, 100) && (result.obj != null))
 				{
 					Log.Logger(4, "Spear", "MySlugcat:Deflagration:Spear_HitSomething", $"thrownBy ({player})");
 					Explode(spear, result.chunk, player);
+				}
+			}
+			return return_;
+		}
+
+		public static bool DeflagrationHit<T>(ref bool Execute, ref bool return_, ref T weapon, ref SharedPhysics.CollisionResult result, ref bool eu) where T : Weapon
+		{
+			if (weapon.thrownBy != null && weapon.thrownBy is Player player && player.GetModule().DeflagrationSkill)
+			{
+				int percentage = 8;
+				if (weapon is Spear)
+				{
+					percentage = 12;
+				}
+				else if (weapon is Rock)
+				{
+					percentage = 8;
+				}
+				else if (weapon is ScavengerBomb)
+				{
+					percentage = 60;
+				}
+				else if (weapon is PuffBall)
+				{
+					percentage = 14;
+				}
+				else if (ModManager.MSC && weapon is LillyPuck)
+				{
+					percentage = 8;
+				}
+				else if (ModManager.Watcher && weapon is Boomerang)
+				{
+					percentage = 16;
+				}
+
+				if (percentage > UnityEngine.Random.Range(0, 100) && (result.obj != null))
+				{
+					//Log.Logger(4, "Spear", "MySlugcat:Deflagration:Spear_HitSomething", $"thrownBy ({player})");
+					Explode(weapon, result.chunk, player);
 				}
 			}
 			return return_;
@@ -300,8 +339,6 @@ namespace MySlugcat
 
 		public static void LillyPuck_SetRandomSpin(ref bool Execute, ref On.MoreSlugcats.LillyPuck.orig_SetRandomSpin orig, ref LillyPuck lillyPuck)
 		{
-			orig(lillyPuck);
-
 			//Log.Logger(7, "LillyPuck", "MySlugcat:Deflagration:LillyPuck_SetRandomSpin", $"({lillyPuck.thrownBy != null}), ({lillyPuck.thrownBy is Player}), ({lillyPuck.thrownBy is Player && ((Player)lillyPuck.thrownBy).slugcatStats.name == Plugin.YourSlugID}), ({SC.DeflagrationSkill})");
 			if (lillyPuck.thrownBy != null && lillyPuck.thrownBy is Player player && player.GetModule().DeflagrationSkill)
 			{

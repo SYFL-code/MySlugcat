@@ -14,6 +14,8 @@ using MoreSlugcats;
 using MonoMod.RuntimeDetour;
 using CustomPassages = CustomPassageSupport.CustomPassageSupport;
 using System.Reflection;
+using HarmonyLib;
+using Menu;
 
 // Allows access to private members 允许访问私有成员
 #pragma warning disable CS0618
@@ -33,6 +35,8 @@ namespace MySlugcat
 		//用于检查角色id
 		public static readonly SlugcatStats.Name YourSlugID = new SlugcatStats.Name("theaccommodator.LH", false);
 
+		private static readonly Harmony harmony = new("my.slugcat.intros");
+
 
 		public void OnEnable()
 		{
@@ -48,7 +52,8 @@ namespace MySlugcat
 			//Perception.Hook();
 			//IntelHUD.Hook();
 			//PointerSkillHook.Hook();
-
+			harmony.Patch(AccessTools.Constructor(typeof(IntroRoll)),
+			  postfix: new HarmonyMethod(typeof(Intros), nameof(Intros.Postfix)));
 			//Intros.Hook();
 			FixedSkill.Hook();
 
@@ -73,12 +78,6 @@ namespace MySlugcat
 		// Load any resources, such as sprites or sounds-加载任何资源 包括图像素材和音效
 		private void LoadResources(RainWorld rainWorld)
 		{
-
-		}
-
-		private void Player_Update(On.Player.orig_Update orig, Player player, bool eu)
-		{
-			orig(player, eu);
 
 		}
 

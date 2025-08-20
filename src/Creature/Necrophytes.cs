@@ -54,8 +54,6 @@ namespace MySlugcat
 
 		public static void LizardGraphics_DrawSprites(ref bool Execute, ref On.LizardGraphics.orig_DrawSprites orig, ref LizardGraphics lizardGraphics, ref RoomCamera.SpriteLeaser sLeaser, ref RoomCamera rCam, ref float timeStacker, ref Vector2 camPos)
 		{
-			orig(lizardGraphics, sLeaser, rCam, timeStacker, camPos);
-
 			if (!rCam.room.game.DEBUGMODE)
 			{
 				Creature lizard = lizardGraphics.lizard;
@@ -217,13 +215,13 @@ namespace MySlugcat
 						return;
 					}
 					//Health.KillCreature(creature.room.game, creature);
+					Execute = false;
 					orig(creature);
 					module_c.NecrophyteDying = true;
 					creature.room?.AddObject(new DespawnAnimation(creature));
 					return;
 				}
 			}
-			orig(creature);
 		}
 
 		public static void Creature_Update(ref bool Execute, ref On.Creature.orig_Update orig, ref Creature creature, ref bool eu)
@@ -425,6 +423,7 @@ namespace MySlugcat
 			int N = player.playerState.playerNumber;
 			if (player.GetModule(out var module) && module.SpawnNecrophytes)
 			{
+				//Console.WriteLine($"JmpCounter_({module.JmpCounter})_[0].jmp_({player.input[0].jmp})_[1].jmp({player.input[1].jmp})");
 				if (module.JmpCounter >= 60 && !player.input[0].jmp && player.input[1].jmp)
 				{
 					if (!player.dead)

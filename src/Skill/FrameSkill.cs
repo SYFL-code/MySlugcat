@@ -250,6 +250,14 @@ namespace MySlugcat
 
 		public static Creature? Frame(Player player, bool IncludePlayer, Creature NotIncludeCreature, int probability = -1)
 		{
+			if (player.room == null) return null;
+			// ── 防重复令牌 -----------------------------
+			int now = player.room?.world?.game?.clock ?? -1;
+			var mod = player.GetModule();
+			if (Math.Abs(now - mod.lastFrameSkillTick) < 3) return null;
+			mod.lastFrameSkillTick = now;
+			// ---------------------------------------------
+
 			Creature? creature = Extension.RandomlySelectedCreature(player.room, true, player, false);
 			int percentage = 40;
 			if (probability == -1)
@@ -260,10 +268,10 @@ namespace MySlugcat
 			{
 				percentage = probability;
 			}
-			StackTrace stackTrace = new StackTrace();
-			StackFrame stackFrame = stackTrace.GetFrame(2);
-			MethodBase methodBase = stackFrame.GetMethod();
-			//Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
+			//StackTrace stackTrace = new StackTrace();
+			//StackFrame stackFrame = stackTrace.GetFrame(2);
+			//MethodBase methodBase = stackFrame.GetMethod();
+			//Log.OutputLog(8, "Frame", "MySlugcat:FrameSkill:Frame", $"Frameer ({creature}), Null  ({creature == null}), ({methodBase.DeclaringType?.Name}), ({methodBase.Name}), ({SC.FrameSkill})");
 			if (percentage > UnityEngine.Random.Range(0, 100) && creature != null && player.GetModule().FrameSkill)
 			{
 				if (Vector2.Distance(player.mainBodyChunk.pos, creature.mainBodyChunk.pos) < 10  || Vector2.Distance(player.mainBodyChunk.lastPos, creature.mainBodyChunk.pos) < 10 || Vector2.Distance(player.mainBodyChunk.lastLastPos, creature.mainBodyChunk.pos) < 10)
@@ -569,7 +577,7 @@ namespace MySlugcat
 					var hs = obj.State as HealthState;
 					if (hs != null)
 					{
-						hs.health -= 3f;
+						hs.health -= 3f / obj.Template.baseDamageResistance;
 					}
 					Execute = false;
 				}
@@ -636,7 +644,7 @@ namespace MySlugcat
 
 					Teleport.SetObjectPosition(spear, creaturepos);
 
-					hs.health -= spear.spearDamageBonus;
+					hs.health -= spear.spearDamageBonus / obj.Template.baseDamageResistance;
 					if (hs != null && hs.health != null)
 					{
 						Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"hs_Null ({hs == null}), hs ({hs?.health}) _ ({spear.spearDamageBonus})");

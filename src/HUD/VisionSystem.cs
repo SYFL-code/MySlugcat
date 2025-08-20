@@ -48,7 +48,7 @@ namespace MySlugcat
 			{
 				SpawnHUD(HUD);
 			}
-			orig.Invoke(HUD, cam);
+			//orig.Invoke(HUD, cam);
 		}
 
 		public static void HUD_InitMultiplayerHud(ref bool Execute, ref On.HUD.HUD.orig_InitMultiplayerHud orig, ref HUD.HUD HUD, ref ArenaGameSession session)
@@ -57,7 +57,7 @@ namespace MySlugcat
 			{
 				SpawnHUD(HUD);
 			}
-			orig.Invoke(HUD, session);
+			//orig.Invoke(HUD, session);
 		}
 
 		public static void HUD_InitSafariHud(ref bool Execute, ref On.HUD.HUD.orig_InitSafariHud orig, ref HUD.HUD HUD, ref RoomCamera cam)
@@ -66,7 +66,7 @@ namespace MySlugcat
 			{
 				SpawnHUD(HUD);
 			}
-			orig.Invoke(HUD, cam);
+			//orig.Invoke(HUD, cam);
 		}
 
 		private static void SpawnHUD(HUD.HUD HUD)

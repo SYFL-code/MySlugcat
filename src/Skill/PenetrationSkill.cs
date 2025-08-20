@@ -36,9 +36,12 @@ namespace MySlugcat
 		public static void Weapon_Update(ref bool Execute, ref Creature? thrownBy, ref On.Weapon.orig_Update orig, ref Weapon weapon, ref bool eu)
 		{
 			AbPhysicalObjectModule weaponModule = weapon.abstractPhysicalObject.GetModule();
-			if (weaponModule != null && weapon.mode != Weapon.Mode.Thrown)
+			if (weaponModule != null)
 			{
-				weaponModule.WeaponPenetration.Clear();
+				if (weapon.mode != Weapon.Mode.Thrown && weapon.mode != Weapon.Mode.StuckInCreature)
+				{
+					weaponModule.stuckInObject = null;
+				}
 			}
 
 			if (thrownBy != null && weapon.thrownBy == null && thrownBy is Player player && player.GetModule().PenetrationSkill)
@@ -46,13 +49,134 @@ namespace MySlugcat
 				weapon.thrownBy = player;
 			}
 
-			if (weapon.thrownBy != null && weapon.mode == Weapon.Mode.Free && weapon.thrownBy is Player player_ && player_.GetModule().DeflagrationSkill)
+			if (weapon.thrownBy != null && (weapon.mode != Weapon.Mode.Thrown && weapon.mode != Weapon.Mode.StuckInCreature) && weapon.thrownBy is Player player_ && player_.GetModule().DeflagrationSkill)
 			{
 				weapon.thrownBy = null;
 			}
 		}
 
-		public static bool Weapon_HitSomething(ref bool Execute, ref bool return_, ref On.Weapon.orig_HitSomething orig, ref Weapon weapon, ref SharedPhysics.CollisionResult result, ref bool eu)
+		public static bool PenetrateHit<T>(
+			ref bool Execute,
+			ref bool return_,
+			ref T weapon,
+			ref SharedPhysics.CollisionResult result, 
+			ref bool eu) where T : Weapon
+		{
+			if (weapon.thrownBy is Player player && player.GetModule().PenetrationSkill)
+			{
+				if (result.obj is Creature creature)
+				{
+					AbPhysicalObjectModule weaponModule = weapon.abstractPhysicalObject.GetModule();
+					if (weaponModule != null && weaponModule.stuckInObject != creature)
+					{
+						if (creature.State is HealthState hs)
+						{
+							Room room = weapon.room;
+							weaponModule.stuckInObject = creature;
+
+							if (weapon is Spear spear)
+							{
+								spear.stuckInObject = creature;
+								room.PlaySound(SoundID.Spear_Stick_In_Creature, weapon.firstChunk);
+
+								float spearDamageBonus = 1f;
+								switch (player.slugcatStats.throwingSkill)
+								{
+									case 0:
+										spearDamageBonus = 0.6f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
+										break;
+
+									case 1:
+										spearDamageBonus = 1f;
+										break;
+
+									case 2:
+										spearDamageBonus = 1.25f;
+										break;
+
+									case 3:
+										spearDamageBonus = 1.5f;
+										break;
+
+									default:
+										spearDamageBonus = 1f;
+										break;
+								}
+								/*if (player.slugcatStats.name == Plugin.YourSlugID)
+								{
+									spearDamageBonus = Mathf.Max(3f * Mathf.Pow(UnityEngine.Random.value, 10f) - 2.1f, 0.001f);
+								}*/
+
+								spearDamageBonus = spearDamageBonus / creature.Template.baseDamageResistance;
+
+								if (hs.health < spearDamageBonus)
+								{
+									creature.Die();
+								}
+								hs.health -= spearDamageBonus;
+								if (creature is Scavenger scavenger)
+								{
+									creature.Stun(60);
+								}
+								else
+								{
+									creature.Stun(60);
+								}
+							}
+							else if (weapon is Rock)
+							{
+								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
+								hs.health -= 0.001f;
+								if (creature is Scavenger scavenger)
+								{
+									creature.Stun(90);
+								}
+								else
+								{
+									creature.Stun(90);
+								}
+							}
+							else if (weapon is ScavengerBomb)
+							{
+								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
+
+								hs.health -= 0.01f;
+								creature.Stun(40);
+							}
+							else if (ModManager.Watcher && weapon is Boomerang)
+							{
+								room.PlaySound(WatcherEnums.WatcherSoundID.Boomerang_Collide_Creature, weapon.firstChunk);
+
+								hs.health -= 0.005f;
+								creature.Stun(80);
+							}
+							else
+							{
+								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
+								hs.health -= Mathf.Max(0.25f * Mathf.Pow(UnityEngine.Random.value, 4f), 0.01f);
+								if (creature is Scavenger scavenger)
+								{
+									creature.Stun(30);
+								}
+								else
+								{
+									creature.Stun(20);
+								}
+							}
+						}
+					}
+				}
+				result.obj = null;
+				Execute = false;
+				return false;
+			}
+			else
+			{
+				return return_;
+			}
+		}
+
+		/*public static bool Weapon_HitSomething(ref bool Execute, ref bool return_, ref On.Weapon.orig_HitSomething orig, ref Weapon weapon, ref SharedPhysics.CollisionResult result, ref bool eu)
 		{
 			if (weapon.thrownBy is Player player && player.GetModule().PenetrationSkill)
 			{
@@ -64,10 +188,10 @@ namespace MySlugcat
 						if (creature.State is HealthState hs)
 						{
 							weapon.room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
-							/*if (hs.health < 0.25f)
+							*//*if (hs.health < 0.25f)
 							{
 								creature.Die();
-							}*/
+							}*//*
 							hs.health -= Mathf.Max(0.4f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.15f, 0.001f);
 							if (creature is Scavenger scavenger)
 							{
@@ -102,10 +226,10 @@ namespace MySlugcat
 						if (creature.State is HealthState hs)
 						{
 							rock.room.PlaySound(SoundID.Rock_Hit_Creature, rock.firstChunk);
-							/*if (hs.health < 0.25f)
+							*//*if (hs.health < 0.25f)
 							{
 								creature.Die();
-							}*/
+							}*//*
 							hs.health -= Mathf.Max(0.3f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.1f, 0.001f);
 							if (creature is Scavenger scavenger)
 							{
@@ -140,10 +264,10 @@ namespace MySlugcat
 						if (creature.State is HealthState hs)
 						{
 							bomb.room.PlaySound(SoundID.Rock_Hit_Creature, bomb.firstChunk);
-							/*if (hs.health < 0.25f)
+							*//*if (hs.health < 0.25f)
 							{
 								creature.Die();
-							}*/
+							}*//*
 							hs.health -= Mathf.Max(0.5f * Mathf.Pow(UnityEngine.Random.value, 5f) - 0.1f, 0.001f);
 							if (creature is Scavenger scavenger)
 							{
@@ -232,7 +356,7 @@ namespace MySlugcat
 			{
 				return return_;
 			}
-		}
+		}*/
 
 		/*public static bool Weapon_HitSomething(On.Weapon.orig_HitSomething orig, Weapon weapon, SharedPhysics.CollisionResult result, bool eu)
 		{

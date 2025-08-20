@@ -69,7 +69,7 @@ namespace MySlugcat
 		}
 
 		/* ---------- 5. Postfix：健壮字段注入 ---------- */
-		private static void Postfix(IntroRoll __instance)
+		public static void Postfix(IntroRoll __instance)
 		{
 			try
 			{

@@ -78,7 +78,7 @@ namespace MySlugcat
                 //if ((player.input[0].pckp || player.input[0].mp) &&
                 //    player.input[0].y > 0 && player.playerState.foodInStomach > 2)
                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill:Player_Update_st", $"bool1 ({player.input[0].pckp}), bool2 ({!player.input[1].pckp}), bool3 ({player.room.abstractRoom.creatures.Count > 0})");
-                if (player.input[0].pckp && !player.input[1].pckp && false)
+                if (player.input[0].pckp && !player.input[1].pckp)
                 {
                     //player.playerState.foodInStomach -= 2;
 
@@ -103,8 +103,8 @@ namespace MySlugcat
 
                             Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill:Player_Update_stt", $"bool1 ({distance <= 500f}), bool2 ({Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f})");
                             //normalized adj.标准化的；正常化的
-                            //if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f)
-                            if (distance <= 500f)
+                            if (distance <= 500f && Vector2.Dot(direction.normalized, toCreature.normalized) > 0.8f)
+                            //if (distance <= 500f)
                             {
                                 Log.Logger(7, "FixedSkill", "MySlugcat:FixedSkill:Player_Update_sh", $"T");
                                 FreezeCreature(c);

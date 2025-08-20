@@ -72,6 +72,7 @@ namespace MySlugcat
 						module.JmpCounter = 0;
 					}
 				}
+				//Console.WriteLine($"Player_Update4_Key({module.JmpCounter})_({player.input[0].jmp})_({player.input[1].jmp})");
 
 				//pckp
 				if (player.input[0].pckp)

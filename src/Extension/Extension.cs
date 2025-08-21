@@ -251,7 +251,7 @@ namespace MySlugcat
 			List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
 			float radiusSquared = radius * radius;
 
-			if (!(room.abstractRoom.creatures.Count > 0))
+			if (room == null || !(room.abstractRoom.creatures.Count > 0))
 			{
 				return new List<Creature>();
 			}

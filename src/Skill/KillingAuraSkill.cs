@@ -63,7 +63,7 @@ namespace MySlugcat
 			sLeaser.sprites[sprite_index].x = sLeaser.sprites[3].x;
 			sLeaser.sprites[sprite_index].y = sLeaser.sprites[3].y;
 			sLeaser.sprites[sprite_index].y -= 5f;
-			sLeaser.sprites[sprite_index].color = new Color(1f, 0.5f, 0.5f, 0.1f);
+			sLeaser.sprites[sprite_index].color = new Color(1f, 0.5f, 0.5f, 0.01f);
 		}
 
 		public int lastKillingAuraDamaged = 0;
@@ -74,9 +74,9 @@ namespace MySlugcat
 			{
 				KillingAuraSkill? kaSkill = module.KASkill;
 				//Console.WriteLine($"Null({kaSkill != null})_clock({player.room.world.game.clock})_lastKillingAuraDamaged_({kaSkill.lastKillingAuraDamaged})");
-				if (kaSkill != null)
+				if (kaSkill != null && player.room != null)
 				{
-					int now = player.room?.world?.game?.clock ?? -99999;
+					int now = player.room.world?.game?.clock ?? -99999;
 					if (now - kaSkill.lastKillingAuraDamaged >= 120)
 					{
 						kaSkill.lastKillingAuraDamaged = now;
@@ -90,10 +90,7 @@ namespace MySlugcat
 							{
 								if (creature != null)
 								{
-									if (creature.State is HealthState hs)
-									{
-										hs.health -= 1f;
-									}
+									creature.Violence(player.mainBodyChunk, null, creature.mainBodyChunk, null, Creature.DamageType.Stab, 0.3f, 10f);
 								}
 							}
 						}

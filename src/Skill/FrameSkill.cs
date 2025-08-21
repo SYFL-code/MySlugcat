@@ -21,6 +21,7 @@ using MonoMod.RuntimeDetour;
 using Watcher;
 using static MonoMod.InlineRT.MonoModRule;
 using System.Reflection;
+using static Menu.Remix.InternalOI;
 
 
 namespace MySlugcat
@@ -573,58 +574,61 @@ namespace MySlugcat
 				{
 					player.dead = false;
 					player.stun = 0;
+					obj.Violence(player.mainBodyChunk, null, obj.mainBodyChunk, null, Creature.DamageType.Bite, 3f, 60f);
+					
 					//obj.Die();
-					var hs = obj.State as HealthState;
+					/*var hs = obj.State as HealthState;
 					if (hs != null)
 					{
-						hs.health -= 3f / obj.Template.baseDamageResistance;
-					}
+						hs.health -= Mathf.Max(3f / obj.Template.baseDamageResistance, 0.2f);
+						//hs.health -= 3f / obj.Template.baseDamageResistance;
+					}*/
 					Execute = false;
 				}
 			}
 		}
 
-/*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
-		{
-			Console.WriteLine($"MySlugcat:Spear_HitSomething,{result.obj == null},{result.obj is not Player},{result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}");
-			if (result.obj == null)
-			{
-				return false;
-			}
-			//如果被命中的不是玩家
-			if (result.obj is not Player player)
-				return orig.Invoke(spear, result, eu);
-			//如果玩家不是MySlugcat则运行原程序
-			if (player.slugcatStats.name != Plugin.YourSlugID)
-				return orig.Invoke(spear, result, eu);
-			//取玩家变量
-			GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
-
-			Console.WriteLine("MySlugcat:Spear_HitSomething: st");
-
-			Creature obj = Frame(player, false, player);
-
-			Console.WriteLine($"MySlugcat:Spear_HitSomething: sh  Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}, {obj == null}");
-
-			//spear.thrownBy = null;
-			//Creature obj = FindNearestCreature(spear., Frameobj.room, false, null);
-			if (obj != null)
-			{
-				//(!this.dead && this.State is HealthState && (this.State as HealthState).health < 0f && UnityEngine.Random.value < -(this.State as HealthState).health && UnityEngine.Random.value < 0.025f)
-				//obj.health -= 1;
-				//if((obj.State as HealthState).health -= 1)
-				var hs = obj.State as HealthState;
-				Console.WriteLine($"MySlugcat:Spear_HitSomething: sh hs {hs == null}");
-				if (hs != null)
+		/*        private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear spear, SharedPhysics.CollisionResult result, bool eu)
 				{
-					hs.health -= spear.spearDamageBonus;
-				}
-				result.obj = obj;
-				Console.WriteLine($"MySlugcat:Spear_HitSomething: sh result.obj {result.obj}");
-			}
+					Console.WriteLine($"MySlugcat:Spear_HitSomething,{result.obj == null},{result.obj is not Player},{result.obj is Player player1 && player1.slugcatStats.name == Plugin.YourSlugID}");
+					if (result.obj == null)
+					{
+						return false;
+					}
+					//如果被命中的不是玩家
+					if (result.obj is not Player player)
+						return orig.Invoke(spear, result, eu);
+					//如果玩家不是MySlugcat则运行原程序
+					if (player.slugcatStats.name != Plugin.YourSlugID)
+						return orig.Invoke(spear, result, eu);
+					//取玩家变量
+					GlobalVar.playerVar.TryGetValue(player, out PlayerVar pv);
 
-			return orig.Invoke(spear, result, eu);
-		}*/
+					Console.WriteLine("MySlugcat:Spear_HitSomething: st");
+
+					Creature obj = Frame(player, false, player);
+
+					Console.WriteLine($"MySlugcat:Spear_HitSomething: sh  Creature type: {obj?.GetType()}, BodyChunks: {obj?.bodyChunks?.Length}, {obj == null}");
+
+					//spear.thrownBy = null;
+					//Creature obj = FindNearestCreature(spear., Frameobj.room, false, null);
+					if (obj != null)
+					{
+						//(!this.dead && this.State is HealthState && (this.State as HealthState).health < 0f && UnityEngine.Random.value < -(this.State as HealthState).health && UnityEngine.Random.value < 0.025f)
+						//obj.health -= 1;
+						//if((obj.State as HealthState).health -= 1)
+						var hs = obj.State as HealthState;
+						Console.WriteLine($"MySlugcat:Spear_HitSomething: sh hs {hs == null}");
+						if (hs != null)
+						{
+							hs.health -= spear.spearDamageBonus;
+						}
+						result.obj = obj;
+						Console.WriteLine($"MySlugcat:Spear_HitSomething: sh result.obj {result.obj}");
+					}
+
+					return orig.Invoke(spear, result, eu);
+				}*/
 
 
 		public static bool Spear_HitSomething(ref bool Execute, ref bool return_, ref On.Spear.orig_HitSomething orig, ref Spear spear, ref SharedPhysics.CollisionResult result, ref bool eu)
@@ -640,19 +644,29 @@ namespace MySlugcat
 
 				if (obj != null && obj.State is HealthState hs)
 				{
+					result.obj = obj;
+
 					Vector2 creaturepos = obj.mainBodyChunk.pos;
 
 					Teleport.SetObjectPosition(spear, creaturepos);
 
-					hs.health -= spear.spearDamageBonus / obj.Template.baseDamageResistance;
-					if (hs != null && hs.health != null)
+					/*float num = spear.spearDamageBonus;
+					if (ModManager.MSC && result.obj is Player player_ && player_.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Gourmand && UnityEngine.Random.value < 0.15f)
 					{
-						Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"hs_Null ({hs == null}), hs ({hs?.health}) _ ({spear.spearDamageBonus})");
+						num /= 10f;
+						Custom.Log(new string[]
+						{
+						"GOURMAND SAVE!"
+						});
 					}
+					if (spear.bugSpear)
+					{
+						num *= 3f;
+					}
+					obj.Violence(spear.firstChunk, new Vector2?(spear.firstChunk.vel * spear.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, num, 20f);*/
 				}
 
 				Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"Creature type ({obj?.GetType()})");
-				result.obj = obj;
 				//return orig(spear, result, eu);
 			}
 			Log.Logger(8, "Frame", "MySlugcat:FrameSkill:Spear_HitSomething", $"Creature type ({result.obj?.GetType()})");
@@ -666,11 +680,11 @@ namespace MySlugcat
 				Creature? obj = Frame(player, false, player);
 				if (obj != null)
 				{
+					result.obj = obj;
 					Vector2 creaturepos = obj.mainBodyChunk.pos;
 
 					Teleport.SetObjectPosition(bomb, creaturepos);
 
-					result.obj = obj;
 					player.stun = 0;
 				}
 			}

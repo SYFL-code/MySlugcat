@@ -1319,6 +1319,131 @@ creature.abstractCreature.world.game.session.creatureCommunities.SetLikeOfPlayer
 
 	}
 
+		public class DamageType : ExtEnum<Creature.DamageType>
+		{
+			// Token: 0x060041F9 RID: 16889 RVA: 0x0049750D File Offset: 0x0049570D
+			public DamageType(string value, bool register = false) : base(value, register)
+			{
+			}
+
+			public static readonly Creature.DamageType Blunt = new Creature.DamageType("Blunt", true);//钝击
+
+			public static readonly Creature.DamageType Stab = new Creature.DamageType("Stab", true);//穿刺
+
+			public static readonly Creature.DamageType Bite = new Creature.DamageType("Bite", true);//撕咬
+
+			public static readonly Creature.DamageType Water = new Creature.DamageType("Water", true);//水浸
+
+			public static readonly Creature.DamageType Explosion = new Creature.DamageType("Explosion", true);//爆炸
+
+			public static readonly Creature.DamageType Electric = new Creature.DamageType("Electric", true);//电击
+
+			public static readonly Creature.DamageType None = new Creature.DamageType("None", true);//无伤害
+		}
+
+		/*public virtual void 暴力攻击(
+			BodyChunk 攻击源,
+			Vector2? 方向与动量,
+			BodyChunk 受击部位,
+			PhysicalObject.Appendage.Pos 受击附属肢体,
+			Creature.DamageType 伤害类型,
+			float 基础伤害值,
+			float 眩晕加成)
+		{
+			// 波纹暴力效果检查
+			if (!this.波纹暴力效果检查(攻击源))
+			{
+				return;
+			}
+
+			// 设置击杀标记（如果攻击源来自生物）
+			if (攻击源 != null && 攻击源.owner is Creature)
+			{
+				this.设置击杀标记((攻击源.owner as Creature).abstractCreature);
+			}
+
+			// 处理物理击退效果
+			if (方向与动量 != null)
+			{
+				if (受击部位 != null)
+				{
+					受击部位.vel += Vector2.ClampMagnitude(方向与动量.Value / 受击部位.mass, 10f);
+				}
+				else if (受击附属肢体 != null && this is PhysicalObject.IHaveAppendages)
+				{
+					(this as PhysicalObject.IHaveAppendages).对附属肢体施加力(受击附属肢体, 方向与动量.Value);
+				}
+			}
+
+			// 计算实际伤害和眩晕值
+			float 实际伤害 = 基础伤害值 / this.Template.baseDamageResistance;
+			float 实际眩晕值 = (基础伤害值 * 30f + 眩晕加成) / this.Template.baseStunResistance;
+
+			// 生命状态下的伤害加成
+			if (this.State is HealthState)
+			{
+				实际眩晕值 *= 1.5f + Mathf.InverseLerp(0.5f, 0f, (this.State as HealthState).health) * UnityEngine.Random.value;
+			}
+
+			// 伤害类型抗性计算
+			if (伤害类型.Index != -1)
+			{
+				if (this.Template.damageRestistances[伤害类型.Index, 0] > 0f)
+				{
+					实际伤害 /= this.Template.damageRestistances[伤害类型.Index, 0];
+				}
+				if (this.Template.damageRestistances[伤害类型.Index, 1] > 0f)
+				{
+					实际眩晕值 /= this.Template.damageRestistances[伤害类型.Index, 1];
+				}
+			}
+
+			// 竞技场模式特殊规则
+			if (ModManager.MSC)
+			{
+				if (this.room != null && this.room.world.game.IsArenaSession
+					&& this.room.world.game.GetArenaGameSession.chMeta != null
+					&& this.room.world.game.GetArenaGameSession.chMeta.resistMultiplier > 0f
+					&& !(this is Player))
+				{
+					实际伤害 /= this.room.world.game.GetArenaGameSession.chMeta.resistMultiplier;
+				}
+				if (this.room != null && this.room.world.game.IsArenaSession
+					&& this.room.world.game.GetArenaGameSession.chMeta != null
+					&& this.room.world.game.GetArenaGameSession.chMeta.invincibleCreatures
+					&& !(this is Player))
+				{
+					实际伤害 = 0f;
+				}
+			}
+
+			// 应用眩晕效果
+			this.stunDamageType = 伤害类型;
+			this.眩晕((int)实际眩晕值);
+			this.stunDamageType = Creature.DamageType.None;
+
+			// 生命值处理
+			if (this.State is HealthState)
+			{
+				(this.State as HealthState).health -= 实际伤害;
+
+				// 快速死亡判定
+				if (this.Template.quickDeath &&
+					(UnityEngine.Random.value < -(this.State as HealthState).health
+					 || (this.State as HealthState).health < -1f
+					 || ((this.State as HealthState).health < 0f && UnityEngine.Random.value < 0.33f)))
+				{
+					this.死亡();
+				}
+			}
+
+			// 即死伤害判定
+			if (实际伤害 >= this.Template.instantDeathDamageLimit)
+			{
+				this.死亡();
+			}
+		}*/
+
 		private static void Control()
 		{
 			//private static bool StartRunning = true;

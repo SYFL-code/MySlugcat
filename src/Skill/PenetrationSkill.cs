@@ -47,11 +47,13 @@ namespace MySlugcat
 			if (thrownBy != null && weapon.thrownBy == null && thrownBy is Player player && player.GetModule().PenetrationSkill)
 			{
 				weapon.thrownBy = player;
+				weapon.firstChunk.owner = player;
 			}
 
 			if (weapon.thrownBy != null && (weapon.mode != Weapon.Mode.Thrown && weapon.mode != Weapon.Mode.StuckInCreature) && weapon.thrownBy is Player player_ && player_.GetModule().DeflagrationSkill)
 			{
 				weapon.thrownBy = null;
+				weapon.firstChunk.owner = null;
 			}
 		}
 
@@ -62,6 +64,15 @@ namespace MySlugcat
 			ref SharedPhysics.CollisionResult result, 
 			ref bool eu) where T : Weapon
 		{
+			if (result.obj == null)
+			{
+				return false;
+			}
+			if (result.obj.abstractPhysicalObject.rippleLayer != weapon.abstractPhysicalObject.rippleLayer && !result.obj.abstractPhysicalObject.rippleBothSides && !weapon.abstractPhysicalObject.rippleBothSides)
+			{
+				return false;
+			}
+
 			if (weapon.thrownBy is Player player && player.GetModule().PenetrationSkill)
 			{
 				if (result.obj is Creature creature)
@@ -77,7 +88,6 @@ namespace MySlugcat
 							if (weapon is Spear spear)
 							{
 								spear.stuckInObject = creature;
-								room.PlaySound(SoundID.Spear_Stick_In_Creature, weapon.firstChunk);
 
 								float spearDamageBonus = 1f;
 								switch (player.slugcatStats.throwingSkill)
@@ -107,9 +117,37 @@ namespace MySlugcat
 									spearDamageBonus = Mathf.Max(3f * Mathf.Pow(UnityEngine.Random.value, 10f) - 2.1f, 0.001f);
 								}*/
 
-								spearDamageBonus = spearDamageBonus / creature.Template.baseDamageResistance;
+								float MaxspearDamageBonus = Mathf.Max(spear.spearDamageBonus, spearDamageBonus);
 
-								if (hs.health < spearDamageBonus)
+								//spearDamageBonus = spearDamageBonus / creature.Template.baseDamageResistance;
+
+								if (ModManager.MSC && result.obj is Player player_ && player_.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Gourmand && UnityEngine.Random.value < 0.15f)
+								{
+									//MaxspearDamageBonus /= 10f;
+
+									/*Custom.Log(new string[]
+									{
+										"GOURMAND SAVE!"
+									});*/
+								}
+								if (spear.bugSpear)
+								{
+									MaxspearDamageBonus *= 3f;
+								}
+
+								creature.Violence(weapon.firstChunk, new Vector2?(weapon.firstChunk.vel * weapon.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, MaxspearDamageBonus, 60f);
+
+								if (ModManager.MSC && result.obj is Player player_1)
+								{
+									player_1.playerState.permanentDamageTracking += (double)(MaxspearDamageBonus / player_1.Template.baseDamageResistance);
+									if (player_1.playerState.permanentDamageTracking >= 1.0)
+									{
+										player_1.Die();
+									}
+								}
+								room.PlaySound(SoundID.Spear_Stick_In_Creature, weapon.firstChunk);
+
+								/*if (hs.health < spearDamageBonus)
 								{
 									creature.Die();
 								}
@@ -121,48 +159,59 @@ namespace MySlugcat
 								else
 								{
 									creature.Stun(60);
-								}
+								}*/
 							}
 							else if (weapon is Rock)
 							{
+								weapon.vibrate = 20;
+
+								float stunBonus = 45f;
+								if (ModManager.MMF && MMF.cfgIncreaseStuns.Value && (result.obj is Cicada || result.obj is LanternMouse || (ModManager.MSC && result.obj is Yeek)))
+								{
+									stunBonus = 90f;
+								}
+								if (ModManager.MSC && room.game.IsArenaSession && room.game.GetArenaGameSession.chMeta != null)
+								{
+									stunBonus = 90f;
+								}
+								creature.Violence(weapon.firstChunk, new Vector2?(weapon.firstChunk.vel * weapon.firstChunk.mass), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0.12f, stunBonus);
+
 								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
-								hs.health -= 0.001f;
-								if (creature is Scavenger scavenger)
-								{
-									creature.Stun(90);
-								}
-								else
-								{
-									creature.Stun(90);
-								}
 							}
 							else if (weapon is ScavengerBomb)
 							{
-								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
+								weapon.vibrate = 20;
 
-								hs.health -= 0.01f;
-								creature.Stun(40);
+								creature.Violence(weapon.firstChunk, new Vector2?(weapon.firstChunk.vel * weapon.firstChunk.mass), result.chunk, result.onAppendagePos, Creature.DamageType.Explosion, 0.8f, 85f);
+
+								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
 							}
 							else if (ModManager.Watcher && weapon is Boomerang)
 							{
-								room.PlaySound(WatcherEnums.WatcherSoundID.Boomerang_Collide_Creature, weapon.firstChunk);
+								weapon.vibrate = 20;
+								float stunBonus = 45f;
+								if (ModManager.MMF && MMF.cfgIncreaseStuns.Value && (result.obj is Cicada || result.obj is LanternMouse || (ModManager.MSC && result.obj is Yeek)))
+								{
+									stunBonus = 90f;
+								}
+								if (ModManager.MSC && room.game.IsArenaSession && room.game.GetArenaGameSession.chMeta != null)
+								{
+									stunBonus = 90f;
+								}
 
-								hs.health -= 0.005f;
-								creature.Stun(80);
+								creature.Violence(weapon.firstChunk, new Vector2?(weapon.firstChunk.vel * weapon.firstChunk.mass), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0.15f, stunBonus);
+
+								room.PlaySound(WatcherEnums.WatcherSoundID.Boomerang_Collide_Creature, weapon.firstChunk);
 							}
 							else
 							{
+								creature.Violence(weapon.firstChunk, new Vector2?(weapon.firstChunk.vel * weapon.firstChunk.mass), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0.2f, 20);
+
 								room.PlaySound(SoundID.Rock_Hit_Creature, weapon.firstChunk);
-								hs.health -= Mathf.Max(0.25f * Mathf.Pow(UnityEngine.Random.value, 4f), 0.01f);
-								if (creature is Scavenger scavenger)
-								{
-									creature.Stun(30);
-								}
-								else
-								{
-									creature.Stun(20);
-								}
 							}
+
+							//震动强度
+							weapon.vibrate = 20;
 						}
 					}
 				}

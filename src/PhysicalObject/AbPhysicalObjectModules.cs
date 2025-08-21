@@ -155,6 +155,10 @@ internal static class AbPhysicalObjectModuleManager
 		#region 字段
 		/// <summary> 武器穿透对象 </summary>
 		public PhysicalObject? stuckInObject = null;
+		/// <summary> 武器穿透时长 </summary>
+		public int stuckInObjectTime = 0;
+		/// <summary> 武器穿透次数 </summary>
+		public int penetrateCount = 0;
 		#endregion
 
 

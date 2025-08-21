@@ -36,6 +36,9 @@ namespace MySlugcat
 
         public static bool AllPlayerSkill = false;
 
+		public static bool DebugMode = false;
+		public static bool CheatMode = false;
+
 		public static bool LogDebug = false;
 		public static float Loglevel = 10f;
 

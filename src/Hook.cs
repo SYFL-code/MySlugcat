@@ -73,6 +73,7 @@ namespace MySlugcat
 			On.PuffBall.Explode += PuffBall_Explode;
 			On.FlareBomb.StartBurn += FlareBomb_StartBurn;
 			On.Weapon.Update += Weapon_Update;
+			On.Weapon.HitAnotherThrownWeapon += Weapon_HitAnotherThrownWeapon;
 			if (ModManager.MSC)
 			{
 				On.MoreSlugcats.LillyPuck.HitSomething += LillyPuck_HitSomething;
@@ -1035,6 +1036,22 @@ namespace MySlugcat
 			{
 				Debug.LogException(e);
 			}
+		}
+
+		public static void Weapon_HitAnotherThrownWeapon(On.Weapon.orig_HitAnotherThrownWeapon orig, Weapon weapon, Weapon obj)
+		{
+			bool Execute = true;
+			try
+			{
+				PenetrationSkill.Weapon_HitWeapon(ref Execute, ref weapon, ref obj);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(weapon, obj);
 		}
 
 		private static void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall puffBall)

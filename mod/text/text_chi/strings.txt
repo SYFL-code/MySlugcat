@@ -5,14 +5,10 @@ Accommodator|适应者
 accommodator|适应者
 The accommodator|适应者
 Theaccommodator|适应者
+theaccommodator.LH-name|适应者
 
+theaccommodator.LH-description|从远岸漂泊而来，带着残缺的身体，流浪至此地。<LINE>面对残酷的世界，生命会找到自己的出路...
 Drifting from distant shores, bearing a broken body, wandering to this place.<LINE>Facing a cruel world, Life finds a way...|从远岸漂泊而来，带着残缺的身体，流浪至此地。<LINE>面对残酷的世界，生命会找到自己的出路...
-
-General 1|通用设置1
-General 2|通用设置2
-Tools 1|工具1
-Tools 2|工具2
-Tool Settings|工具设置
 
 KnitmeshSkill|缠绕技能
 Enable Knitmesh Skill (default: false)|启用缠绕技能（默认:否）
@@ -23,7 +19,34 @@ Enable Frame Skill (default: false)|启用嫁祸技能（默认:否）
 
 Log debug|错误日志
 Useful for debugging if you share your log files.|分享你的日志文件可以方便排查错误。
-Copy ID duplicate|复制 ID
-Creates an exact copy of the previous object when duplicating.|复制时创建前一个对象的精确副本。
 Log Level|日志级别
 The maximum value is 10, and the minimum value is 0.|最高值为10，最低值为0。
+
+
+Hello, little creature.|你好小生灵。
+I can see you appear to have undergone some modifications, but they don’t look like Five Pebbles’ work.|我看得出来你似乎经过了一些改造？但看着不太像是五块卵石。
+His own experiments have rotted him from the inside. Perhaps he is completely corrupted now. So he should be incapable of this.|因为他被自己的实验从内部腐化了。也许现在全被腐化了。所以他现在应该没有这样的能力。
+Perhaps you should go to him. If he isn’t entirely lost, he might still be able to help you.|也许你应该去找他。如果他还没有全被腐化，他可能有能力帮助你。
+As you can see, I have no way to help you, nothing to give you—not even my memories.|你也看得出来，我没有任何办法可以帮助你，也没有任何东西可以给你。甚至连我的记忆也不行。
+
+
+Yet another little creature whose days are numbered.|又来了一只时日不多的小生物。
+A small being specially modified by another iterator, but the modification appears to have failed.|一只经过另一个迭代器特殊改造的小生物，但看样子改造失败了。
+From within you, I sense something very faint and dormant, though I’m not sure what it is.|从你的内部，我感受到了一些很微弱的、处于沉眠的东西，但我不确定那是什么。
+They seem able to help you; I could try to awaken them for you. I don’t know what you’ll gain from them, but I hope it helps.|它们似乎可以帮助你，我可以尝试帮你唤醒它们。但我不确定你能从它们中得到什么。但我希望这能帮到你。
+Awaken|唤醒
+
+Decision|判断
+…This…|这……
+Can you feel anything?|你能感觉到什么？
+I can’t be certain what happened, but I’m sure you’ve gained some abilities.|我没法确定发生了什么，但我可以肯定你现在得到了一些能力。
+
+Perhaps I’m just being paranoid.|也许只是我多疑了。
+Nothing has happened…|什么都没有发生……
+
+Forget it—either way, you're stuck in a cycle, a repeating pattern.|算了，反正都是被困在了一个周而复始的循环当中。
+Know that this does not make you special—every living thing shares that same frustration.<LINE>From the microbes in the processing strata to me, who am, if you excuse me, godlike in comparison.|要知道这并不会让你变得与众不同，从处理层中的微生物，到像我这样的——请见谅<LINE>——相对来说如神一般的存在而言，每个生物都遭遇着相同的困境。
+The good news first. Me and my kind have as our<LINE>purpose to solve that very oscillating claustrophobia in the chests of you and countless others.<LINE>A strange charity—you the unknowing recipient, I the reluctant gift. The noble benefactors?<LINE>Gone.|先告诉你好消息。我和我的同类<LINE>的目标，就是解决你和世间万物心中潜藏的那份幽闭恐惧症。<LINE>真是一次奇怪的施舍——你是个一无所知的受益者，而我是个不情不愿的礼物。至于那些高尚的施舍者呢？<LINE>已经不在了。
+The bad news is that no definitive solution has been found. And every moment the equipment erodes to a new state of decay.<LINE>I can't help you collectively, or individually. I can't even help myself.|坏消息是，我们还没有找到确定的答案。而我们的设备每时每刻都因为风化腐蚀的原因变得更糟。<LINE>我救不了天下众生，也救不了你。我甚至救不了我自己。
+For you though, there is another way. The old path. Go to the west past the Farm Arrays, and then down into the earth<LINE>where the land fissures, as deep as you can reach, where the ancients built their temples and danced their silly rituals.|不过对你来说，还有另外一个方法。一条老路。向西穿过农场阵列，然后在大地断裂之处深入地下，<LINE>到你能抵达的最深处，古代文明就在那里建造了他们的神殿并跳着他们愚蠢的仪式舞蹈。
+Not that it solves anyone's problem but yours.|这只能解决你自己的问题，没办法解决其他生灵的。

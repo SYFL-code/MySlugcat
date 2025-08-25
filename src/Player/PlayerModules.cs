@@ -190,7 +190,7 @@ internal static class PlayerModuleManager
 		public bool KnitmeshSkill = false;
 		/// <summary> 感知能力 </summary>
 		public bool PerceptionSkill = false;
-		/// <summary> 暴食能力 </summary>
+		/// <summary> 吞食能力 </summary>
 		public bool DigestionSkill = false;
 		/// <summary> 死灵能力 死灵法师 </summary>
 		public bool SpawnNecrophytes = false;
@@ -200,6 +200,8 @@ internal static class PlayerModuleManager
 		public bool KillingAuraSkill = false;
 		/// <summary> 穿透能力 </summary>
 		public bool PenetrationSkill = false;
+		/// <summary> 电弧连锁 </summary>
+		public bool ArcLightningSkill = false;
 		/// <summary> 迅捷能力 </summary>
 		public int Swift = 0;
 
@@ -209,49 +211,51 @@ internal static class PlayerModuleManager
 		#region 通行证字段
 		// Vanilla
 		/// <summary> "求生者" </summary>
-		private const string TheSurvivorPassage = "The Survivor";
+		public const string TheSurvivorPassage = "The Survivor";
 		/// <summary> "猎手" </summary>
-		private const string TheHunterPassage = "The Hunter";
+		public const string TheHunterPassage = "The Hunter";
 		/// <summary> "圣徒" </summary>
-		private const string TheSaintPassage = "The Saint";
+		public const string TheSaintPassage = "The Saint";
 		/// <summary> "漫游者" </summary>
-		private const string TheWandererPassage = "The Wanderer";
+		public const string TheWandererPassage = "The Wanderer";
 		/// <summary> "酋长" </summary>
-		private const string TheChieftainPassage = "The Chieftain";
+		public const string TheChieftainPassage = "The Chieftain";
 		/// <summary> "僧侣" </summary>
-		private const string TheMonkPassage = "The Monk";
+		public const string TheMonkPassage = "The Monk";
 		/// <summary> "暴徒" </summary>
-		private const string TheOutlawPassage = "The Outlaw";
+		public const string TheOutlawPassage = "The Outlaw";
 		/// <summary> "屠龙者" </summary>
-		private const string TheDragonSlayerPassage = "The Dragon Slayer";
+		public const string TheDragonSlayerPassage = "The Dragon Slayer";
 		/// <summary> "学者" </summary>
-		private const string TheScholarPassage = "The Scholar";
+		public const string TheScholarPassage = "The Scholar";
 		/// <summary> "朋友" </summary>
-		private const string TheFriendPassage = "The Friend";
+		public const string TheFriendPassage = "The Friend";
 
 		// ModManager.MSC
 		/// <summary> "流浪者" </summary>
-		private const string TheNomadPassage = "The Nomad";
+		public const string TheNomadPassage = "The Nomad";
 		/// <summary> "殉道者" </summary>
-		private const string TheMartyrPassage = "The Martyr";
+		public const string TheMartyrPassage = "The Martyr";
 		/// <summary> "朝圣者" </summary>
-		private const string ThePilgrimPassage = "The Pilgrim";
+		public const string ThePilgrimPassage = "The Pilgrim";
 		/// <summary> "慈母" </summary>
-		private const string TheMotherPassage = "The Mother";
+		public const string TheMotherPassage = "The Mother";
 
 		// The Vanguard
 		/// <summary> "龙王" </summary>
-		private const string TheDragonlordPassage = "The Dragonlord";
+		public const string TheDragonlordPassage = "The Dragonlord";
 		// Rotund World
 		/// <summary> "贪食者" </summary>
-		private const string TheGluttonPassage = "The Glutton";
+		public const string TheGluttonPassage = "The Glutton";
 		#endregion
 
 		#region 按键Key
 		// player.input[0].jmp 玩家当前帧是否按下跳跃键
 		// player.input[1].jmp 玩家上一帧是否按下跳跃键
 
-		//按下按键的时长(40次 = 1秒)
+		public bool blockinput = false;
+
+		//按下按键的时长(40次 = 1秒)?
 		//jump 跳跃键
 		public int JmpCounter = 0;
 		//pckp 拾取键
@@ -333,6 +337,7 @@ internal static class PlayerModuleManager
 			FixedSkill = false;
 			KillingAuraSkill = false;
 			PenetrationSkill = false;
+			ArcLightningSkill = false;
 			Swift = 0;
 
 			if (player.slugcatStats.name == Plugin.YourSlugID || Control.AllPlayerSkill)
@@ -342,15 +347,16 @@ internal static class PlayerModuleManager
 				Hunger = true;
 				VisionSystem = true;
 
-				FrameSkill = true;//
+				FrameSkill = false;//
 				DeflagrationSkill = true;//
-				KnitmeshSkill = true;//
+				KnitmeshSkill = false;//
 				PerceptionSkill = true;//
-				DigestionSkill = true;//
-				SpawnNecrophytes = true;//
+				DigestionSkill = false;//
+				SpawnNecrophytes = false;//
 				FixedSkill = false;
-				KillingAuraSkill = true;//
-				PenetrationSkill = true;//
+				KillingAuraSkill = false;//f
+				PenetrationSkill = false;//
+				ArcLightningSkill = false;//
 				Swift = 0;
 
 				var session = player?.room?.game?.GetStorySession;
@@ -416,6 +422,17 @@ internal static class PlayerModuleManager
 
 			}
 		}
+
+
+		public static bool HasPassage(Player player, string passageName)
+		{
+			if (player?.room?.game?.GetStorySession?.saveState?.deathPersistentSaveData?.winState is not WinState winState)
+				return false;
+
+			return winState.endgameTrackers.Any(t => t.GoalFullfilled &&
+													   WinState.PassageDisplayName(t.ID) == passageName);
+		}
+
 	}
 }
 

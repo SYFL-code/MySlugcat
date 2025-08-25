@@ -30,14 +30,19 @@ namespace MySlugcat
 	public static class Extension
 	{
 
-		public static int RandomValue(int min, int max)
+		public static int Random(int min, int max)
 		{
 			return UnityEngine.Random.Range(min, max);
 		}
 
-		public static float RandomValue(float min, float max)
+		public static float Random(float min, float max)
 		{
 			return UnityEngine.Random.Range(min, max);
+		}
+
+		public static Vector2 Random(float xMin, float xMax, float yMin, float yMax)
+		{
+			return new Vector2(UnityEngine.Random.Range(xMin, xMax), UnityEngine.Random.Range(yMin, yMax));
 		}
 
 		/// <summary>
@@ -124,7 +129,7 @@ namespace MySlugcat
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static HSLColor ToGrayscale(this HSLColor hsl, float strength = 1f)
 		{
-			strength = MathHelper.Clamp(strength, 0f, 1f);
+			strength = Mathf.Clamp(strength, 0f, 1f);
 
 			// 用 Vector3 一次性做乘加，JIT 会自动展开为 SIMD
 			Vector3 rgb = new(hsl.rgb.r, hsl.rgb.g, hsl.rgb.b);
@@ -132,10 +137,11 @@ namespace MySlugcat
 
 			return new HSLColor(
 				hue: hsl.hue,
-				saturation: MathHelper.Lerp(hsl.saturation, 0f, strength),
-				lightness: MathHelper.Lerp(hsl.lightness, grayLightness, strength)
+				saturation: Mathf.Lerp(hsl.saturation, 0f, strength),
+				lightness: Mathf.Lerp(hsl.lightness, grayLightness, strength)
 			);
 		}
+
 		/*public static HSLColor ToGrayscale(this HSLColor hsl, float strength = 1f)
 		{
 			strength = Mathf.Clamp01(strength);
@@ -246,7 +252,7 @@ namespace MySlugcat
 		/// <summary>
 		/// 查找获取一定范围内所有生物
 		/// </summary>
-		public static List<Creature> CreaturesInRange(Room room, Vector2 centerPos, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature, Player? player = null, bool IncludeTameCreature = false)
+		public static List<Creature> CreaturesInRange(Vector2 centerPos, Room room, float radius, bool IncludePlayer, Creature creature, bool IncludeSpecificCreature, bool IncludeDeadCreature, Player? player = null, bool IncludeTameCreature = false)
 		{
 			List<(Creature creature, float sqrDistance)> results = new List<(Creature, float)>();
 			float radiusSquared = radius * radius;
@@ -368,6 +374,58 @@ namespace MySlugcat
 			}
 			//return creatures[UnityEngine.Random.Range(0, creatures.Count)];
 			return nearest; // 返回最近生物（可能为null）
+		}
+
+		/// <summary>
+		/// 扇形范围内找最近生物（排除自身、可选玩家/死亡）
+		/// </summary>
+		public static Creature? FindNearestCreatureDirection(
+			Vector2 selfPos,
+			Room room,
+			bool includePlayer,
+			Creature? exclude,
+			bool includeDead,
+			Vector2 forward,          // 正前方向量（不必单位化）
+			float maxAngleDeg,        // 扇形 半 角（度）
+			float maxDist,
+			int filter = 0)           // 0=全部 1=非禁用 2=非无害
+		{
+			if (room?.abstractRoom?.creatures == null) return null;
+			if (forward.sqrMagnitude < 1E-4f) return null;
+
+			Creature? nearest = null;
+			float minDistSq = float.MaxValue;
+			Vector2 dirNorm = forward.normalized;
+			float cosLimit = Mathf.Cos(maxAngleDeg * Mathf.Deg2Rad);
+
+			foreach (var abs in room.abstractRoom.creatures)
+			{
+				var c = abs.realizedCreature;
+				if (c == null || c == exclude || c.mainBodyChunk == null) continue;
+
+				Vector2 toTarget = c.mainBodyChunk.pos - selfPos;
+				float distSq = toTarget.sqrMagnitude;
+				if (distSq > maxDist * maxDist) continue;
+
+				if (!includePlayer && c is Player) continue;
+				if (!includeDead && c.dead) continue;
+
+				if (filter == 1 && DisabledCreature(c)) continue;
+				if (filter == 2 && IsHarmlessCreature(c)) continue;
+
+				// 扇形检测：向量夹角余弦 ≥ cosLimit
+				if (Vector2.Dot(dirNorm, toTarget.normalized) < cosLimit) continue;
+
+				Trace(selfPos, c.mainBodyChunk.pos, room, out bool isTerrain);
+				if (isTerrain) continue;
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = c;
+				}
+			}
+			return nearest;
 		}
 
 		/// <summary>
@@ -493,9 +551,35 @@ namespace MySlugcat
 		}
 
 
+		// 方法名：路径修正（检测闪电路径是否碰撞地形）
+		public static Vector2 Trace(Vector2 start, Vector2 end, Room room, out bool isTerrain)
+		{
+			// 计算从起点到终点的方向向量（归一化）
+			Vector2 Direction = Custom.DegToVec(Custom.AimFromOneVectorToAnother(start, end));
+
+			// 核心逻辑：射线检测起点到终点之间是否碰撞地形
+			// 返回值intVector为碰撞的格子坐标（若无碰撞则返回null）
+			IntVector2? intVector = SharedPhysics.RayTraceTilesForTerrainReturnFirstSolid(room, start, end);
+
+			if (intVector != null)
+			{
+				// 标记闪电碰撞到地形（用于后续特效）
+				isTerrain = true;
+
+				// 计算修正后的终点位置（避免闪电穿透地形视觉效果）
+				// 方案：取碰撞格子的中心坐标，并向反方向微调7单位
+				return room.MiddleOfTile(intVector.Value) - Direction * 7f;
+			}
+
+			// 无碰撞时保持原始终点
+			isTerrain = false;
+			return start;
+		}
+
+
 	}
 
-	internal static class MathHelper
+	/*internal static class MathHelper
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Clamp(float v, float min, float max) =>
@@ -504,7 +588,7 @@ namespace MySlugcat
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float Lerp(float a, float b, float t) =>
 			a + (b - a) * t;
-	}
+	}*/
 
 
 }

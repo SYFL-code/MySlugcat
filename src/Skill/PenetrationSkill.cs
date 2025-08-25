@@ -43,6 +43,7 @@ namespace MySlugcat
 					weaponModule.stuckInObject = null;
 					weaponModule.stuckInObjectTime = 0;
 					weaponModule.penetrateCount = 0;
+					//weaponModule.originalVel = Vector2.zero;
 				}
 			}
 
@@ -55,8 +56,12 @@ namespace MySlugcat
 			if (weapon.thrownBy != null && (weapon.mode != Weapon.Mode.Thrown && weapon.mode != Weapon.Mode.StuckInCreature) && weapon.thrownBy is Player player_ && player_.GetModule().PenetrationSkill)
 			{
 				weapon.thrownBy = null;
-				weapon.firstChunk.owner = null;
 			}
+
+			/*if (weapon.firstChunk.owner != null && (weapon.mode != Weapon.Mode.Thrown && weapon.mode != Weapon.Mode.StuckInCreature) && weapon.firstChunk.owner is Player player__ && player__.GetModule().PenetrationSkill)
+			{
+				weapon.firstChunk.owner = null;
+			}*/
 		}
 
 		public static void Weapon_HitWeapon<T>(
@@ -69,7 +74,10 @@ namespace MySlugcat
 				return;
 			}
 
-			if (weapon.thrownBy is Player player && player.GetModule().PenetrationSkill)
+			bool flag = weapon.thrownBy is Player player && player.GetModule().PenetrationSkill;
+			bool flag_ = obj.thrownBy is Player player_ && player_.GetModule().PenetrationSkill;
+
+			if (flag || flag_)
 			{
 				Room room = weapon.room;
 				if (room != null)
@@ -93,7 +101,14 @@ namespace MySlugcat
 							new Color(1f, 1f, 1f), null, 10, 170));
 					}
 					Vector2 vector2 = Custom.DegToVec(UnityEngine.Random.value * 360f);
-					obj.WeaponDeflect(vector, -vector2, weapon.firstChunk.vel.magnitude);
+					if (flag_)
+					{
+						weapon.WeaponDeflect(vector, vector2, weapon.firstChunk.vel.magnitude);
+					}
+					if (flag)
+					{
+						obj.WeaponDeflect(vector, -vector2, weapon.firstChunk.vel.magnitude);
+					}
 					room.PlaySound(SoundID.Spear_Bounce_Off_Creauture_Shell, vector, weapon.abstractPhysicalObject);
 				}
 			}
@@ -123,7 +138,7 @@ namespace MySlugcat
 					AbPhysicalObjectModule weaponModule = weapon.abstractPhysicalObject.GetModule();
 					if (weaponModule != null)
 					{
-						if (weaponModule.stuckInObject != creature || weaponModule.stuckInObjectTime > 3)
+						if (weaponModule.stuckInObject != creature || weaponModule.stuckInObjectTime > 30)
 						{
 							weaponModule.stuckInObject = creature;
 							weaponModule.stuckInObjectTime = 1;
@@ -133,7 +148,7 @@ namespace MySlugcat
 								weaponModule.penetrateCount = 0;
 							}
 
-							if (UnityEngine.Random.value * 10f > Math.Max(6.8f, 12f - weaponModule.penetrateCount))
+							if (UnityEngine.Random.value * 10f > Mathf.Max(6.6f, 12f - weaponModule.penetrateCount))
 							{
 								return return_;
 							}
@@ -171,7 +186,7 @@ namespace MySlugcat
 								}*/
 
 								float MaxspearDamageBonus = Mathf.Max(spear.spearDamageBonus, spearDamageBonus);
-								MaxspearDamageBonus *= Math.Max(0.6f, 1.1f - 0.1f * weaponModule.penetrateCount);
+								MaxspearDamageBonus *= Mathf.Max(0.6f, 1.1f - 0.1f * weaponModule.penetrateCount);
 
 								//spearDamageBonus = spearDamageBonus / creature.Template.baseDamageResistance;
 
@@ -266,6 +281,16 @@ namespace MySlugcat
 
 							//震动强度
 							weapon.vibrate = 20;
+
+							Log.OutputLog($"Spear _OK1");
+							HashSet<Creature> hit = new HashSet<Creature>();
+							hit.Add(creature);
+							room.AddObject(new ArcLightning(weapon.firstChunk.pos, creature, weapon.firstChunk.vel.normalized, 60f, weapon.thrownBy, ref hit));
+							Log.OutputLog($"Spear _OK2");
+
+
+							// 屏幕震动
+							//room.ScreenMovement(null, dir, strength);
 						}
 						else
 						{

@@ -49,6 +49,7 @@ namespace MySlugcat
 			//Content.Register(new EnderPearlFisob());
 			//玩家能力
 			Hook.HookOn();
+			Conversation.Hook();
 			//Perception.Hook();
 			//IntelHUD.Hook();
 			//PointerSkillHook.Hook();

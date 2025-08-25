@@ -93,7 +93,7 @@ namespace MySlugcat
 		//public FSprite background;
 		public FSprite[,] pixelGrid;
 
-		public float gridX = 700;
+		public float gridX = 1000;
 		public float gridY = 400;
 
 		public float pixelSize = 50; // 每个"像素"的大小
@@ -117,9 +117,11 @@ namespace MySlugcat
 
 		public VisionSystem(HUD.HUD hud) : base(hud)
 		{
+			int w = Screen.width;
+			int h = Screen.height;
 			pixelSize = Control.pixelSize; // 每个"像素"的大小
-			gridWidth = (int)Math.Ceiling(gridX * 2 / pixelSize); // 网格宽度(像素数)
-			gridHeight = (int)Math.Ceiling(gridY * 2 / pixelSize); // 网格高度(像素数)
+			gridWidth = (int)Math.Ceiling(Mathf.Max(gridX * 2, w) / pixelSize); // 网格宽度(像素数)
+			gridHeight = (int)Math.Ceiling(Mathf.Max(gridY * 2, h) / pixelSize); // 网格高度(像素数)
 			Alpha = Control.Alpha;
 
 			// 创建容器
@@ -207,6 +209,10 @@ namespace MySlugcat
 			{
 				Clear = 0.025f;
 				HOLE_COLOR = new Color(1f, 1f, 1f);
+			}
+			else
+			{
+				HOLE_COLOR = new Color(0f, 0f, 0f);
 			}
 
 			if (Clear != 0)

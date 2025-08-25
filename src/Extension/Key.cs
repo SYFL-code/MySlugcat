@@ -27,11 +27,11 @@ namespace MySlugcat
     //按键输入
     public class Key
     {
-        // player.input[0].jmp 玩家当前帧是否按下跳跃键
-        // player.input[1].jmp 玩家上一帧是否按下跳跃键
+		// player.input[0].jmp 玩家当前帧是否按下跳跃键
+		// player.input[1].jmp 玩家上一帧是否按下跳跃键
 
-        //按下按键的时长(40次 = 1秒)
-        /*//jump 跳跃键
+		//按下按键的时长(40次 = 1秒)
+		/*//jump 跳跃键
         public static int[] JmpCounter = Enumerable.Repeat(0, 100).ToArray();
         //pckp 拾取键
         public static int[] pckpCounter = Enumerable.Repeat(0, 100).ToArray();
@@ -55,6 +55,45 @@ namespace MySlugcat
         {
             On.Player.Update += Player_Update;
         }*/
+
+		public static void Player_checkInput(ref bool Execute, ref Player player)
+		{
+			if (player.GetModule().blockinput)
+			{
+				Execute = false;
+
+				int playerNumber = player.playerState.playerNumber;
+				if (ModManager.MSC && player.abstractCreature.world.game.IsArenaSession &&
+					player.abstractCreature.world.game.GetArenaGameSession.chMeta != null)
+				{
+					playerNumber = 0;
+				}
+
+				if (player.stun == 0 && !player.dead)
+				{
+					if (player.controller != null)
+					{
+						player.input[0] = player.controller.GetInput();
+					}
+					else
+					{
+						if (player.AI != null)
+						{
+							player.AI.Update();
+						}
+						else
+						{
+							player.input[0] = RWInput.PlayerInput(playerNumber);
+						}
+					}
+				}
+				player.pointInput = player.input[0];
+				player.input[0].x = 0;
+				player.input[0].y = 0;
+				Player.InputPackage[] input = player.input;
+				player.input[0].analogueDir = input[0].analogueDir * 0f;
+			}
+		}
 
 		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
         {
@@ -201,9 +240,11 @@ namespace MySlugcat
 				}
 			}
 
-            //int N = player.playerState.playerNumber;
+			module.blockinput = false;
 
-            /*//jmp
+			//int N = player.playerState.playerNumber;
+
+			/*//jmp
             if (player.input[0].jmp)
             {
                 JmpCounter++;
@@ -346,7 +387,7 @@ namespace MySlugcat
 
 
 
-        }
+		}
     }
 }
 

@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 
 namespace MySlugcat
 {
-	//暴食能力
+	//吞食能力
 	public class DigestionSkill
 	{
 

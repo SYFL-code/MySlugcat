@@ -33,7 +33,7 @@ namespace MySlugcat
 		Options()
 		{
 			//设置默认值
-			PixelSize = config.Bind<float>("PixelSize_conf", 10f);
+			PixelSize = config.Bind<float>("PixelSize_conf", 7f);
 			Alpha = config.Bind<float>("Alpha_conf", 0.9f);
 
 			AllPlayerSkill = config.Bind<bool>("AllPlayerSkill_conf", false);

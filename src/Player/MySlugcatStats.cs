@@ -66,7 +66,7 @@ namespace MySlugcat
 			}
 		}
 
-		private static int HungerDegree = (int)(40 * 60 * Extension.RandomValue(5f, 10f));
+		private static int HungerDegree = (int)(40 * 60 * Extension.Random(5f, 10f));
 
 		public static void Player_Update(ref bool Execute, ref On.Player.orig_Update orig, ref Player player, ref bool eu)
 		{
@@ -113,7 +113,7 @@ namespace MySlugcat
 					{
 						if (--HungerDegree <= 0)
 						{
-							HungerDegree = (int)(40 * 60 * Extension.RandomValue(3f, 10f));
+							HungerDegree = (int)(40 * 60 * Extension.Random(3f, 10f));
 
 							if (!Extension.SubtractQuarterFood(player, 1))
 							{

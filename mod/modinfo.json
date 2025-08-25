@@ -4,7 +4,7 @@
 	"version": "0.1.0",
 	"authors": "LH",
 	"description": "Drifting from distant shores, bearing a broken body, wandering to this place.<LINE>Facing a cruel world, Life finds a way...",
-	"requirements": [ "slime-cubed.slugbase", "fluffball.custompassages", "fisobs", "improved-input-config" ],
-	"requirements_names": [ "SlugBase", "Custom Passage Support", "Fisobs", "Improved Input Config: Extended" ],
+	"requirements": [ "slime-cubed.slugbase", "dressmyslugcat", "fluffball.custompassages", "fisobs", "improved-input-config" ],
+	"requirements_names": [ "SlugBase", "Dress My Slugcat", "Custom Passage Support", "Fisobs", "Improved Input Config: Extended" ],
 	"tags": [ "Custom Slugcat" ]
 }

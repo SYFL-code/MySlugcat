@@ -34,9 +34,14 @@ namespace MySlugcat
 		{
 			On.RainWorldGame.Update += RainWorldGame_Update;
 
+			On.PhysicalObject.TerrainImpact += PhysicalObject_TerrainImpact;
+
+			On.RoomCamera.Update += RoomCamera_Update;
+
 			#region Player
 			On.Player.ctor += Player_ctor;
 			On.Player.Update += Player_Update;
+			On.Player.checkInput += Player_checkInput;
 			On.Player.MovementUpdate += Player_MovementUpdate;
 			On.Player.SwallowObject += Player_SwallowObject;
 			On.Player.ThrownSpear += Player_ThrownSpear;
@@ -154,7 +159,40 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 		}
-		
+
+		public static void PhysicalObject_TerrainImpact(On.PhysicalObject.orig_TerrainImpact orig, PhysicalObject physicalObject, int chunk, IntVector2 direction, float speed, bool firstContact)
+		{
+			bool Execute = true;
+
+			try
+			{
+				//ArcLightningSkill.ArcLightningTerrainImpact(ref Execute, ref physicalObject);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(physicalObject, chunk, direction, speed, firstContact);
+		}
+
+		public static void RoomCamera_Update(On.RoomCamera.orig_Update orig, RoomCamera roomCamera)
+		{
+			bool Execute = true;
+
+			orig(roomCamera);
+			try
+			{
+				Camera.RoomCamera_Update(ref Execute, ref roomCamera);
+				if (!Execute) return;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+		}
+
 		#region Player
 		private static void Player_ctor(On.Player.orig_ctor orig, Player player, AbstractCreature abstractCreature, World world)
 		{
@@ -237,6 +275,23 @@ namespace MySlugcat
 			{
 				Debug.LogException(e);
 			}
+		}
+
+		public static void Player_checkInput(On.Player.orig_checkInput orig, Player player)
+		{
+			bool Execute = true;
+			try
+			{
+				Key.Player_checkInput(ref Execute, ref player);
+				if (!Execute) return;
+
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
+			}
+
+			orig(player);
 		}
 
 		public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player player, int grasp)
@@ -821,6 +876,8 @@ namespace MySlugcat
 				if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref spear, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
 
@@ -830,7 +887,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(spear, result, eu);
-			Log.OutputLog($"Spear ret({ret})_");
+			//Log.OutputLog($"Spear ret({ret})_");
 			return ret;
 		}
 
@@ -844,8 +901,9 @@ namespace MySlugcat
 				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
+				//if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
-				//ret = PenetrationSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -854,7 +912,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(bomb, result, eu);
-			Log.OutputLog($"Rock ret({ret})_");
+			//Log.OutputLog($"Rock ret({ret})_");
 			return ret;
 		}
 
@@ -867,8 +925,9 @@ namespace MySlugcat
 			{
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref rock, ref result, ref eu);
+				//if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref rock, ref result, ref eu);
-				//ret = PenetrationSkill.Rock_HitSomething(ref Execute, ref ret, ref orig, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -877,7 +936,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(rock, result, eu);
-			Log.OutputLog($"Rock ret({ret})_");
+			//Log.OutputLog($"Rock ret({ret})_");
 			return ret;
 		}
 
@@ -889,6 +948,8 @@ namespace MySlugcat
 			{
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
 				if (!Execute) return ret;
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
+				//if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
 				if (!Execute) return ret;
 
@@ -898,7 +959,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(boomerang, result, eu);
-			Log.OutputLog($"boomerang ret({ret})_");
+			//Log.OutputLog($"boomerang ret({ret})_");
 			return ret;
 		}
 
@@ -910,6 +971,8 @@ namespace MySlugcat
 			{
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
 				if (!Execute) return ret;
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
+				//if (!Execute) return ret;
 
 			}
 			catch (Exception e)
@@ -917,7 +980,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(lillyPuck, result, eu);
-			Log.OutputLog($"lillyPuck ret({ret})_");
+			//Log.OutputLog($"lillyPuck ret({ret})_");
 			return ret;
 		}
 
@@ -929,14 +992,15 @@ namespace MySlugcat
 			{
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
 				if (!Execute) return ret;
-
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
+				//if (!Execute) return ret;
 			}
 			catch (Exception e)
 			{
 				Debug.LogException(e);
 			}
 			ret = orig(puffBall, result, eu);
-			Log.OutputLog($"PuffBall ret({ret})_");
+			//Log.OutputLog($"PuffBall ret({ret})_");
 			return ret;
 		}
 
@@ -947,8 +1011,9 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
+				//if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
-				//ret = PenetrationSkill.Weapon_HitSomething(ref Execute, ref ret, ref orig, ref weapon, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -957,7 +1022,7 @@ namespace MySlugcat
 				Debug.LogException(e);
 			}
 			ret = orig(weapon, result, eu);
-			Log.OutputLog($"Weaponret({ret})_");
+			//Log.OutputLog($"Weaponret({ret})_");
 			return ret;
 		}
 

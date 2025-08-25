@@ -14,6 +14,7 @@ using static MySlugcat.AbPhysicalObjectModuleManager;
 using On;
 using IL;
 using RewiredConsts;
+using static Menu.Remix.InternalOI;
 
 
 namespace MySlugcat;
@@ -145,6 +146,36 @@ internal static class AbPhysicalObjectModuleManager
 		finally { _rwLock.ExitWriteLock(); }
 	}
 
+	public static AbPhysicalObjectModule GetModuleE(this AbstractPhysicalObject abPhysicalObject, out AbPhysicalObjectModule module)
+	{
+		_rwLock.EnterReadLock();
+		try
+		{
+			if (AbPhysicalObjectModules.TryGetValue(abPhysicalObject, out var module_))
+			{
+				module = module_;
+				return module_;
+			}
+		}
+		finally { _rwLock.ExitReadLock(); }
+
+		_rwLock.EnterWriteLock();
+		try
+		{
+			// 玩家不存在于 AbPhysicalObjectModules 中时，创建并注册模块
+			AbPhysicalObjectModule module__ = new AbPhysicalObjectModule(abPhysicalObject);
+			AbPhysicalObjectModules.Add(abPhysicalObject, module__);
+			if (!_activeAbPhysicalObjects.Contains(abPhysicalObject))
+			{
+				_activeAbPhysicalObjects.Add(abPhysicalObject);
+				_dirty = true;
+			}
+			module = module__;
+			return module__;
+		}
+		finally { _rwLock.ExitWriteLock(); }
+	}
+
 
 
 	internal class AbPhysicalObjectModule
@@ -159,6 +190,11 @@ internal static class AbPhysicalObjectModuleManager
 		public int stuckInObjectTime = 0;
 		/// <summary> 武器穿透次数 </summary>
 		public int penetrateCount = 0;
+		///// <summary> 武器原始速度 </summary>
+		//public Vector2 originalVel = Vector2.zero;
+
+		///// <summary> 电击中 </summary>
+		//public bool ElectricShocking = false;
 		#endregion
 
 

@@ -83,7 +83,7 @@ namespace MySlugcat
 
 						// 执行你的操作
 						//List<Creature> creatures = Extension.CreaturesInRange(player.room, player.mainBodyChunk.pos, Radius, false, player, true, false, player, false);
-						var creatures = Extension.CreaturesInRange(player.room, player.mainBodyChunk.pos, Radius, false, player, true, false, player, false) ?? new List<Creature>();
+						var creatures = Extension.CreaturesInRange(player.mainBodyChunk.pos, player.room, Radius, false, player, true, false, player, false) ?? new List<Creature>();
 						if (creatures != null && creatures.Count > 0)
 						{
 							foreach (Creature creature in creatures)

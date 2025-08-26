@@ -29,321 +29,23 @@ using Noise;
 using static Menu.Remix.InternalOI;
 using System.Threading;
 
-
 namespace MySlugcat
 {
 	/// <summary> 电弧连锁 </summary>
-	public class ArcLightning : UpdatableAndDeletable
+	public class ArcLightning
 	{
-		private LightningMachine? arcEmitter;
-		public HashSet<Creature> ElectricCreatures = new HashSet<Creature>();
-
-		public int depth;
-		private Vector2 start;
-		private Creature? startCreature;
-		private Creature? endCreature;
+		private Creature initialCreature;    // 初始生物（闪电起点）
 		private Vector2 direction;
-		private float maxAngleDeg;
+		private Room room;
 		private Creature thrownBy;
-		private int lifetime;
+		private Creature sourceCreature;
+		private float maxAngle;
+		private float maxDistance;
+		private int chainCount; // 连锁次数计数器
+		private int maxChains; // 最大连锁次数
 
-		const int MAX_LIFETIME = 400;
-		const float CHAIN_RADIUS = 300f;      // 半径
-		const int MAX_RECURSION_DEPTH = 8;    // 深度
-		const int FORKS_PER_HIT = 3;          // 分叉
-		const int MAX_TOTAL_FORKS = 50;
-		static int totalForks = 0;
-
-		public ArcLightning(Vector2 start_, Creature? startCreature_, Vector2 direction_, float maxAngleDeg_, Creature thrownBy_, ref HashSet<Creature> ElectricCreatures_, int depth_ = 0)
-		{
-			depth = depth_;
-			start = start_;
-			startCreature = startCreature_;
-			direction = direction_;
-			maxAngleDeg = maxAngleDeg_;
-			thrownBy = thrownBy_;
-			lifetime = MAX_LIFETIME;
-
-			// 添加深度限制
-			/*if (depth >= MAX_RECURSION_DEPTH || room == null || slatedForDeletetion || totalForks > MAX_TOTAL_FORKS)
-			{
-				Destroy();
-				slatedForDeletetion = true;
-				return;
-			}*/
-			ElectricCreatures = ElectricCreatures_;
-			if (depth == 0)
-			{
-				ElectricCreatures.Clear();
-			}
-			Interlocked.Increment(ref totalForks);
-			//totalForks += 1;
-			if (startCreature != null)
-			{
-				start = startCreature.firstChunk.pos;
-			}
-
-			Creature? c = Extension.FindNearestCreatureDirection(start, room, true, thrownBy, true, direction, maxAngleDeg, CHAIN_RADIUS);
-			if (c != null && !ElectricCreatures.Contains(c))
-			{
-				Vector2 end = c.firstChunk.pos;
-				float radius = (end - start).sqrMagnitude;
-
-				if (radius < CHAIN_RADIUS * CHAIN_RADIUS)
-				{
-					endCreature = c;
-					ElectricCreatures.Add(c);
-
-					//if (c is not BigEel && !CheckElectricCreature(c))
-					//{
-					//	c.Violence(thrownBy.firstChunk, new Vector2?(Custom.DirVec(start, end) * 5f), c.firstChunk, null, Creature.DamageType.Electric, 0.8f, (c is not Player) ? (320f * Mathf.Lerp(c.Template.baseStunResistance, 1f, 0.5f)) : 140f);
-					//	room.AddObject(new CreatureSpasmer(c, false, c.stun));
-					//	lifetime = c.stun;
-					//}
-					//if (c.Submersion > 0.5f)
-					//{
-					//	room.AddObject(new UnderwaterShock(room, null, end, 10, 800f, 2f, thrownBy, new Color(0.8f, 0.8f, 1f)));
-					//}
-
-					//room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, c.firstChunk);
-					//room.AddObject(new Explosion.ExplosionLight(start, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
-
-					// 在房间里生成一个一次性电弧放射器
-					arcEmitter = new LightningMachine(
-						pos: start,
-						startPoint: Vector2.zero,
-						endPoint: end - start,  // 200px 半径
-						chance: 0.8f,                    // 高概率
-						permanent: false,
-						radial: true,                    // 放射
-						width: 0.5f,
-						intensity: 1f,
-						lifeTime: 9999f);                  // 20 帧后消失
-
-					arcEmitter.lightningType = 0.66f;
-
-					room.AddObject(arcEmitter);
-				}
-			}
-
-
-		}
-
-		public override void Update(bool eu)
-		{
-			base.Update(eu);
-
-			if (slatedForDeletetion)
-			{
-				return;
-			}
-			if (room == null)
-			{
-				Destroy();
-				slatedForDeletetion = true;
-				return;
-			}
-
-			if (lifetime > 0)
-			{
-				lifetime--;
-			}
-			else
-			{
-				Destroy();
-				slatedForDeletetion = true;
-				return;
-			}
-			//if (MAX_LIFETIME - lifetime == 30)
-			//{
-			//	room.AddObject(new ArcLightning(start, startCreature, direction, maxAngleDeg, thrownBy, ref ElectricCreatures, depth + 1));
-			//}
-
-			if (arcEmitter != null)
-			{
-				arcEmitter.chance = 0.8f * (lifetime / MAX_LIFETIME);
-				if (lifetime % 20 == 0)
-				{
-					if (startCreature != null)
-					{
-						start = startCreature.firstChunk.pos;
-					}
-					Creature? c = Extension.FindNearestCreatureDirection(start, room, true, thrownBy, true, direction, maxAngleDeg, CHAIN_RADIUS);
-					if (c != null && (!ElectricCreatures.Contains(c) || c == endCreature))
-					{
-						Vector2 end = c.firstChunk.pos;
-						float radius = (end - start).sqrMagnitude;
-
-						if (radius < CHAIN_RADIUS * CHAIN_RADIUS)
-						{
-							endCreature = c;
-							ElectricCreatures.Add(c);
-
-							arcEmitter.pos = start;
-							arcEmitter.endPoint = end - start;
-							room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, c.firstChunk);
-						}
-					}
-
-				}
-			}
-		}
-
-		// Token: 0x06000C13 RID: 3091 RVA: 0x0009B489 File Offset: 0x00099689
-		public override void Destroy()
-		{
-			base.Destroy();
-			slatedForDeletetion = true;
-			Interlocked.Decrement(ref totalForks);
-			if (arcEmitter != null)
-			{
-				arcEmitter.Destroy();
-			}
-			if (depth == 0)
-			{
-				ElectricCreatures.Clear();
-				totalForks = 0;
-			}
-		}
-
-		public static bool CheckElectricCreature(Creature otherObject)
-		{
-			return otherObject is Centipede || otherObject is BigJellyFish || otherObject is Inspector;
-		}
-
-
-		/*public void ArcLightning1(Weapon weapon, Vector2 start, Vector2 direction, float maxAngleDeg, ref HashSet<Creature> ElectricCreatures, int depth = 0)
-		{
-			if (depth == 0)
-			{
-				ElectricCreatures.Clear();
-				totalForks = 0;
-			}
-
-			if (totalForks >= MAX_TOTAL_FORKS) return;
-			totalForks++;
-
-			// 添加深度限制
-			if (depth >= MAX_RECURSION_DEPTH)
-			{
-				return;
-			}
-
-			for (int fork = 0; fork < FORKS_PER_HIT; fork++)
-			{
-				if (Extension.Random(0f, 1f) < Mathf.Min(0.05f + depth * 0.08f, 0.95f))
-				{
-					float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-					angle += Extension.Random(-60f, 60f);
-					Vector2 newDir = Custom.DegToVec(angle);
-					//ArcLightning(weapon, start, newDir, maxAngleDeg, ref ElectricCreatures, depth + 1);
-				}
-				else
-				{
-					break;
-				}
-			}
-
-			Creature thrownBy = weapon.thrownBy;
-			Creature? c = Extension.FindNearestCreatureDirection(start, weapon.room, false, thrownBy, false, direction, maxAngleDeg, CHAIN_RADIUS);
-
-			if (c != null && !ElectricCreatures.Contains(c))
-			{
-				Vector2 end = c.firstChunk.pos;
-				Room room = c.room;
-				float radius = (end - start).sqrMagnitude;
-
-				if (radius < CHAIN_RADIUS * CHAIN_RADIUS)
-				{
-					ElectricCreatures.Add(c);
-
-					if (c is not BigEel && !CheckElectricCreature(c))
-					{
-						c.Violence(weapon.firstChunk, new Vector2?(Custom.DirVec(start, end) * 5f), c.firstChunk, null, Creature.DamageType.Electric, 0.8f, (c is not Player) ? (320f * Mathf.Lerp(c.Template.baseStunResistance, 1f, 0.5f)) : 140f);
-						room.AddObject(new CreatureSpasmer(c, false, c.stun));
-					}
-					if (weapon.Submersion <= 0.5f && c.Submersion > 0.5f)
-					{
-						room.AddObject(new UnderwaterShock(room, null, end, 10, 800f, 2f, thrownBy, new Color(0.8f, 0.8f, 1f)));
-					}
-					room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, c.firstChunk);
-					room.AddObject(new Explosion.ExplosionLight(start, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
-					for (int i = 0; i < 15; i++)
-					{
-						Vector2 a = Custom.DegToVec(360f * UnityEngine.Random.value);
-						room.AddObject(new MouseSpark(start + a * 9f, weapon.firstChunk.vel + a * 36f * UnityEngine.Random.value, 20f, new Color(0.7f, 1f, 1f)));
-					}
-
-					for (int i = 0; i < Mathf.Clamp(radius / CHAIN_RADIUS * Extension.Random(10, 20), 4, 25); i++)
-					{
-						// 生成一条 0.2 秒、宽度 4、亮度 1 的电弧
-						room.AddObject(new LightningMachine(start, start + Extension.Random(-8f, 8f, -8f, 8f),
-															end + Extension.Random(-8f, 8f, -8f, 8f),
-															1f,           // 立即触发
-															false,        // 非永久
-															false,        // 非径向
-															4f,           // 宽度
-															1f,           // 亮度
-															0.2f));       // 生命周期(秒)
-					}
-					Vector2 dir = (end - start).normalized;
-					float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-					angle += Extension.Random(-45f, 45f);
-					Vector2 newDir = Custom.DegToVec(angle);
-					float nextMax = Mathf.Clamp(maxAngleDeg * 0.9f + Extension.Random(-10f, 10f), 10f, 60f);
-					// 递归调用
-					//ArcLightning(weapon, end, newDir, nextMax, ref ElectricCreatures, depth + 1);
-				}
-			}
-
-			if (depth == 0)
-			{
-				ElectricCreatures.Clear();
-				totalForks = 0;
-			}
-		}
-
-		public static float GetTerrainPercent(Weapon w) => w switch
-		{
-			Spear => 0.85f,
-			Rock => 0.90f,
-			ScavengerBomb => 0.80f,
-			Boomerang => 0.88f,
-			_ => 0.95f
-		};
-
-		public static void ArcLightningTerrainImpact(
-			ref bool Execute,
-			ref PhysicalObject physicalObject)
-		{
-			if (physicalObject != null && physicalObject is Weapon weapon && weapon.thrownBy is Player player && player.GetModule().ArcLightningSkill)
-			{
-				Room room = weapon.room;
-				if (room != null)
-				{
-					float Percent = 0.8f;
-					Percent = GetTerrainPercent(weapon);
-
-					if (Extension.Random(0f, 1f) > Percent && true)
-					{
-						for (int i = 0; i < Extension.Random(5, 25); i++)
-						{
-							room.AddObject(new LightningMachine(weapon.firstChunk.pos, weapon.firstChunk.pos + Extension.Random(-8f, 8f, -8f, 8f),
-																weapon.firstChunk.pos + new Vector2(100, 100) + Extension.Random(-8f, 8f, -8f, 8f),
-																3f,           // 立即触发
-																false,        // 非永久
-																false,        // 非径向
-																50f,           // 宽度
-																5f,           // 亮度
-																40f));       // 生命周期(秒)
-						}
-
-						//HashSet<Creature> hit = new HashSet<Creature>();
-						//ArcLightning(weapon, weapon.firstChunk.pos, weapon.firstChunk.vel.normalized, 60f, ref hit);
-					}
-				}
-			}
-		}
+		private LightningMachine? arcEmitter;
+		private List<Creature> hitCreatures; // 记录已经击中的生物
 
 		public static bool ArcLightningHit<T>(
 			ref bool Execute,
@@ -366,19 +68,419 @@ namespace MySlugcat
 				Room room = weapon.room;
 				if (result.obj is Creature creature && room != null)
 				{
-					float Percent = 0.8f;
-					Percent = GetTerrainPercent(weapon);
-
-					if (Extension.Random(0f, 1f) > Percent && true)
+					int percentage = 2;
+					if (weapon is Spear)
 					{
+						percentage = 8;
+					}
+					else if (weapon is Rock)
+					{
+						percentage = 3;
+					}
+					else if (weapon is ScavengerBomb)
+					{
+						percentage = 1;
+					}
+					else if (weapon is PuffBall)
+					{
+						percentage = 2;
+					}
+					else if (ModManager.MSC && weapon is LillyPuck)
+					{
+						percentage = 6;
+					}
+					else if (ModManager.Watcher && weapon is Boomerang)
+					{
+						percentage = 4;
+					}
 
-						HashSet<Creature> hit = new HashSet<Creature>();
-						//ArcLightning1(weapon, weapon.firstChunk.pos, weapon.firstChunk.vel.normalized, 60f, ref hit);
+					if (percentage > UnityEngine.Random.Range(0, 100))
+					{
+						// 创建雷电实例
+						var lightning = new ArcLightning(creature, weapon.firstChunk.vel, room, player, creature, 60f, 500f, 8);
+
+						// 执行雷电效果（可以多次调用）
+						lightning.Execute();
 					}
 				}
 			}
 			return return_;
-		}*/
+		}
+
+		/// <summary>
+		/// 创建雷电链实例
+		/// </summary>
+		public ArcLightning(Creature initialCreature, Vector2 direction, Room room, Creature thrownBy,
+						   Creature sourceCreature, float maxAngle = 60f, float maxDistance = 300f,
+						   int maxChains = 3) // 默认最多连锁3次
+		{
+			this.initialCreature = initialCreature;
+			this.direction = direction;
+			this.room = room;
+			this.thrownBy = thrownBy;
+			this.sourceCreature = sourceCreature;
+			this.maxAngle = maxAngle;
+			this.maxDistance = maxDistance;
+			this.maxChains = maxChains;
+			this.chainCount = 0;
+			this.hitCreatures = new List<Creature>();
+
+			// 添加初始排除的生物
+			if (sourceCreature != null)
+			{
+				hitCreatures.Add(sourceCreature);
+			}
+		}
+
+		/// <summary>
+		/// 执行雷电链效果
+		/// </summary>
+		public void Execute()
+		{
+			Log.OutputLog($"Spear _OK1 - Chain {chainCount + 1}");
+
+			Vector2 start = initialCreature.firstChunk.pos;
+
+			// 寻找最近的生物目标（排除所有已经击中的生物）
+			Creature? c = FindNextTarget(start, direction.normalized);
+
+			if (c != null)
+			{
+				Log.OutputLog($"Spear _OK2 - Hit {c.GetType()}");
+
+				Vector2 end = c.firstChunk.pos;
+
+				// 创建闪电效果
+				CreateLightningEffect(start, end, c); // 添加目标生物参数
+
+				// 对目标造成伤害
+				ApplyDamageToTarget(start, end, c);
+
+				// 添加水中效果
+				ApplyUnderwaterEffects(end, c);
+
+				// 添加音效和光效
+				AddSoundAndLightEffects(start, c);
+
+				// 记录击中的生物
+				hitCreatures.Add(c);
+				chainCount++;
+
+				// 如果还有连锁次数，继续连锁
+				if (chainCount < maxChains)
+				{
+					// 从当前目标继续连锁
+					ChainToNextTarget(c, end);
+				}
+
+				Log.OutputLog($"Spear _OK6 - Chain completed");
+			}
+
+			Log.OutputLog($"Spear _OK5 - Chain search ended");
+		}
+
+		/// <summary>
+		/// 寻找下一个目标（排除所有已击中生物）
+		/// </summary>
+		private Creature? FindNextTarget(Vector2 startPos, Vector2 searchDirection)
+		{
+			// 使用扩展方法寻找目标，排除所有已经击中的生物
+			var target = Extension.FindNearestCreatureDirection(
+				startPos,
+				room,
+				false,
+				hitCreatures,
+				true,
+				searchDirection,
+				maxAngle,
+				maxDistance
+			);
+			if (target != null && !hitCreatures.Contains(target))
+			{
+				return target;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// 创建闪电视觉效果
+		/// </summary>
+		private void CreateLightningEffect(Vector2 start, Vector2 end, Creature target)
+		{
+			arcEmitter = new LightningMachine(
+				pos: start,
+				startPoint: Vector2.zero,
+				endPoint: end - start,
+				chance: 0.4f,
+				permanent: false,
+				radial: false,
+				width: 0.2f,
+				intensity: 1f,
+				lifeTime: 20f
+			);
+
+			arcEmitter.lightningType = 0.66f;
+			room.AddObject(arcEmitter);
+
+			// 启动5秒后销毁的协程，并传递目标生物和初始生物
+			room.AddObject(new DestroyLightningAfterDelay(arcEmitter, thrownBy, target, initialCreature, 300));
+		}
+
+		/// <summary>
+		/// 对目标造成伤害
+		/// </summary>
+		private void ApplyDamageToTarget(Vector2 start, Vector2 end, Creature target)
+		{
+			if (target is not BigEel && !CheckElectricCreature(target))
+			{
+				target.Violence(thrownBy.firstChunk, new Vector2?(Custom.DirVec(start, end) * 5f),
+							   target.firstChunk, null, Creature.DamageType.Electric, 0.8f,
+							   (target is not Player) ? (320f * Mathf.Lerp(target.Template.baseStunResistance, 1f, 0.5f)) : 140f);
+				target.stun = Math.Max(target.stun, 300);
+				room.AddObject(new CreatureSpasmer(target, false, target.stun));
+			}
+		}
+
+		private static void ApplyDamageToTarget(Vector2 start, Vector2 end, Creature target, Room room, Creature thrownBy)
+		{
+			if (target is not BigEel && !CheckElectricCreature(target))
+			{
+				target.Violence(thrownBy.firstChunk, new Vector2?(Custom.DirVec(start, end) * 5f),
+							   target.firstChunk, null, Creature.DamageType.Electric, 0.1f,
+							   (target is not Player) ? (320f * Mathf.Lerp(target.Template.baseStunResistance, 1f, 0.5f)) : 140f);
+				target.stun = Math.Max(target.stun, 10);
+				room.AddObject(new CreatureSpasmer(target, false, target.stun));
+			}
+		}
+
+		/// <summary>
+		/// 添加水中效果
+		/// </summary>
+		private void ApplyUnderwaterEffects(Vector2 end, Creature target)
+		{
+			if (target.Submersion > 0.5f)
+			{
+				room.AddObject(new UnderwaterShock(room, null, end, 10, 800f, 2f, thrownBy, new Color(0.8f, 0.8f, 1f)));
+			}
+		}
+
+		/// <summary>
+		/// 添加音效和光效
+		/// </summary>
+		private void AddSoundAndLightEffects(Vector2 start, Creature target)
+		{
+			room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, target.firstChunk);
+			room.AddObject(new Explosion.ExplosionLight(start, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
+		}
+
+		/// <summary>
+		/// 继续连锁到下一个目标
+		/// </summary>
+		private void ChainToNextTarget(Creature currentTarget, Vector2 currentPos)
+		{
+			// 稍微延迟一下再连锁，让效果更自然
+			room.AddObject(new ChainDelay(this, currentTarget, currentPos, 10)); // 10帧后继续连锁
+		}
+
+		/// <summary>
+		/// 延迟连锁的协程
+		/// </summary>
+		private class ChainDelay : UpdatableAndDeletable
+		{
+			private ArcLightning parent;
+			private Creature currentTarget;
+			private Vector2 currentPos;
+			private int delay;
+			private int timer;
+
+			public ChainDelay(ArcLightning parent, Creature currentTarget, Vector2 currentPos, int delayFrames)
+			{
+				this.parent = parent;
+				this.currentTarget = currentTarget;
+				this.currentPos = currentPos;
+				this.delay = delayFrames;
+				this.timer = 0;
+			}
+
+			public override void Update(bool eu)
+			{
+				base.Update(eu);
+
+				timer++;
+				if (timer >= delay)
+				{
+					// 从当前目标的位置和方向创建新的连锁
+					Vector2 newDirection = (currentPos - parent.initialCreature.firstChunk.pos).normalized;
+					var nextLightning = new ArcLightning(
+						currentTarget,
+						newDirection,
+						parent.room,
+						parent.thrownBy,
+						parent.sourceCreature,
+						parent.maxAngle,
+						parent.maxDistance * 0.8f, // 每次连锁距离减少
+						parent.maxChains
+					);
+
+					// 复制已经击中的生物列表
+					foreach (var hit in parent.hitCreatures)
+					{
+						nextLightning.hitCreatures.Add(hit);
+					}
+
+					nextLightning.chainCount = parent.chainCount;
+					nextLightning.Execute();
+
+					this.Destroy();
+				}
+			}
+		}
+
+		/// <summary>
+		/// 检查生物是否对电击免疫
+		/// </summary>
+		public static bool CheckElectricCreature(Creature otherObject)
+		{
+			return otherObject is Centipede || otherObject is BigJellyFish || otherObject is Inspector;
+		}
+
+		/// <summary>
+		/// 延迟销毁LightningMachine的协程类（增加生物状态检查和移动跟随）
+		/// </summary>
+		private class DestroyLightningAfterDelay : UpdatableAndDeletable
+		{
+			private LightningMachine lightning;
+			private Creature thrownBy;
+			private Creature targetCreature;     // 目标生物（闪电终点）
+			private Creature initialCreature;    // 初始生物（闪电起点）
+			private int delay;
+			private int timer;
+			private Vector2 originalStartPos;    // 原始起始位置
+			private int lastFrameSkillTick = -100;
+
+			public DestroyLightningAfterDelay(LightningMachine lightning, Creature thrownBy, Creature targetCreature, Creature initialCreature, int delayFrames)
+			{
+				this.lightning = lightning;
+				this.thrownBy = thrownBy;
+				this.targetCreature = targetCreature;
+				this.initialCreature = initialCreature;
+				this.delay = delayFrames;
+				this.timer = 0;
+				this.originalStartPos = lightning.pos;
+			}
+
+			public override void Update(bool eu)
+			{
+				base.Update(eu);
+
+				// 每帧更新闪电的位置，让闪电跟随生物移动
+				if (lightning != null && !lightning.slatedForDeletetion)
+				{
+					Vector2 currentStartPos = originalStartPos;
+					Vector2 currentEndPos = originalStartPos;
+
+					// 更新起始点（跟随初始生物）
+					if (initialCreature != null && initialCreature.firstChunk != null &&
+						!initialCreature.dead && !initialCreature.slatedForDeletetion)
+					{
+						currentStartPos = initialCreature.firstChunk.pos;
+					}
+
+					// 更新终点（跟随目标生物）
+					if (targetCreature != null && targetCreature.firstChunk != null &&
+						!targetCreature.dead && !targetCreature.slatedForDeletetion)
+					{
+						currentEndPos = targetCreature.firstChunk.pos;
+					}
+
+					// 更新闪电位置
+					lightning.pos = currentStartPos;
+					lightning.startPoint = Vector2.zero;
+					lightning.endPoint = currentEndPos - currentStartPos;
+
+					// 强制刷新闪电（如果需要）
+					// lightning.Reset();
+
+					int now = room?.world?.game?.clock ?? -1;
+					if (Math.Abs(now - lastFrameSkillTick) > 10 && targetCreature != null && initialCreature != null && room != null)
+					{
+						lastFrameSkillTick = now;
+						ApplyDamageToTarget(currentStartPos, currentEndPos, initialCreature, room, thrownBy);
+						ApplyDamageToTarget(currentStartPos, currentEndPos, targetCreature, room, thrownBy);
+					}
+				}
+
+				bool shouldDestroy = false;
+				string reason = "";
+
+				// 检查初始生物状态
+				if (initialCreature != null)
+				{
+					/*if (initialCreature.dead)
+					{
+						shouldDestroy = true;
+						reason = "initial creature died";
+					}*/
+					if (initialCreature.slatedForDeletetion || initialCreature.room == null)
+					{
+						shouldDestroy = true;
+						reason = "initial creature removed";
+					}
+				}
+
+				// 检查目标生物状态
+				if (targetCreature != null)
+				{
+					/*if (targetCreature.dead)
+					{
+						shouldDestroy = true;
+						reason = "target died";
+					}*/
+					if (targetCreature.stun <= 0)
+					{
+						shouldDestroy = true;
+						reason = "target woke up";
+					}
+					else if (targetCreature.slatedForDeletetion || targetCreature.room == null)
+					{
+						shouldDestroy = true;
+						reason = "target removed";
+					}
+					else if (targetCreature.firstChunk != null &&
+							 Vector2.Distance(originalStartPos, targetCreature.firstChunk.pos) > 500f)
+					{
+						shouldDestroy = true;
+						reason = "target moved too far";
+					}
+				}
+
+				// 时间检查
+				timer++;
+				if (timer >= delay)
+				{
+					shouldDestroy = true;
+					reason = "time expired";
+				}
+
+				// 闪电本身已经被销毁
+				if (lightning == null || lightning.slatedForDeletetion)
+				{
+					shouldDestroy = true;
+					reason = "lightning already destroyed";
+				}
+
+				if (shouldDestroy)
+				{
+					if (lightning != null && !lightning.slatedForDeletetion)
+					{
+						lightning.Destroy();
+						Log.OutputLog($"Lightning destroyed: {reason}");
+					}
+					this.Destroy();
+				}
+			}
+		}
 
 	}
 }

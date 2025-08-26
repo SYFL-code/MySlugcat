@@ -383,48 +383,106 @@ namespace MySlugcat
 			Vector2 selfPos,
 			Room room,
 			bool includePlayer,
-			Creature? exclude,
+			List<Creature> exclude,
 			bool includeDead,
 			Vector2 forward,          // 正前方向量（不必单位化）
 			float maxAngleDeg,        // 扇形 半 角（度）
 			float maxDist,
 			int filter = 0)           // 0=全部 1=非禁用 2=非无害
 		{
-			if (room?.abstractRoom?.creatures == null) return null;
-			if (forward.sqrMagnitude < 1E-4f) return null;
+			// 检查房间和生物列表是否为空
+			if (room == null || room.abstractRoom == null || room.abstractRoom.creatures == null)
+			{
+				Log.OutputLog("Room or abstractRoom or creatures is null.");
+				return null;
+			}
+
+			// 检查方向向量是否有效
+			if (forward.sqrMagnitude < 1E-4f)
+			{
+				Log.OutputLog("Forward vector is too small.");
+				return null;
+			}
 
 			Creature? nearest = null;
 			float minDistSq = float.MaxValue;
 			Vector2 dirNorm = forward.normalized;
 			float cosLimit = Mathf.Cos(maxAngleDeg * Mathf.Deg2Rad);
 
+			Log.OutputLog($"Starting search for nearest creature from position {selfPos} in room {room}.");
+
 			foreach (var abs in room.abstractRoom.creatures)
 			{
 				var c = abs.realizedCreature;
-				if (c == null || c == exclude || c.mainBodyChunk == null) continue;
+				if (c == null || exclude.Contains(c) || c.mainBodyChunk == null)
+				{
+					Log.OutputLog($"Skipping creature {c?.GetType()} due to null check or exclusion.");
+					continue;
+				}
 
 				Vector2 toTarget = c.mainBodyChunk.pos - selfPos;
 				float distSq = toTarget.sqrMagnitude;
-				if (distSq > maxDist * maxDist) continue;
+				if (distSq > maxDist * maxDist)
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} due to distance check.");
+					continue;
+				}
 
-				if (!includePlayer && c is Player) continue;
-				if (!includeDead && c.dead) continue;
+				if (!includePlayer && c is Player)
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} because it is a player and includePlayer is false.");
+					continue;
+				}
 
-				if (filter == 1 && DisabledCreature(c)) continue;
-				if (filter == 2 && IsHarmlessCreature(c)) continue;
+				if (!includeDead && c.dead)
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} because it is dead and includeDead is false.");
+					continue;
+				}
+
+				if (filter == 1 && DisabledCreature(c))
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} because it is disabled and filter is 1.");
+					continue;
+				}
+
+				if (filter == 2 && IsHarmlessCreature(c))
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} because it is harmless and filter is 2.");
+					continue;
+				}
 
 				// 扇形检测：向量夹角余弦 ≥ cosLimit
-				if (Vector2.Dot(dirNorm, toTarget.normalized) < cosLimit) continue;
+				if (toTarget.sqrMagnitude < 1E-4f || Vector2.Dot(dirNorm, toTarget.normalized) < cosLimit)
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} due to angle check.");
+					continue;
+				}
 
 				Trace(selfPos, c.mainBodyChunk.pos, room, out bool isTerrain);
-				if (isTerrain) continue;
+				if (isTerrain)
+				{
+					Log.OutputLog($"Skipping creature {c.GetType()} because there is terrain blocking the way.");
+					continue;
+				}
 
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
 					nearest = c;
+					Log.OutputLog($"Found a closer creature: {c.GetType()} at distance {Mathf.Sqrt(distSq)}.");
 				}
 			}
+
+			if (nearest == null)
+			{
+				Log.OutputLog("No creature found within the specified parameters.");
+			}
+			else
+			{
+				Log.OutputLog($"Nearest creature found: {nearest.GetType()} at distance {Mathf.Sqrt(minDistSq)}.");
+			}
+
 			return nearest;
 		}
 

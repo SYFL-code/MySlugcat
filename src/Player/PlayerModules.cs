@@ -355,8 +355,8 @@ internal static class PlayerModuleManager
 				SpawnNecrophytes = true;//
 				FixedSkill = false;
 				KillingAuraSkill = false;//f
-				PenetrationSkill = true;//
-				ArcLightningSkill = false;//
+				PenetrationSkill = false;//
+				ArcLightningSkill = true;//
 				Swift = 0;
 
 				var session = player?.room?.game?.GetStorySession;

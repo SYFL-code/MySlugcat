@@ -282,13 +282,6 @@ namespace MySlugcat
 							//震动强度
 							weapon.vibrate = 20;
 
-							//Log.OutputLog($"Spear _OK1");
-							//HashSet<Creature> hit = new HashSet<Creature>();
-							//hit.Add(creature);
-							//room.AddObject(new ArcLightning(weapon.firstChunk.pos, creature, weapon.firstChunk.vel.normalized, 60f, weapon.thrownBy, ref hit));
-							//Log.OutputLog($"Spear _OK2");
-
-
 							// 屏幕震动
 							//room.ScreenMovement(null, dir, strength);
 						}
@@ -307,6 +300,7 @@ namespace MySlugcat
 				return return_;
 			}
 		}
+
 
 	}
 }

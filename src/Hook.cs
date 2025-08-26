@@ -876,7 +876,7 @@ namespace MySlugcat
 				if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref spear, ref result, ref eu);
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref spear, ref result, ref eu);
 				if (!Execute) return ret;
@@ -899,11 +899,11 @@ namespace MySlugcat
 			{
 				ret = FrameSkill.ScavengerBomb_HitSomething(ref Execute, ref ret, ref orig, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
-				//if (!Execute) return ret;
-				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref bomb, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -923,11 +923,11 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref rock, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref rock, ref result, ref eu);
-				//if (!Execute) return ret;
-				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref rock, ref result, ref eu);
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref rock, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -946,11 +946,11 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
-				//if (!Execute) return ret;
-				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref boomerang, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}
@@ -969,10 +969,12 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
-				//if (!Execute) return ret;
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref lillyPuck, ref result, ref eu);
+				if (!Execute) return ret;
 
 			}
 			catch (Exception e)
@@ -990,10 +992,12 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
+				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
+				if (!Execute) return ret;
 				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
 				if (!Execute) return ret;
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
-				//if (!Execute) return ret;
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref puffBall, ref result, ref eu);
+				if (!Execute) return ret;
 			}
 			catch (Exception e)
 			{
@@ -1011,9 +1015,11 @@ namespace MySlugcat
 			bool ret = false;
 			try
 			{
-				//ret = ArcLightningSkill.ArcLightningHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
-				//if (!Execute) return ret;
 				ret = PenetrationSkill.PenetrateHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
+				if (!Execute) return ret;
+				ret = DeflagrationSkill.DeflagrationHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
+				if (!Execute) return ret;
+				ret = ArcLightning.ArcLightningHit(ref Execute, ref ret, ref weapon, ref result, ref eu);
 				if (!Execute) return ret;
 
 			}

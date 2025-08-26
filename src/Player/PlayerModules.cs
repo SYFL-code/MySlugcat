@@ -347,15 +347,15 @@ internal static class PlayerModuleManager
 				Hunger = true;
 				VisionSystem = true;
 
-				FrameSkill = false;//
+				FrameSkill = true;//
 				DeflagrationSkill = true;//
-				KnitmeshSkill = false;//
+				KnitmeshSkill = true;//
 				PerceptionSkill = true;//
-				DigestionSkill = false;//
-				SpawnNecrophytes = false;//
+				DigestionSkill = true;//
+				SpawnNecrophytes = true;//
 				FixedSkill = false;
 				KillingAuraSkill = false;//f
-				PenetrationSkill = false;//
+				PenetrationSkill = true;//
 				ArcLightningSkill = false;//
 				Swift = 0;
 
